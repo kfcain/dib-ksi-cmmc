@@ -1,0 +1,348 @@
+{
+  "registry": "DIB-KSI collection",
+  "version": "0.4.0",
+  "date": "2026-07-25",
+  "supersedes": "ontology/collectors.json (0.3.0), which conflated three separate things: the baseline that defines a requirement, the method used to read state, and the product that happens to implement that method.",
+  "premise": "This framework does not maintain a list of approved products, and it should not be read as endorsing any tool named here. A measurement is fed by whatever can retrieve the state and emit a conforming reading — a vendor API, a webhook, an agent, a SIEM query, a CI job, a spreadsheet export, a script somebody wrote on a Tuesday. What the framework is definitive about is the shape of the reading and the assurance properties of the method that produced it. Anything meeting the interface below is a valid collector.",
+  "separation_of_concerns": {
+    "statement": "Three things get confused constantly, including by earlier versions of this file. They are separate and belong in separate fields.",
+    "concerns": [
+      {
+        "concern": "Criteria source",
+        "answers": "What does good look like, and who says so?",
+        "examples": "CISA SCuBA secure configuration baselines, CIS Benchmarks, DISA STIGs, vendor security baselines, the CISA KEV catalogue, NIST CMVP, or your own documented policy.",
+        "field": "signals[].authority",
+        "note": "SCuBA and CIS are baselines. They define the bar. They are not collectors, and a tool that ships a baseline is not the same thing as the baseline it ships."
+      },
+      {
+        "concern": "Collection method",
+        "answers": "How is the state actually retrieved?",
+        "examples": "Authenticated API pull, pushed webhook, agent self-report, log query, config scan, admission-control decision, pipeline gate, outside-in probe, system-of-record query, attested human record.",
+        "field": "signals[].methods",
+        "note": "This is the part that determines assurance properties — provenance, independence, freshness — so this is the part the framework constrains."
+      },
+      {
+        "concern": "Implementation",
+        "answers": "What are you actually running?",
+        "examples": "Anything. The list in this file is illustrative and deliberately incomplete.",
+        "field": "not modelled per signal",
+        "note": "Naming products per signal would date the framework within a release cycle and would quietly exclude every environment that made a different choice."
+      }
+    ]
+  },
+  "interface": {
+    "statement": "A collector is anything that emits this shape. There is no registration, no approval, and no vendor list. If a reading carries these fields and can be re-derived from the source named in it, the framework will grade it.",
+    "required": [
+      {
+        "field": "signal",
+        "description": "The measurement this reading feeds."
+      },
+      {
+        "field": "observed_at",
+        "description": "When the state was read, not when the record was written."
+      },
+      {
+        "field": "method",
+        "description": "One of the method ids below. Determines how independence and freshness are judged."
+      },
+      {
+        "field": "source",
+        "description": "The system that produced it, specifically enough that somebody else could go re-read the same thing."
+      },
+      {
+        "field": "population",
+        "description": "The denominator, and where it came from. For coverage measurements this must be the authoritative inventory, never the reporting tool's own list of things it already knows about."
+      }
+    ],
+    "conditional": [
+      {
+        "field": "uncovered",
+        "when": "kind is coverage",
+        "description": "Named subjects not covered. Named, because a percentage cannot be remediated."
+      },
+      {
+        "field": "value",
+        "when": "kind is range or threshold",
+        "description": "The measured number."
+      },
+      {
+        "field": "exceptions",
+        "when": "any subject is uncovered",
+        "description": "Each carrying a justification and an expiry date."
+      }
+    ],
+    "optional": [
+      {
+        "field": "provenance",
+        "description": "Signature, hash, transcript, or query text — whatever lets a reviewer reproduce the reading rather than trust it."
+      },
+      {
+        "field": "evidence_ref",
+        "description": "Pointer to the raw artifact in evidence storage."
+      }
+    ],
+    "denominator_warning": "The most common way an honest pipeline reports a false number: coverage computed against the tool's own inventory rather than the organisation's. An endpoint platform that reports 100% agent health across the endpoints it can see says nothing about the laptop that has never had the agent installed. Every coverage reading names where its denominator came from for exactly this reason."
+  },
+  "methods": [
+    {
+      "id": "platform-api",
+      "name": "Authenticated API query against a control plane",
+      "direction": "pull",
+      "description": "REST, GraphQL, SDK, or CLI query against the management plane that holds the state — an identity provider, cloud provider, SaaS admin API, MDM, EDR console, vulnerability platform, ticketing system, or anything else with an interface.",
+      "freshness": "on-demand, so cadence is whatever you schedule",
+      "provenance": "Strong when the query text and the response are both retained. Weak when only a summary is kept.",
+      "control_plane": "The queried platform. Two queries against the same platform are one reading for independence purposes, however different the tools issuing them.",
+      "denominator_risk": "high — the platform reports what it manages, which is rarely the whole estate"
+    },
+    {
+      "id": "event-stream",
+      "name": "Pushed event or webhook",
+      "direction": "push",
+      "description": "The source pushes state changes as they happen — webhooks, event buses, message queues, streaming telemetry, cloud audit event feeds.",
+      "freshness": "continuous, which makes drift visible between scheduled reads",
+      "provenance": "Strong for change detection, weak for current state. An event stream tells you what moved, not what is true now; pair it with a periodic pull.",
+      "control_plane": "The emitting platform.",
+      "denominator_risk": "very high — an absence of events is not evidence of compliance, it is equally consistent with a broken feed"
+    },
+    {
+      "id": "agent-report",
+      "name": "Agent on the asset reports its own state",
+      "direction": "push",
+      "description": "Endpoint agent, configuration management client, or host daemon reporting from the asset itself.",
+      "freshness": "continuous while healthy",
+      "provenance": "Good for host-local facts no control plane can see. Circular for the question of whether the agent is installed, which is why agent coverage is measured against the inventory rather than against the agent fleet.",
+      "control_plane": "The asset, aggregated by its management console.",
+      "denominator_risk": "very high — an agent cannot report about a host it is not on"
+    },
+    {
+      "id": "log-query",
+      "name": "Query over retained logs",
+      "direction": "pull",
+      "description": "Search across a SIEM, log platform, data lake, or warehouse holding retained telemetry.",
+      "freshness": "bounded by ingestion lag and retention window",
+      "provenance": "Strong when the query is retained with the result. This is usually the only method that can answer historical questions, which is what the higher assurance classes ask for.",
+      "control_plane": "The log platform, which is often independent of the system that generated the events — one of the few genuinely independent second reads available.",
+      "denominator_risk": "high — you can only query what was onboarded, and log source coverage is itself a measurement"
+    },
+    {
+      "id": "config-scan",
+      "name": "Assessment against structured content",
+      "direction": "pull",
+      "description": "A host, image, container, or configuration evaluated against machine-readable criteria content — SCAP, benchmark profiles, compliance-as-code profiles, image scanners.",
+      "freshness": "point-in-time per scan",
+      "provenance": "Strong. The content, the target, and the result together are reproducible.",
+      "control_plane": "The scanned target.",
+      "denominator_risk": "moderate — scan scope is explicit, but unscanned assets are invisible"
+    },
+    {
+      "id": "admission-control",
+      "name": "Policy decision at admission time",
+      "direction": "push",
+      "description": "A policy engine evaluating a change as it is requested — Kubernetes admission, cloud policy engines, resource-level guardrails.",
+      "freshness": "continuous, at the moment of change",
+      "provenance": "Strong, and preventive rather than detective: it records what was refused, not just what exists.",
+      "control_plane": "The orchestrator or cloud control plane.",
+      "denominator_risk": "low for what it governs, total for what routes around it"
+    },
+    {
+      "id": "pipeline-check",
+      "name": "Gate in the build or deployment pipeline",
+      "direction": "push",
+      "description": "Evaluation of code, infrastructure-as-code, dependencies, or images before merge or release.",
+      "freshness": "per build",
+      "provenance": "Strong. The run is logged, attributable to a commit, and re-runnable.",
+      "control_plane": "The CI/CD system.",
+      "denominator_risk": "moderate — governs what ships through the pipeline, not what was changed by hand"
+    },
+    {
+      "id": "external-probe",
+      "name": "Outside-in observation",
+      "direction": "pull",
+      "description": "Observation requiring no privileged access — public DNS records, TLS configuration, certificate transparency, exposed service enumeration, breach and credential exposure feeds.",
+      "freshness": "on-demand",
+      "provenance": "Strong and adversary-equivalent: it sees what an attacker sees, and does not depend on the organisation's own instrumentation being honest or working.",
+      "control_plane": "None. Independent of every internal system, which makes it valuable as a second read.",
+      "denominator_risk": "low for what is externally visible, total for anything that is not"
+    },
+    {
+      "id": "record-system",
+      "name": "Query against a system of record",
+      "direction": "pull",
+      "description": "Process facts held in business systems — ticketing and change management, HR and directory records, learning management, asset and contract systems, procurement.",
+      "freshness": "as current as the business process feeding it",
+      "provenance": "Good for process facts, and the only practical source for several human-centred requirements. It measures the record, not the reality behind it.",
+      "control_plane": "The business system.",
+      "denominator_risk": "high — an incomplete roster produces a flattering training-coverage number"
+    },
+    {
+      "id": "attested-record",
+      "name": "Human-produced record with provenance",
+      "direction": "push",
+      "description": "Demonstrations, exercises, restore tests, walkthroughs, interviews, physical inspections, and reporting-path drills. Any requirement no query can answer.",
+      "freshness": "point-in-time, per exercise",
+      "provenance": "Depends entirely on what is retained. A dated record naming who did what, with the artifacts produced, is evidence. An assertion that it happened is not.",
+      "control_plane": "None.",
+      "denominator_risk": "n/a",
+      "note": "Roughly a third of the catalogue is judgment, physical, or human. Naming this as a method keeps that honest instead of implying the whole framework is automated."
+    },
+    {
+      "id": "inherited-feed",
+      "name": "Reading relayed from a provider",
+      "direction": "push",
+      "description": "A validated reading the tenant did not collect, delivered by a service provider for a control the provider operates. The collection happened on the provider side by some other method; this is the transport and the attestation around it.",
+      "freshness": "as fresh as the feed, which is itself a measurement — see SIG-INHERIT-FRESH",
+      "provenance": "Only as strong as what the feed carries. A signed reading naming the provider-side method and population is evidence; a green tile on a portal is not.",
+      "control_plane": "The provider. Independent of the tenant, and shared with every other tenant of that provider — which is why a provider-side failure is correlated across its customers rather than isolated.",
+      "denominator_risk": "high — the provider measures its own estate, and the tenant must confirm the reading covers the tenant’s controlled data specifically",
+      "note": "This is the method behind every inherited control. When the feed goes quiet everything inherited through it ages out together and reports stale, because the tenant has stopped receiving evidence the protection is running."
+    },
+    {
+      "id": "derived",
+      "name": "Computed from other readings",
+      "direction": "n/a",
+      "description": "No independent collection. The value is a function of other measurements already in the graph.",
+      "freshness": "inherits the oldest input, and goes stale when any input does",
+      "provenance": "Only as good as its inputs, and it must name them.",
+      "control_plane": "Inherits from inputs, and therefore never counts as an independent second read.",
+      "denominator_risk": "inherited"
+    }
+  ],
+  "independence": {
+    "statement": "Class C and above require two independent methods per automatable indicator. Independence is structural, not a matter of running two products.",
+    "rule": "Two readings are independent when they originate from different control planes. Different methods against the same control plane are a weaker form and count only where noted; the same method against the same control plane never counts twice.",
+    "worked_examples": [
+      {
+        "pair": "Identity provider API + a tool that queries the same identity provider",
+        "independent": false,
+        "why": "One control plane. Two vendors reading the same tenant configuration produce one fact, twice."
+      },
+      {
+        "pair": "Identity provider API + SIEM query over authentication logs",
+        "independent": true,
+        "why": "Different control planes, and the log platform would have to be independently wrong to agree."
+      },
+      {
+        "pair": "Endpoint agent self-report + asset inventory from the network or procurement side",
+        "independent": true,
+        "why": "This is the pairing that catches the machine with no agent, which is the only interesting case."
+      },
+      {
+        "pair": "Internal TLS configuration scan + external probe of the same endpoint",
+        "independent": true,
+        "why": "The external view does not depend on internal instrumentation working or being truthful."
+      },
+      {
+        "pair": "Two cloud security tools reading the same account",
+        "independent": false,
+        "why": "Same control plane. Broad coverage is not the same property as independence."
+      }
+    ]
+  },
+  "criteria_sources": {
+    "statement": "What a reading is evaluated against. These define the bar; they do not collect anything. A signal cites one of these in its authority field, or declares itself a local policy choice.",
+    "sources": [
+      {
+        "id": "cisa-scuba",
+        "name": "CISA SCuBA Secure Configuration Baselines",
+        "covers": "Microsoft 365, Google Workspace",
+        "form": "policy statements with SHALL / SHOULD criticality",
+        "licence": "CC0-1.0",
+        "url": "https://github.com/cisagov/ScubaGear",
+        "note": "Binding on federal civilian agencies under BOD 25-01; recommended by CISA for all stakeholders."
+      },
+      {
+        "id": "cis-benchmarks",
+        "name": "CIS Benchmarks",
+        "covers": "operating systems, cloud providers, platforms, containers",
+        "form": "consensus configuration benchmarks with profile levels",
+        "note": "Widely adopted and broad, but licensed content — check terms before redistributing."
+      },
+      {
+        "id": "disa-stig",
+        "name": "DISA STIGs and SRGs",
+        "covers": "operating systems, applications, network devices",
+        "form": "hardening requirements with severity categories",
+        "note": "Not required by CMMC or 800-171. Frequently assumed to be; it is worth checking your contract rather than your instincts."
+      },
+      {
+        "id": "vendor-baseline",
+        "name": "Vendor security baselines",
+        "covers": "the vendor's own platform",
+        "form": "recommended configuration published by the platform owner",
+        "note": "Authoritative about intent, and sometimes weaker than an independent baseline about risk."
+      },
+      {
+        "id": "cisa-kev",
+        "name": "CISA Known Exploited Vulnerabilities catalogue",
+        "covers": "vulnerabilities under active exploitation",
+        "form": "an enumerated list with remediation due dates",
+        "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+      },
+      {
+        "id": "nist-cmvp",
+        "name": "NIST Cryptographic Module Validation Program",
+        "covers": "validated cryptographic modules",
+        "form": "certificate records with operational environment bounds and status",
+        "note": "Status matters as much as the certificate: sunset, historical, and revoked modules still appear in search results."
+      },
+      {
+        "id": "nist-800-171",
+        "name": "NIST SP 800-171 and 800-171A",
+        "covers": "protection of controlled unclassified information",
+        "form": "requirements and assessment objectives"
+      },
+      {
+        "id": "contract-clause",
+        "name": "Contract clauses",
+        "covers": "reporting obligations and safeguarding terms",
+        "form": "flowed-down contractual requirement",
+        "note": "The only category here that is legally binding on its own."
+      },
+      {
+        "id": "local-policy",
+        "name": "Local policy",
+        "covers": "anything no external authority sets a bar for",
+        "form": "documented internal decision with a rationale",
+        "note": "Half the measurements in this framework fall here, and each says so rather than implying an authority it does not have."
+      }
+    ]
+  },
+  "example_implementations": {
+    "statement": "ILLUSTRATIVE AND DELIBERATELY INCOMPLETE. Not endorsements, not requirements, not a shortlist. They exist to answer 'what would this look like in practice' for someone who has not built a pipeline before, and they will date faster than anything else in this repository. Any product, script, or platform meeting the interface above is equally valid, including one you write yourself.",
+    "by_method": {
+      "platform-api": "Identity providers, cloud provider APIs, MDM and UEM consoles, EDR platforms, vulnerability management platforms, SaaS admin APIs, CSPM and CNAPP tools, backup platforms, or a script hitting any of the same endpoints. Baseline-evaluating tools such as ScubaGear, ScubaGoggles, CIS-CAT, and open-source cloud scanners also sit here — each is one implementation that bundles a criteria source with an API pull.",
+      "event-stream": "Cloud audit event feeds, SaaS webhooks, message queues, streaming telemetry pipelines, alerting integrations.",
+      "agent-report": "Endpoint detection agents, configuration management clients, host compliance daemons, patch management clients.",
+      "log-query": "SIEM platforms, log analytics services, data warehouses and lakehouses holding retained telemetry.",
+      "config-scan": "SCAP-based scanners, benchmark assessment tools, compliance-as-code profile runners, container and image scanners.",
+      "admission-control": "Kubernetes admission controllers, cloud-native policy engines, resource guardrail services.",
+      "pipeline-check": "Policy-as-code evaluators in CI, IaC scanners, dependency and secret scanners, signed-build attestation.",
+      "external-probe": "DNS and TLS inspection, certificate transparency monitoring, attack-surface management services, credential exposure feeds.",
+      "record-system": "Ticketing and change management, HR and directory systems, learning management platforms, asset and contract registers.",
+      "attested-record": "Exercise reports, restore-test records, walkthrough notes, signed inspection records — structured into the reading shape rather than filed as prose.",
+      "derived": "Your own computation over readings already in the graph."
+    },
+    "known_traps": [
+      {
+        "trap": "Licence-gated downloads",
+        "detail": "Tools that were freely available can move behind a licence. Check the current terms rather than the blog post that recommended it."
+      },
+      {
+        "trap": "Archived and end-of-life projects",
+        "detail": "Several widely cited scanners are archived, folded into other products, or closed to new customers. A GitHub star count is not a maintenance signal."
+      },
+      {
+        "trap": "Alpha maturity",
+        "detail": "Some publishers label their own tools alpha. Treat results as indicative until they say otherwise."
+      },
+      {
+        "trap": "Exit codes that mean scan health",
+        "detail": "Some tools return success when the scan completed, regardless of what it found. Wiring that into a gate produces a permanently green pipeline."
+      },
+      {
+        "trap": "Partial content coverage",
+        "detail": "Only a minority of published hardening guides ship machine-readable content, so automated coverage of a benchmark is usually narrower than the benchmark itself."
+      }
+    ]
+  }
+}

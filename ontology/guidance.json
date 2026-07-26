@@ -1,0 +1,105 @@
+{
+  "registry": "DIB-KSI guidance",
+  "version": "0.1.1",
+  "date": "2026-07-25",
+  "premise": "An indicator statement says what must be true. It does not tell a reader what doing it looks like, what they would hand over, or how anyone would check it without a person in the loop. This file answers those four questions in plain language for the indicators a tenant owns alone, because those are the ones where the reader personally has to act.",
+  "coverage_note": "Deliberately incomplete. Written first for the fifteen indicators a small contractor owns alone under the enclave-only profile, which is the most common shape in this sector and the one the enclave argument points at. Indicators that are shared or inherited are driven by a provider, and guidance for them is worth writing only after this set has survived contact with real practitioners. The test suite reports coverage rather than letting the gap go unnoticed.",
+  "fields": {
+    "question": "What is actually being asked, phrased so somebody who does not work in compliance can answer yes, partly, or no.",
+    "in_place": "What the implemented state looks like concretely. Not the goal — the arrangement.",
+    "evidence": "What you would put in front of an assessor. Artifacts, not assertions.",
+    "check": "How the reading is taken without a person, and what makes it fail. Where a control genuinely cannot be automated, this says so instead of pretending."
+  },
+  "guidance": {
+    "KSI-CED-CUI": {
+      "question": "Does everyone who touches controlled information know what it is, how to handle it, and what to do if a colleague starts behaving strangely around it?",
+      "in_place": "One short course covering what controlled information is, how it is marked, what handling rules apply, and how to raise a concern about someone's behaviour. Delivered on hire and repeated annually. The roster it is measured against comes from HR, not from the training platform's own user list.",
+      "evidence": "The course content, showing it covers both handling and insider-threat awareness. A completion record per person with dates. The roster the completion was measured against, and where that roster came from.",
+      "check": "Query the training platform for completions per person, then join to the HR roster. Anyone on the roster without a completion inside the window is named. Measuring against the platform's own user list instead of the roster is the classic way this reports a flattering number. The query proves attendance and nothing else — whether the training taught the right things stays human judgment."
+    },
+    "KSI-CED-RAT": {
+      "question": "Do you check whether the training worked, or only that people clicked through it?",
+      "in_place": "Somebody reviews both completion and effect — phishing simulation results, whether incidents keep tracing to the same misunderstanding — and changes the training when it is not landing. A completion rate on its own measures attendance.",
+      "evidence": "A dated review naming who did it, what they looked at, and what changed as a result. A review that changed nothing, with a stated reason, is still evidence; a review with no record is not.",
+      "check": "Partly automatable. Completion and phishing click-rate trends are queryable; the judgment about whether the training is working is not. Record the review as a dated artifact and let the metrics feed it."
+    },
+    "KSI-CMT-RVP": {
+      "question": "Does anyone check that the way changes actually get made matches the way you say they get made?",
+      "in_place": "On a stated cadence, somebody takes a sample of changes that really happened and compares them against the documented process. The interesting output is the gap: emergency changes that skipped review, or a documented step nobody has performed in a year.",
+      "evidence": "The dated review, the sample examined, and any discrepancies found with what was done about them.",
+      "check": "Sample changes from the change or ticket system and compare each against the approvals the process requires. Changes with no approval record are named. That part is mechanical. The judgment the machine cannot make is whether a documented step is still worth having, or whether the process everyone actually follows is the better one."
+    },
+    "KSI-CUI-MRK": {
+      "question": "When controlled information arrives, does a named person decide it is controlled, mark it, and does everyone know what that marking obliges them to do?",
+      "in_place": "A named person confirms the designation rather than it being assumed. Marking follows a written standard. The handling rules attached to a marking are published somewhere the people who see the marking can find them.",
+      "evidence": "Designation decisions with who made them and when. A sample of marked artifacts. The handling rule the marking points to.",
+      "check": "Largely human, and honestly so — deciding what counts as controlled is judgment. What is queryable: whether every registered controlled asset carries a designation record with a named confirmer and a date. Assets holding controlled information with no confirmer are named."
+    },
+    "KSI-IAM-SUS": {
+      "question": "If an account starts behaving as though it has been stolen, does something actually happen — and how quickly?",
+      "in_place": "Risk signals from the identity platform trigger a real consequence: blocked sign-in, forced re-authentication, or a disabled account. Either automatic, or a queue somebody genuinely watches. A risk score nobody acts on is telemetry, not a control.",
+      "evidence": "The policy configuration showing what triggers what. A log of triggered events with what happened and how long it took.",
+      "check": "Query the identity platform for risk-based policy state and for high-risk sign-ins that completed without a challenge. Any high-risk session that simply proceeded is the finding."
+    },
+    "KSI-INR-AAR": {
+      "question": "After something goes wrong, does anyone write down what happened and what changes because of it?",
+      "in_place": "Every incident above a stated threshold produces a dated report naming what happened, what caused it, what it affected, and the specific changes being made — each with an owner and a date. Blameless, because a report people are punished for produces reports nobody writes.",
+      "evidence": "The reports themselves, with the changes traceable to tickets that were actually closed.",
+      "check": "Query the incident system for incidents closed without a linked report, and for report actions still open past their date. Both are named. What the query cannot assess is whether a report identified the real cause or a convenient one, which is why a person still reads them."
+    },
+    "KSI-INR-RPI": {
+      "question": "Do you look back across incidents for patterns, or handle each one and move on?",
+      "in_place": "A periodic review across incidents rather than within one, asking what keeps recurring and which causes were never addressed. The value is in the repeats, which are invisible when each incident is closed in isolation.",
+      "evidence": "A dated review naming what recurred and what was done about the pattern rather than the instance.",
+      "check": "The input is queryable — cluster incidents by cause and count repeats. The review itself is human, and is recorded as a dated artifact."
+    },
+    "KSI-MLA-RVL": {
+      "question": "Is anyone actually looking at the logs, or are they only being kept?",
+      "in_place": "A stated review cadence with a named reviewer, alerting on defined conditions so the routine case does not depend on somebody reading, and a record that the review happened. Retention without review satisfies a storage requirement and no security one.",
+      "evidence": "Review records with dates and reviewer. The alert rules in force. Response times on what the alerts raised.",
+      "check": "Query the log platform for review and alert activity. Two failures matter: the newest review older than the cadence, and a log source that silently stopped reporting. The second is more dangerous, because an absence of alerts looks identical to an absence of problems."
+    },
+    "KSI-PER-SCR": {
+      "question": "Are people screened before they get access, and does their access actually end when they leave?",
+      "in_place": "Screening completed before access is granted, not after. Separation triggers revocation across every system inside a stated window, driven from the HR record rather than from somebody remembering to file a ticket.",
+      "evidence": "Screening records for people with access. Per departure, the time between separation and revocation in each system.",
+      "check": "Join HR separations to live identity records. Anyone separated who still has an account is named. This is the single most common real path into these environments and it is one query. The screening half is human: a record that a check was completed is an artifact somebody files, not a state a machine can read."
+    },
+    "KSI-PIY-RES": {
+      "question": "Does leadership actually look at this, or was it delegated once and forgotten?",
+      "in_place": "A named executive reviews security posture on a stated cadence, and the decisions taken are recorded — including decisions to accept a risk, which is a legitimate outcome that needs a name attached to it.",
+      "evidence": "A dated record naming who attended, what was reviewed, and what was decided.",
+      "check": "Not automatable, and pretending otherwise would be the original mistake in miniature. Record it as a dated artifact with names."
+    },
+    "KSI-PIY-RIS": {
+      "question": "Is anyone checking that what you spend on security matches the risks you say you have?",
+      "in_place": "A periodic review comparing where money and effort actually went against the risk register. The useful finding is usually a well-funded control for a risk nobody rates, sitting next to an unfunded one that everybody does.",
+      "evidence": "The dated review and what was reprioritised because of it.",
+      "check": "Not automatable. The inputs — the risk register and the spend — can both be exported, but the comparison is judgment."
+    },
+    "KSI-PIY-RSD": {
+      "question": "Does security show up while software is being built, or only after it ships?",
+      "in_place": "Security requirements enter at design rather than review. Gates in the pipeline enforce the parts that can be enforced. Somebody checks periodically that the gates actually fire rather than having been disabled during a bad week.",
+      "evidence": "The gate configuration. A sample of features with their security review trail. Evidence that gates fired, including something they blocked.",
+      "check": "Query the build system for required checks across repositories. Repositories without them are named. The mechanical part stops there. Whether security genuinely entered at design, rather than being bolted on before release, is answered by reading a sample of feature review trails — a human task the gate configuration cannot stand in for."
+    },
+    "KSI-PIY-RVD": {
+      "question": "If somebody outside your company finds a hole in your systems, is there a way for them to tell you, and does anyone answer?",
+      "in_place": "A published intake — an address or form somebody can actually find — with a stated commitment on how fast you will respond, and submissions tracked to closure. Researchers who cannot reach you disclose somewhere else.",
+      "evidence": "The published policy. The submission log with time to first response and time to fix.",
+      "check": "Query the intake for submissions past the stated response commitment. Open submissions past the window are named. The human part is quality of response: an intake with zero submissions in a year is worth investigating rather than celebrating, because it usually means nobody can find it."
+    },
+    "KSI-SCB-ACT": {
+      "question": "Do you know which machines and services touch controlled information, and is that list current rather than something assembled for the last audit?",
+      "in_place": "Every asset carries a category — handles controlled information, provides security for those that do, out of scope — maintained from a live inventory rather than a spreadsheet. Categories change when the environment does.",
+      "evidence": "The categorised inventory with a date, and the source it was reconciled against.",
+      "check": "Query the inventory and reconcile against what the identity and endpoint platforms actually see. Assets present in the estate but absent from the inventory are named. This measurement is upstream of most others, because a wrong inventory quietly makes every coverage number wrong."
+    },
+    "KSI-SCB-DFD": {
+      "question": "Can you show where controlled information actually flows — and was that picture generated from the environment, or drawn by hand and never revisited?",
+      "in_place": "The diagram is produced from the asset and flow inventory and regenerated on a cadence, so it changes when the environment does. A hand-drawn diagram is accurate on the day it is drawn and decorative afterwards.",
+      "evidence": "The diagram, the timestamp it was generated, and the source data it came from.",
+      "check": "Regenerate and diff against the previous version. Flows appearing in network telemetry but not in the diagram are undeclared, and those are the interesting ones — they are how controlled information leaves a boundary nobody realised was open."
+    }
+  }
+}

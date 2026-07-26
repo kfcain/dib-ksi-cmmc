@@ -1,0 +1,945 @@
+{
+  "ontology": "DIB-KSI",
+  "version": "0.6.0",
+  "date": "2026-07-25",
+  "basis": "NIST SP 800-171 r2/r3 + 800-171A, 800-172/172A, 32 CFR 170, DFARS 252.204-7012, FedRAMP CR26 assurance-class semantics",
+  "purpose": "A deterministic system of record for defense-industrial-base CUI assurance. Entities and relations are the source; every deliverable (SDR/SSP, responsibility matrix, POA&M, affirmation package, dataflow diagram) is a projection over this graph. Nothing is authored twice, and no document can age into truth.",
+  "first_principles": [
+    "Start with the data. What is it, why do you hold it, and can you hold less of it?",
+    "Then the people, processes, and technology that touch it — and only those.",
+    "Then who has access, on what basis, reviewed when.",
+    "Then the signal that proves the safeguard is running, not the narrative that says it was designed.",
+    "Then the claim, which is only ever as good as its newest supporting measurement."
+  ],
+  "layers": {
+    "L0_obligation": "What the law and the standard require. Stable across tenants; published, versioned, and identical for everyone.",
+    "L1_data": "What data exists, why it is held, where it lives, and how it moves. The scoping layer.",
+    "L2_ppt": "The people, processes, and technology that safeguard the data, and the access grants that connect people to it.",
+    "L3_signal": "The measured operational reality. Indicators, thresholds, measurements, collectors, findings.",
+    "L4_assurance": "The claims made from signals, who owns each one, what is inherited, and the human attestation on top."
+  },
+  "entities": {
+    "Authority": {
+      "layer": "L0_obligation",
+      "definition": "A statute, regulation, or contract clause that creates an obligation.",
+      "key": "id",
+      "fields": {
+        "id": "string, e.g. AUTH-32CFR170",
+        "citation": "string",
+        "title": "string",
+        "effective_date": "date"
+      },
+      "examples": [
+        "32 CFR 170",
+        "DFARS 252.204-7012",
+        "FAR 52.204-21"
+      ]
+    },
+    "Requirement": {
+      "layer": "L0_obligation",
+      "definition": "A single security requirement in the assessable baseline. The unit at which POA&M eligibility binds under 32 CFR 170.21.",
+      "key": "id",
+      "fields": {
+        "id": "string, e.g. 3.1.1 (r2) or 03.01.01 (r3)",
+        "revision": "enum revision",
+        "family": "string",
+        "poam_eligible": "boolean — per 170.21 and the DoD scoring methodology"
+      }
+    },
+    "AssessmentObjective": {
+      "layer": "L0_obligation",
+      "definition": "A determination statement from 800-171A / 800-172A. THE GRADING UNIT. Every status the framework reports is ultimately per-AO.",
+      "key": "id",
+      "fields": {
+        "id": "string, e.g. 3.1.1[a]",
+        "requirement": "ref Requirement",
+        "text_ref": "pointer to the published objective; normative text is never reproduced here",
+        "automatable": "boolean — whether operational telemetry can demonstrate it"
+      }
+    },
+    "KSI": {
+      "layer": "L0_obligation",
+      "definition": "Key Security Indicator. THE VALIDATION AND REPORTING UNIT. A capability that, when validated, demonstrates a set of AOs. A KSI is never the grading unit — it is MET only when every AO it maps is demonstrated.",
+      "key": "id",
+      "fields": {
+        "id": "string, e.g. KSI-IAM-APM",
+        "family": "ref KSIFamily",
+        "automatable": "boolean",
+        "uplift": "boolean — never required below Class D, never affects level compliance",
+        "classes": "map class -> required|optional|n/a",
+        "levels": "map level -> boolean"
+      }
+    },
+    "KSIFamily": {
+      "layer": "L0_obligation",
+      "definition": "Grouping of KSIs, e.g. IAM, MLA, SCB.",
+      "key": "id"
+    },
+    "DataType": {
+      "layer": "L1_data",
+      "definition": "A classification of data that drives obligation. The first question of the framework.",
+      "key": "id",
+      "enum_ref": "data_type"
+    },
+    "DataAsset": {
+      "layer": "L1_data",
+      "definition": "A store or collection holding data of a given type. Carries the minimization record: why this data is held at all.",
+      "key": "id",
+      "fields": {
+        "id": "string",
+        "data_type": "ref DataType",
+        "necessity": "object {basis, contract_ref, reviewed_on} — the answer to 'why do you have it'; absent necessity is a finding, not a footnote",
+        "resides_in": "ref Boundary or Enclave",
+        "retention": "string"
+      }
+    },
+    "DataFlow": {
+      "layer": "L1_data",
+      "definition": "A declared movement of data between components, parties, or boundaries. Declared flows are claims; observed flows are signal. Disagreement is a finding.",
+      "key": "id",
+      "fields": {
+        "id": "string",
+        "from": "ref Component|Party",
+        "to": "ref Component|Party",
+        "data_type": "ref DataType",
+        "ports": "array of integer",
+        "protocol": "string",
+        "encryption": "object {mechanism, cmvp_cert, cmvp_status}",
+        "declared": "boolean",
+        "observed": "boolean — reconciled against flow telemetry"
+      }
+    },
+    "Boundary": {
+      "layer": "L1_data",
+      "definition": "An assessment boundary: the set of assets in scope for a given contract obligation.",
+      "key": "id",
+      "fields": {
+        "id": "string",
+        "type": "enum boundary_type",
+        "hosting": "enum hosting_model — the enclave-hosted vs contractor-hosted distinction"
+      }
+    },
+    "Enclave": {
+      "layer": "L1_data",
+      "definition": "A hardened multi-tenant environment operated by a provider, into which a tenant moves CUI and from which the tenant inherits controls and their proof. The defended-enclave deployment pattern for small and mid-size contractors.",
+      "key": "id",
+      "fields": {
+        "id": "string",
+        "provider": "ref Party",
+        "authorization": "object {program, level, il, status, expires}",
+        "assurance_class": "enum class — the class the enclave itself sustains",
+        "crm_ref": "pointer to the provider responsibility matrix",
+        "validation_feed": "object {endpoint, signing_key_id, cadence_days, last_received} — the machine-readable feed that makes inheritance real rather than asserted"
+      }
+    },
+    "Party": {
+      "layer": "L2_ppt",
+      "definition": "An organization: the contractor (tenant), an external service provider, a cloud service provider, an enclave operator, an assessor, or the government.",
+      "key": "id",
+      "fields": {
+        "id": "string",
+        "role": "enum party_role"
+      }
+    },
+    "Person": {
+      "layer": "L2_ppt",
+      "definition": "A named human. Attestation, adjudication, and approval always resolve to a Person — never to a system or an agent.",
+      "key": "id",
+      "fields": {
+        "id": "string",
+        "party": "ref Party",
+        "roles": "array of ref Role"
+      }
+    },
+    "Role": {
+      "layer": "L2_ppt",
+      "definition": "A function a person holds, carrying privileges and obligations (e.g. Affirming Official, system administrator, CUI custodian).",
+      "key": "id",
+      "fields": {
+        "id": "string",
+        "privileged": "boolean"
+      }
+    },
+    "Process": {
+      "layer": "L2_ppt",
+      "definition": "An operational procedure people perform. Bound intent (E3) attaches here, never free-floating policy prose.",
+      "key": "id",
+      "fields": {
+        "id": "string",
+        "owner": "ref Role",
+        "cadence": "string",
+        "enforced_by": "array of ref Component"
+      }
+    },
+    "Component": {
+      "layer": "L2_ppt",
+      "definition": "A technology asset in or adjacent to the boundary, categorized per 32 CFR 170.19.",
+      "key": "id",
+      "fields": {
+        "id": "string",
+        "asset_category": "enum asset_category",
+        "category_status": "enum determination_status — categorization is a human determination",
+        "boundary": "ref Boundary",
+        "hosted_in": "ref Enclave, when enclave-hosted",
+        "platform_lane": "string",
+        "operated_by": "ref Party",
+        "fips_modules": "array of {cert, cmvp_status}"
+      }
+    },
+    "AccessGrant": {
+      "layer": "L2_ppt",
+      "definition": "A person's access to a data asset, at a privilege level, on a stated basis, reviewed on a cadence. This entity is the 'who has access' first principle made queryable; it is not derived from a document.",
+      "key": "id",
+      "fields": {
+        "id": "string",
+        "person": "ref Person",
+        "data_asset": "ref DataAsset",
+        "privilege": "enum privilege",
+        "basis": "string — the need that justifies it",
+        "granted_on": "date",
+        "last_reviewed": "date",
+        "mfa": "enum mfa_strength"
+      }
+    },
+    "Indicator": {
+      "layer": "L3_signal",
+      "definition": "A named, measurable property of the running environment — the unit of assurance. Defined once in the signal registry, with a unit, a subject population, a collection method, and per-class thresholds.",
+      "key": "id",
+      "fields": {
+        "id": "string, e.g. SIG-MFA-ENF",
+        "unit": "enum unit",
+        "subject": "string — the population being measured",
+        "validates": "array of ref KSI",
+        "thresholds": "map class -> threshold expression",
+        "cadence_days": "map class -> integer"
+      }
+    },
+    "Measurement": {
+      "layer": "L3_signal",
+      "definition": "One timestamped observation of an Indicator, attributed to a Collector and an authoritative source. Measurements are facts; everything above them is inference.",
+      "key": "id",
+      "fields": {
+        "id": "string",
+        "indicator": "ref Indicator",
+        "value": "number or string",
+        "observed_at": "datetime",
+        "collector": "ref Collector",
+        "evidence_type": "enum evidence_type",
+        "source": "string — the authoritative API or system queried",
+        "population": "object {measured, total} — denominators are published, never implied"
+      }
+    },
+    "Collector": {
+      "layer": "L3_signal",
+      "definition": "The mechanism that produced a measurement: a platform-lane integration, a provider feed, or a human observation record.",
+      "key": "id",
+      "fields": {
+        "id": "string",
+        "platform_lane": "string",
+        "operated_by": "ref Party",
+        "independence_group": "string — two measurements from the same group are not independent methods"
+      }
+    },
+    "Threshold": {
+      "layer": "L3_signal",
+      "definition": "The bar an indicator must clear at a given assurance class. Thresholds are published policy, not per-tenant negotiation.",
+      "key": "id",
+      "fields": {
+        "id": "string",
+        "indicator": "ref Indicator",
+        "class": "enum class",
+        "operator": "enum operator",
+        "value": "number"
+      }
+    },
+    "Finding": {
+      "layer": "L3_signal",
+      "definition": "A breach of a threshold, a stale claim, or a reconciliation disagreement. Findings are generated, never authored.",
+      "key": "id",
+      "fields": {
+        "id": "string",
+        "kind": "enum finding_kind",
+        "subject": "ref any entity",
+        "opened_at": "datetime",
+        "severity_inputs": "object {kev, exploitability, exposure}",
+        "affects": "array of ref AssessmentObjective"
+      }
+    },
+    "Claim": {
+      "layer": "L4_assurance",
+      "definition": "An assertion that an assessment objective is satisfied, with its supporting measurements and evidence, its owner, and its freshness. A claim is a computed state, not a written statement.",
+      "key": "id",
+      "fields": {
+        "id": "string",
+        "objective": "ref AssessmentObjective",
+        "ksi": "ref KSI",
+        "status": "enum claim_status",
+        "responsibility": "ref ResponsibilityAssignment",
+        "supported_by": "array of ref Measurement or EvidenceRef",
+        "last_supported_at": "datetime — freshness is part of the claim, not metadata about it"
+      }
+    },
+    "EvidenceRef": {
+      "layer": "L4_assurance",
+      "definition": "A pointer to an evidence object in the tenant's trust center, typed E1–E5. Evidence stays home; only the pointer and its hash travel.",
+      "key": "id",
+      "fields": {
+        "id": "string",
+        "evidence_type": "enum evidence_type",
+        "hash": "string",
+        "collected_at": "datetime",
+        "retained_until": "date"
+      }
+    },
+    "ResponsibilityAssignment": {
+      "layer": "L4_assurance",
+      "definition": "Who carries a given KSI or objective: the tenant, the enclave or provider, or both. This is the shared-responsibility split expressed as data rather than as a matrix document — the matrix is a projection of these records.",
+      "key": "id",
+      "fields": {
+        "id": "string",
+        "scope": "ref KSI or ref AssessmentObjective",
+        "mode": "enum responsibility_mode",
+        "provider": "ref Party or ref Enclave, when mode is inherited or shared",
+        "tenant_residual": "string — what the tenant still owns when mode is shared",
+        "basis": "string — the CRM clause or authorization that supports the claim of inheritance"
+      }
+    },
+    "Exception": {
+      "layer": "L4_assurance",
+      "definition": "A clocked, prioritized remediation record opened from a finding. Eligibility binds at the requirement level per 32 CFR 170.21; the engine, not a human narrative, decides eligibility.",
+      "key": "id",
+      "fields": {
+        "id": "string",
+        "finding": "ref Finding",
+        "requirement": "ref Requirement",
+        "eligible": "boolean — computed",
+        "status": "enum exception_status",
+        "opened_at": "datetime",
+        "due_at": "datetime"
+      }
+    },
+    "Attestation": {
+      "layer": "L4_assurance",
+      "definition": "A named human's signature on a stated posture at a stated time. The only entity in the ontology that cannot be computed.",
+      "key": "id",
+      "fields": {
+        "id": "string",
+        "person": "ref Person",
+        "scope": "string",
+        "posture_hash": "string — binds the signature to the exact computed state signed",
+        "signed_at": "datetime"
+      }
+    }
+  },
+  "relations": [
+    {
+      "verb": "authorizes",
+      "from": "Authority",
+      "to": "Requirement",
+      "note": "Obligation flows from law to requirement."
+    },
+    {
+      "verb": "decomposes_to",
+      "from": "Requirement",
+      "to": "AssessmentObjective",
+      "note": "The requirement is the POA&M unit; the objective is the grading unit."
+    },
+    {
+      "verb": "validates",
+      "from": "KSI",
+      "to": "AssessmentObjective",
+      "note": "Many-to-many. A KSI is MET only when every objective it validates is demonstrated."
+    },
+    {
+      "verb": "classified_as",
+      "from": "DataAsset",
+      "to": "DataType",
+      "note": "Drives which obligations attach."
+    },
+    {
+      "verb": "resides_in",
+      "from": "DataAsset",
+      "to": "Boundary|Enclave",
+      "note": "Enclave-hosted versus contractor-hosted is decided here."
+    },
+    {
+      "verb": "flows_to",
+      "from": "DataFlow",
+      "to": "Component|Party",
+      "note": "Declared flows are claims; observed flows are signal."
+    },
+    {
+      "verb": "processes",
+      "from": "Component",
+      "to": "DataType",
+      "note": "What a component actually touches drives its 170.19 category."
+    },
+    {
+      "verb": "hosted_in",
+      "from": "Component",
+      "to": "Enclave",
+      "note": "The structural basis for inheritance."
+    },
+    {
+      "verb": "operated_by",
+      "from": "Component",
+      "to": "Party",
+      "note": "Operation and ownership can differ; responsibility follows operation."
+    },
+    {
+      "verb": "performs",
+      "from": "Person|Role",
+      "to": "Process",
+      "note": "Processes have named owners or they are not processes."
+    },
+    {
+      "verb": "grants_access",
+      "from": "AccessGrant",
+      "to": "DataAsset",
+      "note": "Who has access, on what basis, reviewed when."
+    },
+    {
+      "verb": "measured_by",
+      "from": "KSI",
+      "to": "Indicator",
+      "note": "The document-to-signal join."
+    },
+    {
+      "verb": "observes",
+      "from": "Measurement",
+      "to": "Indicator",
+      "note": "A fact about the running environment at a moment."
+    },
+    {
+      "verb": "emitted_by",
+      "from": "Measurement",
+      "to": "Collector",
+      "note": "Provenance of the fact."
+    },
+    {
+      "verb": "gates",
+      "from": "Threshold",
+      "to": "Indicator",
+      "note": "Published bar per assurance class."
+    },
+    {
+      "verb": "breaches",
+      "from": "Finding",
+      "to": "Threshold",
+      "note": "Findings are generated from measurement, never authored."
+    },
+    {
+      "verb": "supports",
+      "from": "Measurement|EvidenceRef",
+      "to": "Claim",
+      "note": "A claim with no fresh support is stale, not met."
+    },
+    {
+      "verb": "asserts",
+      "from": "Claim",
+      "to": "AssessmentObjective",
+      "note": "Status is computed per objective."
+    },
+    {
+      "verb": "assigns",
+      "from": "ResponsibilityAssignment",
+      "to": "KSI|AssessmentObjective",
+      "note": "The shared-responsibility split as data."
+    },
+    {
+      "verb": "inherits_from",
+      "from": "Claim",
+      "to": "Enclave",
+      "note": "Valid only when the three inheritance tests pass."
+    },
+    {
+      "verb": "clocked_by",
+      "from": "Exception",
+      "to": "Finding",
+      "note": "Eligibility computed at the requirement level."
+    },
+    {
+      "verb": "affirms",
+      "from": "Attestation",
+      "to": "Party",
+      "note": "A named human signs a computed posture, bound by hash."
+    }
+  ],
+  "enums": {
+    "revision": [
+      "171r2",
+      "171r3",
+      "172-2021",
+      "172r3"
+    ],
+    "class": [
+      "A",
+      "B",
+      "C",
+      "D"
+    ],
+    "level": [
+      "L1",
+      "L2",
+      "L3"
+    ],
+    "data_type": [
+      "CUI",
+      "FCI",
+      "SPD",
+      "CTI",
+      "NON_COVERED"
+    ],
+    "boundary_type": [
+      "enclave",
+      "corporate",
+      "ot",
+      "cloud_tenant",
+      "standalone"
+    ],
+    "hosting_model": [
+      "enclave_hosted",
+      "contractor_hosted",
+      "hybrid"
+    ],
+    "asset_category": [
+      "CUI",
+      "SPA",
+      "CRMA",
+      "SPECIALIZED",
+      "OOS"
+    ],
+    "determination_status": [
+      "proposed",
+      "human_confirmed"
+    ],
+    "party_role": [
+      "tenant",
+      "enclave_operator",
+      "esp",
+      "csp",
+      "msp",
+      "assessor",
+      "government"
+    ],
+    "privilege": [
+      "read",
+      "write",
+      "admin",
+      "break_glass"
+    ],
+    "mfa_strength": [
+      "none",
+      "otp",
+      "push",
+      "phishing_resistant"
+    ],
+    "unit": [
+      "percent",
+      "count",
+      "days",
+      "hours",
+      "minutes",
+      "boolean",
+      "status"
+    ],
+    "evidence_type": [
+      "E1",
+      "E2",
+      "E3",
+      "E4",
+      "E5"
+    ],
+    "operator": [
+      ">=",
+      "<=",
+      "==",
+      "!="
+    ],
+    "finding_kind": [
+      "threshold_breach",
+      "stale_claim",
+      "undeclared_flow",
+      "coverage_gap",
+      "inheritance_invalid",
+      "unjustified_access",
+      "unnecessary_data"
+    ],
+    "claim_status": [
+      "met",
+      "not_met",
+      "stale",
+      "inherited",
+      "not_applicable",
+      "determination_needed"
+    ],
+    "responsibility_mode": [
+      "tenant",
+      "shared",
+      "inherited",
+      "not_applicable"
+    ],
+    "exception_status": [
+      "open",
+      "overdue",
+      "partially_mitigated",
+      "fully_mitigated",
+      "remediated",
+      "accepted"
+    ]
+  },
+  "invariants": [
+    {
+      "id": "INV-GRADING",
+      "statement": "A KSI is MET only when every assessment objective it validates is demonstrated by the evidence types its assurance class requires. The objective is the grading unit; the KSI is the validation and reporting unit.",
+      "enforced_by": "validator: ksi_status derived from claims, never asserted directly",
+      "plain": "You do not get credit for a protection by saying you have it. The system works out whether you have met it from the evidence underneath, one assessment objective at a time.",
+      "without_it": "Self-graded compliance. A summary page reads MET while nothing underneath actually supports it, which is the failure mode of every checklist ever filled in the night before an audit.",
+      "example": "A shop marks access control as handled. The model does not accept the assertion. It checks each objective the indicator covers, finds one with no supporting evidence, and reports the indicator as not met — naming the objective that failed.",
+      "checked": "Status is always computed from the evidence. There is no field anywhere in the model that lets a status be typed in directly."
+    },
+    {
+      "id": "INV-UNIVERSAL",
+      "statement": "A coverage requirement applies to every in-scope subject. An uncovered subject is permitted only by a justified, dated exception that has not expired. No aggregate percentage is published, because no authority publishes one.",
+      "enforced_by": "tools/lib.mjs — coverage evaluation; an unjustified or expired exception breaches the signal",
+      "plain": "Every in-scope thing has to be covered. There is no passing score below all of them — but there is a documented exception with a name, a reason, and an expiry date.",
+      "without_it": "Ninety-seven percent coverage forever, with the same three machines uncovered every quarter, because nobody can see which three they are.",
+      "example": "A 12-person shop with one uncovered laptop and a 400-person firm with twelve are held to the same rule. Both must name the specific machines. The small shop fixes it that afternoon; the large one files dated exceptions for the four awaiting replacement and fixes the other eight.",
+      "checked": "A reading that leaves a subject uncovered must carry an exception naming that subject, giving a reason, and carrying a future expiry date. An expired exception stops working on its expiry date without anyone intervening."
+    },
+    {
+      "id": "INV-PROJECTION",
+      "statement": "Every deliverable is a projection over this graph. The Security Decision Record, the responsibility matrix, the POA&M, the dataflow diagram, and the affirmation package are views — none is a source, and none may contain a fact that is not derivable from entities and relations.",
+      "enforced_by": "validator: no deliverable entity type exists; projections are computed by tools/project.mjs",
+      "plain": "Every report is generated from the same underlying data. Nothing is typed by hand into a deliverable.",
+      "without_it": "The security plan says one thing, the remediation tracker says another, and the responsibility matrix says a third — all describing the same environment, all edited at different times by different people.",
+      "example": "Reclassify one folder as controlled information. The responsibility matrix, the remediation list, the dataflow diagram, and the decision record all change together, because each is computed from that same fact rather than transcribed from it.",
+      "checked": "There is no deliverable stored anywhere in the model. Reports exist only as computations over the graph, so a report cannot contain a fact the graph does not hold."
+    },
+    {
+      "id": "INV-SIGNAL",
+      "statement": "A claim on an automatable objective is met only while a supporting measurement exists inside the class cadence window. When the newest support ages past the window the claim becomes stale, not met. Documents cannot age into truth.",
+      "enforced_by": "validator: freshness check against Indicator.cadence_days for the tenant class",
+      "plain": "A claim is only good while the reading behind it is fresh. Past its shelf life it reports stale — not passing, not failing.",
+      "without_it": "Documents that age into truth. A statement written in March still reads as current in December, and nothing in the process ever asks whether it still is.",
+      "example": "Multi-factor enforcement is verified in March against a 30-day window. Through April the claim holds. In May, with no new reading, it goes stale on its own — nobody has to notice or decide to admit it.",
+      "checked": "Each measurement declares how long a reading stays good, per assurance class. The claim is compared against the newest supporting reading every time anything is computed."
+    },
+    {
+      "id": "INV-INHERITANCE",
+      "statement": "A tenant may mark an objective inherited only when all three tests pass: the provider's authorization covers it, the provider emits a machine-readable validation for it on the tenant's class cadence, and no tenant-side configuration overrides it. A failed test degrades the assignment to shared or tenant; it never silently stands.",
+      "enforced_by": "validator: three-test rule on every ResponsibilityAssignment with mode inherited",
+      "plain": "You only get to say your provider handles something when three things are true at once, and the model re-checks all three every time rather than taking your word for it.",
+      "without_it": "Inheritance by assumption, which is the most common way an enclave arrangement fails. A tenant believes the provider covers something; the provider believes it is the tenant’s; nobody is doing it.",
+      "example": "A provider covers disk encryption for everything inside the enclave. But a tenant setting still permits download to local machines, so the third test fails and the assignment degrades from inherited to shared automatically. The tenant did not have to spot it.",
+      "checked": "Three tests: the provider’s authorization actually covers it, the provider sends a machine-readable validation on your cadence, and no setting on your side overrides it. Failing any one degrades the claim rather than leaving it standing."
+    },
+    {
+      "id": "INV-ACCESS",
+      "statement": "Every data asset classified CUI carries at least one access grant, and every access grant carries a stated basis and a review date inside the review window. Access without a basis is a finding.",
+      "enforced_by": "validator: unjustified_access finding generation",
+      "plain": "Everyone who can reach controlled information has a stated reason for that access and a date when someone last confirmed the reason still holds.",
+      "without_it": "Access that accumulates. People change roles, projects end, contractors leave, and the permissions stay — the single most common path into these environments.",
+      "example": "An engineer moved off a program eight months ago. Their access record has no reviewed date inside the window, so it surfaces as a finding rather than waiting for an annual review to catch it.",
+      "checked": "Every piece of controlled information must have at least one access grant, and every grant must carry a basis and a review date inside the review window."
+    },
+    {
+      "id": "INV-MINIMIZATION",
+      "statement": "Every data asset classified CUI carries a necessity record naming why the data is held and when that was last reviewed. Data held without a stated need is a finding, because the cheapest control is not holding the data.",
+      "enforced_by": "validator: unnecessary_data finding generation",
+      "plain": "Every piece of controlled information you hold has to have a reason to be here, and a date when that reason was last checked.",
+      "without_it": "Scope that only grows. Old programs, superseded drawing revisions, an attachment from 2021 — each one adding cost and risk while protecting nothing.",
+      "example": "A closed contract’s drawing package has no current necessity record, so it is flagged. Deleting it removes the folder from scope altogether — there is then nothing to encrypt, nobody whose access needs reviewing, and no monitoring to keep running.",
+      "checked": "Controlled information without a stated need is reported as a finding. This is the only rule here that removes risk rather than managing it."
+    },
+    {
+      "id": "INV-INDEPENDENCE",
+      "statement": "Two measurements read from the same control plane do not count as two independent methods for Class C and above.",
+      "enforced_by": "validator: collector control_plane distinctness check",
+      "plain": "Two readings from the same place are one reading. Buying a second tool that asks the same system the same question does not give you a second opinion.",
+      "without_it": "The appearance of corroboration without any. Two products, one blind spot, and a shared failure nobody can see from inside either of them.",
+      "example": "Querying an identity system directly and running a second tool that queries the same identity system is one reading, twice. Pairing that identity query with a log platform holding authentication records is genuinely two, because the log platform would have to be independently wrong to agree.",
+      "checked": "Each collector declares which control plane it reads from. Readings only count separately when those differ. Required from assurance Class C upward."
+    },
+    {
+      "id": "INV-HUMAN",
+      "statement": "Attestation, adjudication, categorization confirmation, and risk acceptance resolve to a named Person. No computed state substitutes for a signature, and every signature binds by hash to the exact posture signed.",
+      "enforced_by": "validator: Attestation.posture_hash required and non-empty",
+      "plain": "A person signs. Nothing computed ever substitutes for that signature, and the signature is bound to the exact state that was signed.",
+      "without_it": "Accountability that dissolves into the system. Everyone points at the dashboard and nobody has actually accepted the risk.",
+      "example": "The environment changes after an attestation is signed. The signature no longer matches the current state, so it does not carry forward. Someone has to look at what changed and sign again.",
+      "checked": "Attestation, adjudicating a finding, confirming what counts as controlled information, and accepting risk each resolve to a named person, and each signature is bound by hash to the posture it covers."
+    },
+    {
+      "id": "INV-AUTHORITY",
+      "statement": "Every measurement either cites an external authority for its requirement, or is explicitly marked as this project’s own policy choice with a stated rationale. A number with no stated origin is not allowed.",
+      "enforced_by": "tools/test.mjs — INV-AUTHORITY block; the suite fails if any signal has neither an authority nor a local-policy rationale",
+      "plain": "Every number either cites where it came from, or openly admits it is this project’s own judgment. There is no third option.",
+      "without_it": "Invented precision. A threshold that looks authoritative, gets quoted, gets built into somebody’s contract, and traces back to nothing at all.",
+      "example": "The standing administrator count cites a published baseline that sets a floor of two and a ceiling of eight. The detection-time target cites nothing, because no authority publishes one, so it is labelled as our judgment with the reasoning attached. Eleven of the twenty-two measurements fall on each side.",
+      "checked": "A measurement must carry either a citation to an external source or a written rationale for the choice. One with neither stops the build."
+    }
+  ],
+  "projections": [
+    {
+      "id": "PRJ-SDR",
+      "name": "Security Decision Record",
+      "query": "components + claims + responsibility + evidence refs, grouped by family, per-objective status retained"
+    },
+    {
+      "id": "PRJ-CRM",
+      "name": "Responsibility matrix",
+      "query": "responsibility assignments joined to KSIs and objectives, split tenant | shared | inherited"
+    },
+    {
+      "id": "PRJ-POAM",
+      "name": "POA&M / exception queue",
+      "query": "open findings joined to requirement-level eligibility and clocks"
+    },
+    {
+      "id": "PRJ-POSTURE",
+      "name": "Class and level posture",
+      "query": "claim statuses aggregated against class evidence floors, cadence compliance, and history depth"
+    },
+    {
+      "id": "PRJ-DFD",
+      "name": "CUI dataflow canvas",
+      "query": "components + declared flows + observed reconciliation, rendered to the portable diagram interchange"
+    },
+    {
+      "id": "PRJ-ACCESS",
+      "name": "Access review",
+      "query": "access grants by data asset, privilege, MFA strength, and review age"
+    },
+    {
+      "id": "PRJ-INHERIT",
+      "name": "Inherited-versus-owned split",
+      "query": "responsibility assignments where mode is inherited or shared, with feed freshness and the three-test result"
+    },
+    {
+      "id": "PRJ-SSP",
+      "name": "Legacy SSP rendering",
+      "query": "the SDR projection rendered into the legacy narrative document shape, for any consumer that still requires one"
+    }
+  ],
+  "scenarios": {
+    "statement": "The same rules land very differently depending on what you have and how you have arranged it. These three are computed from the registries, not estimated — change an assignment and these numbers move.",
+    "caveat": "Illustrative shapes, not advice about your situation. Your class is set by your contract, and your scope is set by where your controlled information actually lives, which is often not where people think it lives.",
+    "cases": [
+      {
+        "id": "small-enclave",
+        "name": "12-person machine shop, everything inside a rented enclave",
+        "situation": "One prime, one program. Drawings arrive by secure transfer and are opened only inside a rented environment through a thin client. Nothing lands on the shop floor machines. Two people have admin rights, one of them the owner.",
+        "class": "B",
+        "profile": "enclave-only",
+        "split": {
+          "in_scope": 60,
+          "inherited": 20,
+          "not_applicable": 1,
+          "shared": 24,
+          "tenant": 15,
+          "off": 21,
+          "pct": 35
+        },
+        "what_you_run": "Effectively nothing of your own. The provider supplies the readings for what it operates. You need a way to record training completions, a way to show you exercised the incident reporting path, and someone to sign.",
+        "first_finding": "Almost always the same one: a former employee or an outside accountant still has an account nobody disabled. It is the cheapest finding to fix and the most common way these environments are actually breached.",
+        "hardest_part": "Believing the enclave is enough and resisting the urge to \"just email that one file\" to somebody. One download reverses the entire scope reduction."
+      },
+      {
+        "id": "mid-hybrid",
+        "name": "200-person manufacturer, enclave plus managed laptops",
+        "situation": "Multiple programs, an engineering team that needs controlled files locally for CAD work, and a corporate network alongside the enclave. Laptops are managed but they do process controlled data.",
+        "class": "C",
+        "profile": "enclave-plus-endpoints",
+        "split": {
+          "in_scope": 60,
+          "inherited": 6,
+          "not_applicable": 0,
+          "shared": 36,
+          "tenant": 18,
+          "off": 6,
+          "pct": 10
+        },
+        "what_you_run": "Real infrastructure. Identity, endpoint protection, vulnerability management, log retention, and a way to prove two of those read from genuinely different places, because Class C requires a second independent reading.",
+        "first_finding": "Endpoint coverage measured against the wrong denominator. The endpoint console reports every machine healthy, and it is right — about the machines it knows about. The four that never got enrolled are invisible to it by construction.",
+        "hardest_part": "The jump from one reading to two independent ones. Buying a second tool that queries the same system does not satisfy it, and that surprises people who have already spent the money."
+      },
+      {
+        "id": "sub-mixed",
+        "name": "Subcontractor with controlled data spread across three clouds",
+        "situation": "Grew by acquisition. Controlled information lives in a general-purpose cloud file share, an object storage bucket, and an engineering SaaS tool nobody put through review. No enclave, and no arrangement anywhere that is scoped to controlled defense information specifically.",
+        "class": "C",
+        "profile": "commercial-cloud",
+        "split": {
+          "in_scope": 60,
+          "inherited": 4,
+          "not_applicable": 0,
+          "shared": 33,
+          "tenant": 23,
+          "off": 4,
+          "pct": 7
+        },
+        "what_you_run": "More than the other two, but the surprise is what the providers already do for you and why you still cannot claim it. Roughly half the catalogue lands as shared: the provider supplies the capability and you configure it. Identity, encryption at rest, audit logging, and durability all work this way. You run the configuration and the reading; they run the machinery underneath.",
+        "first_finding": "The framework refuses to model the environment cleanly, and that refusal is the finding. Controlled information sitting in a third location with no stated reason fails the minimisation rule before a single security control is assessed.",
+        "hardest_part": "Understanding why so little is inherited when the provider does so much. It is not that they are doing nothing — they run the datacenter, the hypervisor, and the physical destruction of failed drives, and no customer can re-perform any of that. It is that a commercial arrangement does not emit a machine-readable validation about your data on your cadence. An annual audit report is a point-in-time artifact about the provider, not a continuous reading about you, so the three-test rule lands it as shared rather than inherited.",
+        "inheritance_note": "Four indicators are genuinely inherited: datacenter physical access, environmental protection, and the physical media lifecycle inside the provider estate. Thirty-three are shared. That shared column is the honest picture of commercial cloud — the provider is doing real work, and you still own the configuration, the evidence, and the answer."
+      }
+    ],
+    "reading_the_numbers": "The gap between the second and third rows is worth sitting with. Both are Class C, and they differ mainly in whether there is an arrangement scoped to controlled information with evidence that flows on a cadence. That single difference moves work between columns without changing what any provider is physically doing."
+  },
+  "evidence_types": {
+    "statement": "Five kinds of evidence, ordered by how hard they are to fake and how much work they are to produce. Assurance classes differ mainly in which of these they will accept: lower classes take an assertion backed by configuration, higher classes want telemetry and a demonstration. Most arguments about \"is this good enough evidence\" are really arguments about which of these five somebody produced.",
+    "types": [
+      {
+        "id": "E1",
+        "name": "Machine telemetry",
+        "what": "A reading taken directly from the running system, by querying its live state rather than describing it.",
+        "strong": "It reflects what is true at the moment of the query, cannot be backdated, and can be re-taken by somebody else who will get the same answer.",
+        "weak": "It says nothing about what was true yesterday, and it inherits the blind spots of whatever produced it. A reading that covers only the assets the tool already knows about is measuring the tool.",
+        "examples": [
+          {
+            "scope": "12-person shop in an enclave",
+            "example": "The provider’s feed reports that multi-factor authentication is enforced for all six accounts that can reach the enclave, listing the six."
+          },
+          {
+            "scope": "200-person manufacturer",
+            "example": "A query against the endpoint platform returns agent status for 214 machines, checked against an asset inventory of 218 — and names the four that are missing."
+          },
+          {
+            "scope": "Subcontractor across three clouds",
+            "example": "Three separate queries, one per provider, returning encryption state per storage location. The reading is only as good as the list of locations, which is the part that is actually wrong here."
+          }
+        ],
+        "mistake": "Presenting a dashboard screenshot as telemetry. A screenshot is a picture of a reading, not the reading, and nobody can re-derive it."
+      },
+      {
+        "id": "E2",
+        "name": "Provenanced artifact",
+        "what": "A document or export that carries proof of where it came from and that it has not been altered since — a signature, a hash chain, a trusted timestamp. Best when it originates from somebody other than the party being assessed.",
+        "strong": "It survives the passage of time and the departure of the person who produced it. A third-party-originated artifact is the hardest kind of evidence to quietly improve.",
+        "weak": "It is true as of its date and silent afterward. It also proves the artifact is intact, not that its contents were correct when written.",
+        "examples": [
+          {
+            "scope": "12-person shop in an enclave",
+            "example": "The provider’s signed attestation of the environment, with a certificate covering the specific offering the shop is using rather than the provider’s brand generally."
+          },
+          {
+            "scope": "200-person manufacturer",
+            "example": "A signed export of the quarterly access review, hashed and timestamped when the reviewer approved it, so a later edit is detectable."
+          },
+          {
+            "scope": "Subcontractor across three clouds",
+            "example": "Three annual audit reports from three providers. Each is a legitimate provenanced artifact and none of them says anything about this tenant’s data specifically — which is exactly why they support shared responsibility rather than inheritance."
+          }
+        ],
+        "mistake": "Treating a vendor’s compliance certificate as covering your usage. Certificates cover a defined service in a defined configuration, and the thing you bought may sit outside it."
+      },
+      {
+        "id": "E3",
+        "name": "Bound intent",
+        "what": "A short policy statement wired to the configuration that enforces it, so the rule and its enforcement point at each other.",
+        "strong": "It closes the oldest gap in compliance, where the written policy and the running system drift apart for years without anyone noticing.",
+        "weak": "It proves the rule is wired up, not that the wiring covers everything. A policy bound to one system and silent about three others looks identical from the policy side.",
+        "examples": [
+          {
+            "scope": "12-person shop in an enclave",
+            "example": "A one-paragraph rule stating controlled drawings never leave the enclave, bound to the platform setting that blocks download, print, and removable media — so turning the setting off breaks the stated policy visibly."
+          },
+          {
+            "scope": "200-person manufacturer",
+            "example": "A change-control rule bound to the branch protection and required-review settings that enforce it, rather than a procedure document describing what reviewers are supposed to do."
+          },
+          {
+            "scope": "Subcontractor across three clouds",
+            "example": "The failure case. A data-handling policy exists and binds to nothing, because there is no single enforcement point that covers all three locations. The absence of a binding is the finding."
+          }
+        ],
+        "mistake": "Writing the policy and the configuration separately and asserting they agree. If nothing breaks when they diverge, they will diverge."
+      },
+      {
+        "id": "E4",
+        "name": "Human observation",
+        "what": "Somebody looked, asked, or walked the floor, and wrote down what they found — interviews, walkthroughs, physical inspections.",
+        "strong": "It reaches everything no query can see: whether people understand the rule, whether the shortcut everyone takes matches the documented process, whether the locked room is actually locked.",
+        "weak": "It does not scale, it is a snapshot, and its quality depends entirely on who did the looking and what they wrote down.",
+        "examples": [
+          {
+            "scope": "12-person shop in an enclave",
+            "example": "A walkthrough confirming the two machines with enclave access sit in the locked office rather than on the shop floor, with the date, the observer, and what was seen."
+          },
+          {
+            "scope": "200-person manufacturer",
+            "example": "Interviews with four engineers about how they actually move CAD files between the enclave and their laptops. This surfaces the workaround that telemetry cannot see because the workaround is compliant-looking."
+          },
+          {
+            "scope": "Subcontractor across three clouds",
+            "example": "Asking the engineering team which systems hold controlled information. This is how the third cloud gets discovered, because nobody put it through review and so it appears in no inventory."
+          }
+        ],
+        "mistake": "Recording the conclusion without the observation. \"Confirmed compliant\" is not evidence; what the observer saw, on what date, is."
+      },
+      {
+        "id": "E5",
+        "name": "Demonstration",
+        "what": "The capability is exercised under realistic conditions and the results are measured. Not a description of what would happen — a record of what did.",
+        "strong": "It is the only evidence that distinguishes a capability that exists from one that works. Restore procedures and incident reporting paths fail here constantly, and it is far better to find that out on a Tuesday.",
+        "weak": "Expensive, and easy to stage into meaninglessness. A restore test against a small file on a good day proves less than the effort suggests.",
+        "examples": [
+          {
+            "scope": "12-person shop in an enclave",
+            "example": "Walking the incident reporting path end to end without filing a real report: who is called, what the reporting portal needs, and whether anybody has the credentials to submit within the required window."
+          },
+          {
+            "scope": "200-person manufacturer",
+            "example": "A restore of a controlled-data volume to a stated recovery objective, timed, with the actual duration recorded — including the part where the restore succeeded but took eleven hours against a four-hour objective."
+          },
+          {
+            "scope": "Subcontractor across three clouds",
+            "example": "A tabletop asking a simple question: controlled data is exposed in one of the three locations, who is called and within what deadline. The exercise usually establishes that nobody is sure which contract clause applies."
+          }
+        ],
+        "mistake": "Running the demonstration and recording only that it passed. The measured result is the evidence, and a failed demonstration honestly recorded is worth more than a staged success."
+      }
+    ],
+    "how_classes_differ": "Higher assurance classes do not ask for more paperwork, they ask for evidence further down this list. A class that accepts bound intent alone is asking whether you set it up. A class that wants telemetry plus a demonstration is asking whether it still works and whether you have proved it recently."
+  },
+  "working_sets": {
+    "statement": "The catalogue is exhaustive so the model can be correct about any arrangement. No single organisation is expected to hold it in its head. This is what each of the three shapes actually touches.",
+    "point": "The reference is large. The work is not. If a framework asks you to read all of it before you can do any of it, that is a documentation failure, not a security requirement.",
+    "sets": [
+      {
+        "id": "small-enclave",
+        "name": "12-person machine shop, everything inside a rented enclave",
+        "class": "B",
+        "own": 15,
+        "shared": 24,
+        "families": 9,
+        "automatable": 4,
+        "manual": 11,
+        "measurements": 17
+      },
+      {
+        "id": "mid-hybrid",
+        "name": "200-person manufacturer, enclave plus managed laptops",
+        "class": "C",
+        "own": 18,
+        "shared": 36,
+        "families": 11,
+        "automatable": 5,
+        "manual": 13,
+        "measurements": 22
+      },
+      {
+        "id": "sub-mixed",
+        "name": "Subcontractor with controlled data spread across three clouds",
+        "class": "C",
+        "own": 23,
+        "shared": 33,
+        "families": 10,
+        "automatable": 6,
+        "manual": 17,
+        "measurements": 22
+      }
+    ]
+  }
+}

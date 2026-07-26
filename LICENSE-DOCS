@@ -1,0 +1,18 @@
+Documentation and framework text in this repository — everything under docs/, the README,
+and the prose fields inside the ontology and registry JSON files — is licensed under the
+Creative Commons Attribution 4.0 International License (CC BY 4.0).
+
+SPDX-License-Identifier: CC-BY-4.0
+Full text: https://creativecommons.org/licenses/by/4.0/legalcode
+
+Copyright 2026 Kyle Cain
+
+You are free to share and adapt this material for any purpose, including commercially,
+provided you give appropriate credit, link to the license, and indicate whether changes
+were made.
+
+Code, schemas, and tooling are licensed separately under Apache-2.0. See LICENSE.
+
+Note on referenced standards: this repository reproduces no normative text from any
+standard or regulation. It references requirement and assessment-objective identifiers
+and points readers at the published sources, which carry their own terms.

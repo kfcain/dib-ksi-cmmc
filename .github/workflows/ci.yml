@@ -1,0 +1,25 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # There is deliberately no install step. The framework is dependency-free so that it runs
+      # inside a disconnected enclave, and this job proves that property on every run.
+      #
+      # The whole suite lives in tools/ci.sh, and this workflow runs that file and nothing else.
+      # Contributors run the identical script locally with ./tools/ci.sh, so "it passed locally"
+      # and "it passed in CI" cannot mean different things.
+      - name: Verification suite
+        run: ./tools/ci.sh

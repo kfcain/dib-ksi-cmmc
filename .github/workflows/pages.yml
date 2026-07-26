@@ -1,0 +1,58 @@
+name: pages
+
+# Publishes site/ to GitHub Pages. The pages are plain static HTML with no build
+# step and no third-party requests, so there is nothing to install and nothing to
+# trust beyond this repository.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Refuse to publish a page that disagrees with the registry it describes.
+      - name: Pages match the registries
+        run: |
+          node tools/gen-pages.mjs
+          if [ -n "$(git status --porcelain site/)" ]; then
+            echo "::error::site/ is stale — run 'node tools/gen-pages.mjs' and commit the result"
+            git --no-pager diff --stat site/
+            exit 1
+          fi
+
+      - uses: actions/configure-pages@v5
+        id: pages
+        with:
+          enablement: true
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

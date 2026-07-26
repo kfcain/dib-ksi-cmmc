@@ -1,0 +1,781 @@
+{
+  "instance": "Ostrander Tool & Gear Co.",
+  "note": "Synthetic worked instance. A forty-person precision manufacturer holding CUI under a subcontract, operating the enclave-only pattern. Nothing here is a real organization or a real environment. Responsibility assignments, claims, findings, and every deliverable are DERIVED from this data by tools/project.mjs — none of them are authored in this file, which is the point.",
+  "as_of": "2026-07-19T12:00:00Z",
+  "tenant": {
+    "party": "PTY-OSTRANDER",
+    "target_level": "L2",
+    "target_class": "C",
+    "current_class": "B",
+    "enclave_profile": "enclave-only",
+    "employees": 40
+  },
+  "parties": [
+    {
+      "id": "PTY-OSTRANDER",
+      "name": "Ostrander Tool & Gear Co.",
+      "role": "tenant"
+    },
+    {
+      "id": "PTY-ENCLAVE",
+      "name": "Defended enclave operator (synthetic)",
+      "role": "enclave_operator"
+    },
+    {
+      "id": "PTY-C3PAO",
+      "name": "Assessor organization (synthetic)",
+      "role": "assessor"
+    }
+  ],
+  "enclaves": [
+    {
+      "id": "ENC-01",
+      "provider": "PTY-ENCLAVE",
+      "authorization": {
+        "program": "FedRAMP",
+        "level": "High",
+        "il": "IL5",
+        "status": "active",
+        "expires": "2027-09-30"
+      },
+      "assurance_class": "C",
+      "crm_ref": "crm://enclave-operator/v4.2",
+      "validation_feed": {
+        "endpoint": "https://feed.enclave.example/validations",
+        "signing_key_id": "enclave-2026-a",
+        "cadence_days": 1,
+        "last_received": "2026-07-19T04:12:00Z"
+      }
+    }
+  ],
+  "boundaries": [
+    {
+      "id": "BND-ENCLAVE",
+      "type": "enclave",
+      "hosting": "enclave_hosted",
+      "enclave": "ENC-01"
+    },
+    {
+      "id": "BND-CORP",
+      "type": "corporate",
+      "hosting": "contractor_hosted"
+    },
+    {
+      "id": "BND-SHOP",
+      "type": "ot",
+      "hosting": "contractor_hosted"
+    }
+  ],
+  "data_assets": [
+    {
+      "id": "DA-CUI-DRAWINGS",
+      "name": "Controlled technical drawings and specifications",
+      "data_type": "CUI",
+      "resides_in": "BND-ENCLAVE",
+      "necessity": {
+        "basis": "Required to manufacture to print under the current subcontract",
+        "contract_ref": "SUB-2026-0114",
+        "reviewed_on": "2026-06-30"
+      },
+      "retention": "Contract term plus six years"
+    },
+    {
+      "id": "DA-CUI-QUALITY",
+      "name": "First-article and inspection records referencing controlled specifications",
+      "data_type": "CUI",
+      "resides_in": "BND-ENCLAVE",
+      "necessity": {
+        "basis": "Contractual quality reporting obligation",
+        "contract_ref": "SUB-2026-0114",
+        "reviewed_on": "2026-06-30"
+      },
+      "retention": "Contract term plus six years"
+    },
+    {
+      "id": "DA-FCI-ORDERS",
+      "name": "Purchase orders and delivery schedules",
+      "data_type": "FCI",
+      "resides_in": "BND-CORP",
+      "necessity": {
+        "basis": "Order administration",
+        "contract_ref": "SUB-2026-0114",
+        "reviewed_on": "2026-06-30"
+      },
+      "retention": "Contract term plus three years"
+    },
+    {
+      "id": "DA-SPD-TELEMETRY",
+      "name": "Security telemetry and validation records about the CUI environment",
+      "data_type": "SPD",
+      "resides_in": "BND-ENCLAVE",
+      "necessity": {
+        "basis": "Required to demonstrate and continuously validate the safeguards",
+        "contract_ref": "SUB-2026-0114",
+        "reviewed_on": "2026-06-30"
+      },
+      "retention": "Six years"
+    }
+  ],
+  "components": [
+    {
+      "id": "CMP-ENC-STORE",
+      "name": "Enclave document store",
+      "asset_category": "CUI",
+      "category_status": "human_confirmed",
+      "boundary": "BND-ENCLAVE",
+      "hosted_in": "ENC-01",
+      "platform_lane": "enclave",
+      "operated_by": "PTY-ENCLAVE",
+      "processes": [
+        "CUI"
+      ],
+      "fips_modules": [
+        {
+          "cert": "SYN-4501",
+          "cmvp_status": "active"
+        }
+      ]
+    },
+    {
+      "id": "CMP-ENC-IDP",
+      "name": "Enclave identity provider",
+      "asset_category": "SPA",
+      "category_status": "human_confirmed",
+      "boundary": "BND-ENCLAVE",
+      "hosted_in": "ENC-01",
+      "platform_lane": "enclave",
+      "operated_by": "PTY-ENCLAVE",
+      "processes": [
+        "SPD"
+      ]
+    },
+    {
+      "id": "CMP-ENC-APPS",
+      "name": "Enclave productivity applications",
+      "asset_category": "CUI",
+      "category_status": "human_confirmed",
+      "boundary": "BND-ENCLAVE",
+      "hosted_in": "ENC-01",
+      "platform_lane": "enclave",
+      "operated_by": "PTY-ENCLAVE",
+      "processes": [
+        "CUI"
+      ]
+    },
+    {
+      "id": "CMP-THIN",
+      "name": "Managed thin clients (no local CUI landing)",
+      "asset_category": "SPA",
+      "category_status": "human_confirmed",
+      "boundary": "BND-CORP",
+      "platform_lane": "endpoint",
+      "operated_by": "PTY-OSTRANDER",
+      "processes": []
+    },
+    {
+      "id": "CMP-FW",
+      "name": "Corporate perimeter firewall",
+      "asset_category": "SPA",
+      "category_status": "human_confirmed",
+      "boundary": "BND-CORP",
+      "platform_lane": "network",
+      "operated_by": "PTY-OSTRANDER",
+      "processes": []
+    },
+    {
+      "id": "CMP-ERP",
+      "name": "Order and scheduling system",
+      "asset_category": "CRMA",
+      "category_status": "human_confirmed",
+      "boundary": "BND-CORP",
+      "platform_lane": "corp",
+      "operated_by": "PTY-OSTRANDER",
+      "processes": [
+        "FCI"
+      ]
+    },
+    {
+      "id": "CMP-CNC",
+      "name": "Shop-floor machine controllers",
+      "asset_category": "SPECIALIZED",
+      "category_status": "human_confirmed",
+      "boundary": "BND-SHOP",
+      "platform_lane": "ot",
+      "operated_by": "PTY-OSTRANDER",
+      "processes": []
+    }
+  ],
+  "data_flows": [
+    {
+      "id": "FLW-01",
+      "from": "CMP-THIN",
+      "to": "CMP-ENC-APPS",
+      "data_type": "CUI",
+      "ports": [
+        443
+      ],
+      "protocol": "HTTPS",
+      "encryption": {
+        "mechanism": "TLS 1.2+",
+        "cmvp_cert": "SYN-4282",
+        "cmvp_status": "active"
+      },
+      "declared": true,
+      "observed": true
+    },
+    {
+      "id": "FLW-02",
+      "from": "CMP-ENC-APPS",
+      "to": "CMP-ENC-STORE",
+      "data_type": "CUI",
+      "ports": [
+        443
+      ],
+      "protocol": "HTTPS",
+      "encryption": {
+        "mechanism": "TLS 1.2+",
+        "cmvp_cert": "SYN-4282",
+        "cmvp_status": "active"
+      },
+      "declared": true,
+      "observed": true
+    },
+    {
+      "id": "FLW-03",
+      "from": "CMP-THIN",
+      "to": "CMP-ENC-IDP",
+      "data_type": "SPD",
+      "ports": [
+        443
+      ],
+      "protocol": "WebAuthn",
+      "encryption": {
+        "mechanism": "TLS 1.2+",
+        "cmvp_cert": "SYN-4282",
+        "cmvp_status": "active"
+      },
+      "declared": true,
+      "observed": true
+    },
+    {
+      "id": "FLW-04",
+      "from": "CMP-ERP",
+      "to": "CMP-FW",
+      "data_type": "FCI",
+      "ports": [
+        443
+      ],
+      "protocol": "HTTPS",
+      "encryption": {
+        "mechanism": "TLS 1.2+",
+        "cmvp_cert": "SYN-4282",
+        "cmvp_status": "active"
+      },
+      "declared": true,
+      "observed": true
+    }
+  ],
+  "roles": [
+    {
+      "id": "ROL-AO",
+      "name": "Affirming Official",
+      "privileged": true
+    },
+    {
+      "id": "ROL-ADMIN",
+      "name": "Enclave tenant administrator",
+      "privileged": true
+    },
+    {
+      "id": "ROL-ENG",
+      "name": "Manufacturing engineer",
+      "privileged": false
+    },
+    {
+      "id": "ROL-QUAL",
+      "name": "Quality inspector",
+      "privileged": false
+    }
+  ],
+  "persons": [
+    {
+      "id": "PSN-001",
+      "party": "PTY-OSTRANDER",
+      "name": "Affirming Official (synthetic)",
+      "roles": [
+        "ROL-AO"
+      ]
+    },
+    {
+      "id": "PSN-002",
+      "party": "PTY-OSTRANDER",
+      "name": "Tenant administrator (synthetic)",
+      "roles": [
+        "ROL-ADMIN"
+      ]
+    },
+    {
+      "id": "PSN-003",
+      "party": "PTY-OSTRANDER",
+      "name": "Engineer A (synthetic)",
+      "roles": [
+        "ROL-ENG"
+      ]
+    },
+    {
+      "id": "PSN-004",
+      "party": "PTY-OSTRANDER",
+      "name": "Engineer B (synthetic)",
+      "roles": [
+        "ROL-ENG"
+      ]
+    },
+    {
+      "id": "PSN-005",
+      "party": "PTY-OSTRANDER",
+      "name": "Quality inspector (synthetic)",
+      "roles": [
+        "ROL-QUAL"
+      ]
+    }
+  ],
+  "access_grants": [
+    {
+      "id": "ACG-01",
+      "person": "PSN-002",
+      "data_asset": "DA-CUI-DRAWINGS",
+      "privilege": "admin",
+      "basis": "Administers the tenant slice holding controlled drawings",
+      "granted_on": "2026-01-15",
+      "last_reviewed": "2026-07-01",
+      "mfa": "phishing_resistant"
+    },
+    {
+      "id": "ACG-02",
+      "person": "PSN-003",
+      "data_asset": "DA-CUI-DRAWINGS",
+      "privilege": "write",
+      "basis": "Manufactures to print on the active subcontract",
+      "granted_on": "2026-02-02",
+      "last_reviewed": "2026-07-01",
+      "mfa": "phishing_resistant"
+    },
+    {
+      "id": "ACG-03",
+      "person": "PSN-004",
+      "data_asset": "DA-CUI-DRAWINGS",
+      "privilege": "read",
+      "basis": "Reviews drawings for manufacturability",
+      "granted_on": "2026-03-11",
+      "last_reviewed": "2026-07-01",
+      "mfa": "phishing_resistant"
+    },
+    {
+      "id": "ACG-04",
+      "person": "PSN-005",
+      "data_asset": "DA-CUI-QUALITY",
+      "privilege": "write",
+      "basis": "Records first-article inspection results",
+      "granted_on": "2026-02-02",
+      "last_reviewed": "2026-07-01",
+      "mfa": "phishing_resistant"
+    },
+    {
+      "id": "ACG-05",
+      "person": "PSN-001",
+      "data_asset": "DA-SPD-TELEMETRY",
+      "privilege": "read",
+      "basis": "Reviews posture before affirming",
+      "granted_on": "2026-01-15",
+      "last_reviewed": "2026-07-01",
+      "mfa": "phishing_resistant"
+    }
+  ],
+  "collectors": [
+    {
+      "id": "COL-ENCLAVE-FEED",
+      "platform_lane": "enclave",
+      "operated_by": "PTY-ENCLAVE",
+      "method": "inherited-feed",
+      "control_plane": "provider-feed"
+    },
+    {
+      "id": "COL-IDP-API",
+      "platform_lane": "enclave",
+      "operated_by": "PTY-OSTRANDER",
+      "method": "platform-api",
+      "control_plane": "identity-control-plane"
+    },
+    {
+      "id": "COL-ENDPOINT",
+      "platform_lane": "endpoint",
+      "operated_by": "PTY-OSTRANDER",
+      "method": "agent-report",
+      "control_plane": "endpoint-agent"
+    },
+    {
+      "id": "COL-NETFLOW",
+      "platform_lane": "network",
+      "operated_by": "PTY-OSTRANDER",
+      "method": "log-query",
+      "control_plane": "network-telemetry"
+    },
+    {
+      "id": "COL-VULN",
+      "platform_lane": "corp",
+      "operated_by": "PTY-OSTRANDER",
+      "method": "platform-api",
+      "control_plane": "vuln-scanner"
+    },
+    {
+      "id": "COL-HR",
+      "platform_lane": "corp",
+      "operated_by": "PTY-OSTRANDER",
+      "method": "record-system",
+      "control_plane": "hr-system"
+    },
+    {
+      "id": "COL-DNS",
+      "method": "external-probe",
+      "platform_lane": "external",
+      "operated_by": "PTY-OSTRANDER",
+      "control_plane": "public-dns"
+    }
+  ],
+  "measurements": [
+    {
+      "id": "MSR-001",
+      "indicator": "SIG-MFA-ENF",
+      "observed_at": "2026-07-19T04:00:00Z",
+      "collector": "COL-IDP-API",
+      "evidence_type": "E1",
+      "source": "identity platform api",
+      "population": {
+        "measured": 41,
+        "total": 41
+      },
+      "uncovered": [],
+      "exceptions": []
+    },
+    {
+      "id": "MSR-002",
+      "indicator": "SIG-MFA-ENF",
+      "observed_at": "2026-07-19T04:05:00Z",
+      "collector": "COL-ENCLAVE-FEED",
+      "evidence_type": "E1",
+      "source": "provider validation feed",
+      "population": {
+        "measured": 41,
+        "total": 41
+      },
+      "uncovered": [],
+      "exceptions": []
+    },
+    {
+      "id": "MSR-003",
+      "indicator": "SIG-MFA-PRIV",
+      "observed_at": "2026-07-19T04:00:00Z",
+      "collector": "COL-IDP-API",
+      "evidence_type": "E1",
+      "source": "identity platform api",
+      "population": {
+        "measured": 2,
+        "total": 2
+      },
+      "uncovered": [],
+      "exceptions": []
+    },
+    {
+      "id": "MSR-004",
+      "indicator": "SIG-EDR-COV",
+      "observed_at": "2026-07-19T03:40:00Z",
+      "collector": "COL-ENDPOINT",
+      "evidence_type": "E1",
+      "source": "detection platform",
+      "population": {
+        "measured": 39,
+        "total": 40
+      },
+      "uncovered": [
+        "WKS-SHOP-04"
+      ],
+      "exceptions": []
+    },
+    {
+      "id": "MSR-005",
+      "indicator": "SIG-LOG-COV",
+      "observed_at": "2026-07-19T03:45:00Z",
+      "collector": "COL-ENCLAVE-FEED",
+      "evidence_type": "E1",
+      "source": "provider validation feed",
+      "population": {
+        "measured": 71,
+        "total": 72
+      },
+      "uncovered": [
+        "CMP-CNC"
+      ],
+      "exceptions": [
+        {
+          "subject": "CMP-CNC",
+          "justification": "Machine controller emits no syslog; compensating physical isolation documented",
+          "expires": "2027-01-31"
+        }
+      ]
+    },
+    {
+      "id": "MSR-006",
+      "indicator": "SIG-PATCH-LAT-EXT",
+      "value": 21,
+      "observed_at": "2026-07-19T02:00:00Z",
+      "collector": "COL-VULN",
+      "evidence_type": "E1",
+      "source": "vulnerability management",
+      "population": {
+        "measured": 12,
+        "total": 12
+      }
+    },
+    {
+      "id": "MSR-007",
+      "indicator": "SIG-PATCH-LAT-INT",
+      "value": 34,
+      "observed_at": "2026-07-19T02:00:00Z",
+      "collector": "COL-VULN",
+      "evidence_type": "E1",
+      "source": "vulnerability management",
+      "population": {
+        "measured": 58,
+        "total": 58
+      }
+    },
+    {
+      "id": "MSR-008",
+      "indicator": "SIG-KEV-OPEN",
+      "value": 0,
+      "observed_at": "2026-07-19T02:05:00Z",
+      "collector": "COL-VULN",
+      "evidence_type": "E1",
+      "source": "vulnerability management enriched with the known-exploited catalog",
+      "population": {
+        "measured": 70,
+        "total": 70
+      }
+    },
+    {
+      "id": "MSR-009",
+      "indicator": "SIG-MTTD",
+      "value": 96,
+      "observed_at": "2026-05-14T00:00:00Z",
+      "collector": "COL-ENDPOINT",
+      "evidence_type": "E5",
+      "source": "detection exercise",
+      "population": {
+        "measured": 4,
+        "total": 4
+      }
+    },
+    {
+      "id": "MSR-010",
+      "indicator": "SIG-MTTC",
+      "value": 48,
+      "observed_at": "2026-05-14T00:00:00Z",
+      "collector": "COL-ENDPOINT",
+      "evidence_type": "E5",
+      "source": "response exercise",
+      "population": {
+        "measured": 4,
+        "total": 4
+      }
+    },
+    {
+      "id": "MSR-011",
+      "indicator": "SIG-ENC-FIPS",
+      "observed_at": "2026-07-19T04:10:00Z",
+      "collector": "COL-ENCLAVE-FEED",
+      "evidence_type": "E1",
+      "source": "provider validation feed",
+      "population": {
+        "measured": 6,
+        "total": 6
+      },
+      "uncovered": [],
+      "exceptions": []
+    },
+    {
+      "id": "MSR-012",
+      "indicator": "SIG-CMVP-STATUS",
+      "value": 0,
+      "observed_at": "2026-07-19T04:10:00Z",
+      "collector": "COL-ENCLAVE-FEED",
+      "evidence_type": "E1",
+      "source": "module validation status check",
+      "population": {
+        "measured": 2,
+        "total": 2
+      }
+    },
+    {
+      "id": "MSR-013",
+      "indicator": "SIG-ACC-REVIEW",
+      "observed_at": "2026-07-01T00:00:00Z",
+      "collector": "COL-IDP-API",
+      "evidence_type": "E1",
+      "source": "access review records",
+      "population": {
+        "measured": 5,
+        "total": 5
+      },
+      "uncovered": [],
+      "exceptions": []
+    },
+    {
+      "id": "MSR-014",
+      "indicator": "SIG-DORMANT",
+      "value": 1,
+      "observed_at": "2026-07-19T04:00:00Z",
+      "collector": "COL-IDP-API",
+      "evidence_type": "E1",
+      "source": "sign-in activity joined to personnel records",
+      "population": {
+        "measured": 41,
+        "total": 41
+      }
+    },
+    {
+      "id": "MSR-015",
+      "indicator": "SIG-BOUNDARY-DRIFT",
+      "value": 0,
+      "observed_at": "2026-07-19T03:50:00Z",
+      "collector": "COL-NETFLOW",
+      "evidence_type": "E1",
+      "source": "flow telemetry reconciled against the declared canvas",
+      "population": {
+        "measured": 4,
+        "total": 4
+      }
+    },
+    {
+      "id": "MSR-016",
+      "indicator": "SIG-INHERIT-FRESH",
+      "value": 0,
+      "observed_at": "2026-07-19T04:12:00Z",
+      "collector": "COL-ENCLAVE-FEED",
+      "evidence_type": "E2",
+      "source": "provider validation feed ingestion metadata",
+      "population": {
+        "measured": 1,
+        "total": 1
+      }
+    },
+    {
+      "id": "MSR-017",
+      "indicator": "SIG-BACKUP-RESTORE",
+      "value": 45,
+      "observed_at": "2026-07-19T00:00:00Z",
+      "collector": "COL-ENCLAVE-FEED",
+      "evidence_type": "E5",
+      "source": "provider restore exercise record",
+      "population": {
+        "measured": 1,
+        "total": 1
+      }
+    },
+    {
+      "id": "MSR-018",
+      "indicator": "SIG-INCIDENT-RPT",
+      "value": 120,
+      "observed_at": "2026-07-19T00:00:00Z",
+      "collector": "COL-HR",
+      "evidence_type": "E5",
+      "source": "reporting-path exercise record",
+      "population": {
+        "measured": 1,
+        "total": 1
+      }
+    },
+    {
+      "id": "MSR-019",
+      "indicator": "SIG-TRAINING-CUR",
+      "observed_at": "2026-07-15T00:00:00Z",
+      "collector": "COL-HR",
+      "evidence_type": "E2",
+      "source": "training records joined to access grants",
+      "population": {
+        "measured": 37,
+        "total": 40
+      },
+      "uncovered": [
+        "PSN-004",
+        "PSN-005",
+        "PSN-003"
+      ],
+      "exceptions": []
+    },
+    {
+      "id": "MSR-020",
+      "indicator": "SIG-SHARE-DEFAULT",
+      "observed_at": "2026-07-19T04:00:00Z",
+      "collector": "COL-ENCLAVE-FEED",
+      "evidence_type": "E1",
+      "source": "tenant sharing configuration",
+      "population": {
+        "measured": 2,
+        "total": 2
+      },
+      "uncovered": [],
+      "exceptions": []
+    },
+    {
+      "id": "MSR-021",
+      "indicator": "SIG-ADMIN-COUNT",
+      "value": 3,
+      "observed_at": "2026-07-19T04:00:00Z",
+      "collector": "COL-IDP-API",
+      "evidence_type": "E1",
+      "source": "directory role assignment",
+      "population": {
+        "measured": 3,
+        "total": 3
+      }
+    },
+    {
+      "id": "MSR-022",
+      "indicator": "SIG-RISK-BLOCK",
+      "observed_at": "2026-07-19T04:00:00Z",
+      "collector": "COL-ENCLAVE-FEED",
+      "evidence_type": "E1",
+      "source": "conditional access configuration",
+      "population": {
+        "measured": 2,
+        "total": 2
+      },
+      "uncovered": [],
+      "exceptions": []
+    },
+    {
+      "id": "MSR-023",
+      "indicator": "SIG-DMARC",
+      "observed_at": "2026-07-19T04:00:00Z",
+      "collector": "COL-DNS",
+      "evidence_type": "E1",
+      "source": "public DNS TXT inspection",
+      "population": {
+        "measured": 1,
+        "total": 1
+      },
+      "uncovered": [
+        "ostrander-tool.example"
+      ],
+      "exceptions": []
+    }
+  ],
+  "attestation": {
+    "id": "ATT-2026Q3",
+    "person": "PSN-001",
+    "scope": "L2 posture for the CUI environment supporting subcontract SUB-2026-0114",
+    "posture_hash": "computed-at-signature-time",
+    "signed_at": null,
+    "note": "Unsigned in this instance on purpose. The affirmation is the one entity the framework will not compute, and an unsigned attestation is reported as unsigned rather than assumed."
+  }
+}

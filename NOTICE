@@ -1,0 +1,65 @@
+DIB-KSI
+Copyright 2026 Kyle Cain
+
+This product includes software and documentation developed by Kyle Cain.
+
+Licensed under the Apache License, Version 2.0 (code, schemas, and tooling)
+and the Creative Commons Attribution 4.0 International License (documentation
+and framework text). See LICENSE and LICENSE-DOCS.
+
+--------------------------------------------------------------------------------
+THIRD-PARTY SOFTWARE
+--------------------------------------------------------------------------------
+
+None. This repository bundles no third-party code, declares no package
+dependencies, and loads no external resources at runtime. The tooling runs on
+the Node.js standard library alone, which is deliberate: the framework has to
+run inside a disconnected enclave where no package manager is available.
+
+If that ever changes, this section records the component, its license, and its
+obligations before the dependency is merged.
+
+--------------------------------------------------------------------------------
+REFERENCED GOVERNMENT WORKS
+--------------------------------------------------------------------------------
+
+This project organizes obligations that arise from U.S. Government works,
+including publications of the National Institute of Standards and Technology,
+the Code of Federal Regulations, the Federal Acquisition Regulation and its
+defense supplement, and FedRAMP program materials. Those works are generally
+not subject to copyright protection in the United States under 17 U.S.C. § 105.
+
+No normative text from any standard or regulation is reproduced here. The
+project references requirement and assessment-objective identifiers and points
+readers at the published sources.
+
+--------------------------------------------------------------------------------
+TRADEMARKS
+--------------------------------------------------------------------------------
+
+All trademarks, service marks, and product names referenced in this repository
+are the property of their respective owners. They are used nominatively, to
+identify the products, programs, and technologies this framework describes or
+interoperates with. Such use does not imply any affiliation with, sponsorship
+by, or endorsement by their owners.
+
+Marks referenced include, without limitation: CMMC and Cybersecurity Maturity
+Model Certification; FedRAMP; OSCAL; Microsoft, Microsoft 365, SharePoint,
+Entra, Intune, Purview, and GCC High; Amazon Web Services, AWS GovCloud, and
+Firecracker; Microsoft Azure and Azure Government; Docker; Kubernetes;
+OpenShift; Open Policy Agent; SPIFFE and SPIRE; HashiCorp Vault; gVisor; Kata
+Containers; OpenTelemetry; Helm; GitHub; Tenable; tldraw; Claude.
+
+This project is not affiliated with, sponsored by, or endorsed by any of these
+organizations. See DISCLAIMER.md.
+
+--------------------------------------------------------------------------------
+FILE FORMATS
+--------------------------------------------------------------------------------
+
+Diagram interchange files in visuals/ use the tldraw v2 file format (.tldr),
+which is plain JSON. This repository contains diagram data only. It does not
+bundle, embed, or distribute the tldraw editor or any tldraw source code, and
+it imposes no tldraw licensing obligation on users of this repository. Anyone
+choosing to embed the tldraw editor in their own product is responsible for
+that product's licensing.

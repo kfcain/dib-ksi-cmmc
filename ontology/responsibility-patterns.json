@@ -1,0 +1,516 @@
+{
+  "registry": "DIB-KSI responsibility patterns",
+  "version": "0.2.0",
+  "date": "2026-07-19",
+  "premise": "A defended enclave is a deployment pattern, not a product. This file expresses the shared-responsibility split as data so a tenant's responsibility matrix is generated from its architecture rather than transcribed from a provider's PDF. Modes are defaults for a tenant that has actually moved its CUI into the enclave; the validator re-tests every inherited assignment against the three-test rule before it will grade one.",
+  "three_test_rule": {
+    "statement": "An objective may be marked inherited only when all three tests pass. A failed test degrades the assignment to shared or tenant. Inheritance is never a status a tenant simply declares.",
+    "tests": [
+      {
+        "id": "T1-COVERAGE",
+        "test": "The provider's authorization and responsibility matrix cover the objective at or above the tenant's assurance class.",
+        "fails_to": "tenant"
+      },
+      {
+        "id": "T2-FEED",
+        "test": "The provider emits a machine-readable, signed validation for the objective within the tenant's class cadence (SIG-INHERIT-FRESH).",
+        "fails_to": "shared"
+      },
+      {
+        "id": "T3-NO-OVERRIDE",
+        "test": "No tenant-side configuration, export, or endpoint re-scopes the objective back to the tenant — a tenant that pulls CUI out of the enclave has re-scoped the destination back in.",
+        "fails_to": "tenant"
+      }
+    ],
+    "note": "T3 is the test tenants fail most. The enclave carries the control only for the CUI actually inside it."
+  },
+  "profiles": {
+    "enclave-only": {
+      "name": "Enclave-only (thin client, no local CUI landing)",
+      "description": "All CUI processing occurs inside the enclave. Endpoints render but never store CUI; download, print, and removable media are blocked at the platform. This is the pattern with the largest scope reduction and the one most small contractors should target.",
+      "hosting_model": "enclave_hosted"
+    },
+    "enclave-plus-endpoints": {
+      "name": "Enclave plus managed endpoints",
+      "description": "CUI is centered in the enclave, but managed tenant endpoints process some CUI locally. Every objective that touches the endpoint returns to the tenant or becomes shared.",
+      "hosting_model": "hybrid"
+    },
+    "commercial-cloud": {
+      "name": "Commercial cloud and SaaS, no dedicated enclave",
+      "description": "Controlled information sits in general-purpose cloud storage, SaaS applications, and tenant-managed infrastructure. The provider genuinely operates a large part of the stack, but nothing in the arrangement is scoped to controlled defense information specifically, and the provider does not emit per-tenant validation on a cadence.",
+      "hosting_model": "commercial_multi_tenant",
+      "inheritance_reality": "A great deal is inheritable in principle and fails on evidence. A major provider really does run the datacenter, the hypervisor, and the physical media lifecycle, and no customer can or should re-perform those. What a commercial arrangement generally does not do is emit a machine-readable validation per tenant on your cadence. An annual audit report is a point-in-time artifact about the provider, not a continuous reading about your data, so most of what the provider genuinely does lands as shared rather than inherited under the three-test rule. That is a statement about evidence flow, not about whether the provider is competent."
+    }
+  },
+  "assignments": [
+    {
+      "ksi": "KSI-APT-PEN",
+      "enclave-only": "inherited",
+      "enclave-plus-endpoints": "shared",
+      "residual": "Tenant-side application and endpoint testing where the tenant runs its own code.",
+      "commercial-cloud": "tenant"
+    },
+    {
+      "ksi": "KSI-APT-RES",
+      "enclave-only": "inherited",
+      "enclave-plus-endpoints": "shared",
+      "residual": "Tenant resilience for anything it operates outside the platform.",
+      "commercial-cloud": "tenant"
+    },
+    {
+      "ksi": "KSI-APT-SOC",
+      "enclave-only": "shared",
+      "enclave-plus-endpoints": "shared",
+      "residual": "Provider runs platform detection; tenant owns escalation, triage, and its own response decisions.",
+      "commercial-cloud": "shared"
+    },
+    {
+      "ksi": "KSI-APT-THR",
+      "enclave-only": "shared",
+      "enclave-plus-endpoints": "shared",
+      "residual": "Provider supplies platform threat intelligence; tenant applies it to its mission and supply chain.",
+      "commercial-cloud": "shared"
+    },
+    {
+      "ksi": "KSI-CED-CUI",
+      "enclave-only": "tenant",
+      "enclave-plus-endpoints": "tenant",
+      "residual": "Your people. A provider trains its own staff, never yours.",
+      "commercial-cloud": "tenant"
+    },
+    {
+      "ksi": "KSI-CED-RAT",
+      "enclave-only": "tenant",
+      "enclave-plus-endpoints": "tenant",
+      "residual": "Role-based training follows the person, not the platform.",
+      "commercial-cloud": "tenant"
+    },
+    {
+      "ksi": "KSI-CMT-LMC",
+      "enclave-only": "shared",
+      "enclave-plus-endpoints": "shared",
+      "residual": "Platform baseline is inherited; tenant configuration inside its own slice is the tenant's change surface.",
+      "commercial-cloud": "shared"
+    },
+    {
+      "ksi": "KSI-CMT-RMV",
+      "enclave-only": "shared",
+      "enclave-plus-endpoints": "shared",
+      "residual": "Provider removes unneeded platform services; tenant removes unneeded tenant services and apps.",
+      "commercial-cloud": "shared"
+    },
+    {
+      "ksi": "KSI-CMT-RVP",
+      "enclave-only": "tenant",
+      "enclave-plus-endpoints": "tenant",
+      "residual": "Change review is a governance act the tenant performs over its own environment.",
+      "commercial-cloud": "tenant"
+    },
+    {
+      "ksi": "KSI-CMT-VTD",
+      "enclave-only": "shared",
+      "enclave-plus-endpoints": "shared",
+      "residual": "Provider detects platform change drift; tenant detects drift in its own configuration.",
+      "commercial-cloud": "shared"
+    },
+    {
+      "ksi": "KSI-CNA-DFP",
+      "enclave-only": "inherited",
+      "enclave-plus-endpoints": "shared",
+      "residual": "Perimeter defense is the platform's; a tenant network fronting the enclave is the tenant's.",
+      "commercial-cloud": "shared"
+    },
+    {
+      "ksi": "KSI-CNA-EIS",
+      "enclave-only": "inherited",
+      "enclave-plus-endpoints": "shared",
+      "residual": "Transit encryption inside the platform is inherited; tenant-originated paths are the tenant's.",
+      "commercial-cloud": "shared"
+    },
+    {
+      "ksi": "KSI-CNA-IBP",
+      "enclave-only": "inherited",
+      "enclave-plus-endpoints": "inherited",
+      "residual": "Platform baseline immutability.",
+      "commercial-cloud": "shared"
+    },
+    {
+      "ksi": "KSI-CNA-MAT",
+      "enclave-only": "inherited",
+      "enclave-plus-endpoints": "inherited",
+      "residual": "Tenant isolation is the provider's core obligation and cannot be delegated to the tenant.",
+      "commercial-cloud": "shared"
+    },
+    {
+      "ksi": "KSI-CNA-OFA",
+      "enclave-only": "inherited",
+      "enclave-plus-endpoints": "inherited",
+      "residual": "Platform availability architecture.",
+      "commercial-cloud": "shared"
+    },
+    {
+      "ksi": "KSI-CNA-RNT",
+      "enclave-only": "shared",
+      "enclave-plus-endpoints": "shared",
+      "residual": "Provider restricts platform traffic; tenant controls its own sharing, guest access, and egress settings.",
+      "commercial-cloud": "shared"
+    },
+    {
+      "ksi": "KSI-CNA-RVP",
+      "enclave-only": "shared",
+      "enclave-plus-endpoints": "shared",
+      "residual": "Provider reviews platform perimeter; tenant reviews its own boundary declarations.",
+      "commercial-cloud": "shared"
+    },
+    {
+      "ksi": "KSI-CNA-ULN",
+      "enclave-only": "inherited",
+      "enclave-plus-endpoints": "inherited",
+      "residual": "Logical network construction is platform-level.",
+      "commercial-cloud": "shared"
+    },
+    {
+      "ksi": "KSI-CUI-ENC",
+      "enclave-only": "inherited",
+      "enclave-plus-endpoints": "shared",
+      "residual": "Validated cryptography inside the enclave is inherited; CUI at rest on a tenant endpoint is the tenant's to encrypt and prove.",
+      "commercial-cloud": "shared"
+    },
+    {
+      "ksi": "KSI-CUI-MRK",
+      "enclave-only": "tenant",
+      "enclave-plus-endpoints": "tenant",
+      "residual": "Marking is human judgment. The enclave supplies labeling tooling, not the decision.",
+      "commercial-cloud": "tenant"
+    },
+    {
+      "ksi": "KSI-IAM-AAM",
+      "enclave-only": "shared",
+      "enclave-plus-endpoints": "shared",
+      "residual": "Provider supplies the identity platform; the tenant owns who is in its directory.",
+      "commercial-cloud": "shared"
+    },
+    {
+      "ksi": "KSI-IAM-APM",
+      "enclave-only": "shared",
+      "enclave-plus-endpoints": "shared",
+      "residual": "Provider supplies phishing-resistant methods; the tenant enforces them on its own population. Capability is inherited, enforcement is not.",
+      "commercial-cloud": "shared"
+    },
+    {
+      "ksi": "KSI-IAM-ELP",
+      "enclave-only": "shared",
+      "enclave-plus-endpoints": "shared",
+      "residual": "Least privilege over tenant roles and data is the tenant's.",
+      "commercial-cloud": "shared"
+    },
+    {
+      "ksi": "KSI-IAM-JIT",
+      "enclave-only": "shared",
+      "enclave-plus-endpoints": "shared",
+      "residual": "Provider supplies elevation machinery; the tenant defines who may elevate.",
+      "commercial-cloud": "shared"
+    },
+    {
+      "ksi": "KSI-IAM-SNU",
+      "enclave-only": "shared",
+      "enclave-plus-endpoints": "shared",
+      "residual": "Tenant service principals and application identities are the tenant's.",
+      "commercial-cloud": "shared"
+    },
+    {
+      "ksi": "KSI-IAM-SUS",
+      "enclave-only": "tenant",
+      "enclave-plus-endpoints": "tenant",
+      "residual": "Disabling a departing employee is joined to the tenant's personnel record, which the provider cannot see.",
+      "commercial-cloud": "shared"
+    },
+    {
+      "ksi": "KSI-INR-AAR",
+      "enclave-only": "tenant",
+      "enclave-plus-endpoints": "tenant",
+      "residual": "After-action governance belongs to the contractor.",
+      "commercial-cloud": "tenant"
+    },
+    {
+      "ksi": "KSI-INR-RIR",
+      "enclave-only": "shared",
+      "enclave-plus-endpoints": "tenant",
+      "residual": "Provider contains platform incidents; the contractor runs its own incident response and owns the decisions.",
+      "commercial-cloud": "tenant"
+    },
+    {
+      "ksi": "KSI-INR-RPI",
+      "enclave-only": "tenant",
+      "enclave-plus-endpoints": "tenant",
+      "residual": "The seventy-two-hour reporting obligation is the contractor's under its own contract clause and cannot be subcontracted away.",
+      "commercial-cloud": "tenant"
+    },
+    {
+      "ksi": "KSI-MED-PPR",
+      "enclave-only": "not_applicable",
+      "enclave-plus-endpoints": "tenant",
+      "residual": "Near-eliminated when print is blocked platform-side; any printing at all returns this to the tenant in full.",
+      "commercial-cloud": "inherited"
+    },
+    {
+      "ksi": "KSI-MED-RMC",
+      "enclave-only": "inherited",
+      "enclave-plus-endpoints": "shared",
+      "residual": "Removable-media block enforced at the platform; endpoint-side control is the tenant's when endpoints exist.",
+      "commercial-cloud": "shared"
+    },
+    {
+      "ksi": "KSI-MED-SAN",
+      "enclave-only": "inherited",
+      "enclave-plus-endpoints": "shared",
+      "residual": "Provider sanitizes decommissioned platform media; tenant sanitizes its own.",
+      "commercial-cloud": "inherited"
+    },
+    {
+      "ksi": "KSI-MED-TRN",
+      "enclave-only": "inherited",
+      "enclave-plus-endpoints": "shared",
+      "residual": "Media transport applies only where physical media exists.",
+      "commercial-cloud": "tenant"
+    },
+    {
+      "ksi": "KSI-MLA-ALA",
+      "enclave-only": "shared",
+      "enclave-plus-endpoints": "shared",
+      "residual": "Provider generates platform alerts; someone at the tenant must receive and act on them.",
+      "commercial-cloud": "shared"
+    },
+    {
+      "ksi": "KSI-MLA-EVC",
+      "enclave-only": "inherited",
+      "enclave-plus-endpoints": "shared",
+      "residual": "Platform event capture is inherited; tenant-run applications emit their own events.",
+      "commercial-cloud": "shared"
+    },
+    {
+      "ksi": "KSI-MLA-LET",
+      "enclave-only": "inherited",
+      "enclave-plus-endpoints": "inherited",
+      "residual": "Retention duration is a platform property the tenant configures within provider limits.",
+      "commercial-cloud": "shared"
+    },
+    {
+      "ksi": "KSI-MLA-OSM",
+      "enclave-only": "shared",
+      "enclave-plus-endpoints": "shared",
+      "residual": "Continuous monitoring of the tenant's own posture stays with the tenant.",
+      "commercial-cloud": "shared"
+    },
+    {
+      "ksi": "KSI-MLA-RVL",
+      "enclave-only": "tenant",
+      "enclave-plus-endpoints": "tenant",
+      "residual": "Log review is an act of attention. No provider performs it on the tenant's behalf.",
+      "commercial-cloud": "shared"
+    },
+    {
+      "ksi": "KSI-PER-SCR",
+      "enclave-only": "tenant",
+      "enclave-plus-endpoints": "tenant",
+      "residual": "Screening and separation of your people.",
+      "commercial-cloud": "tenant"
+    },
+    {
+      "ksi": "KSI-PHY-LPA",
+      "enclave-only": "shared",
+      "enclave-plus-endpoints": "shared",
+      "residual": "Datacenter physical access is inherited; the space where a person views CUI on a screen is the tenant's.",
+      "commercial-cloud": "inherited"
+    },
+    {
+      "ksi": "KSI-PHY-MEV",
+      "enclave-only": "shared",
+      "enclave-plus-endpoints": "shared",
+      "residual": "Provider escorts visitors in its facilities; the tenant escorts visitors in its own.",
+      "commercial-cloud": "inherited"
+    },
+    {
+      "ksi": "KSI-PIY-GIV",
+      "enclave-only": "shared",
+      "enclave-plus-endpoints": "shared",
+      "residual": "Provider inventories the platform; the tenant inventories what it operates and declares scope.",
+      "commercial-cloud": "tenant"
+    },
+    {
+      "ksi": "KSI-PIY-RES",
+      "enclave-only": "tenant",
+      "enclave-plus-endpoints": "tenant",
+      "residual": "Executive support for security is a property of the contractor's leadership.",
+      "commercial-cloud": "tenant"
+    },
+    {
+      "ksi": "KSI-PIY-RIS",
+      "enclave-only": "tenant",
+      "enclave-plus-endpoints": "tenant",
+      "residual": "Security investment decisions are the contractor's.",
+      "commercial-cloud": "tenant"
+    },
+    {
+      "ksi": "KSI-PIY-RSD",
+      "enclave-only": "tenant",
+      "enclave-plus-endpoints": "tenant",
+      "residual": "Secure development applies to what the tenant builds.",
+      "commercial-cloud": "tenant"
+    },
+    {
+      "ksi": "KSI-PIY-RVD",
+      "enclave-only": "tenant",
+      "enclave-plus-endpoints": "tenant",
+      "residual": "Vulnerability disclosure is the contractor's public commitment.",
+      "commercial-cloud": "tenant"
+    },
+    {
+      "ksi": "KSI-RPL-ABO",
+      "enclave-only": "inherited",
+      "enclave-plus-endpoints": "shared",
+      "residual": "Platform backup objectives; tenant data held outside the enclave is the tenant's to protect.",
+      "commercial-cloud": "shared"
+    },
+    {
+      "ksi": "KSI-RPL-ARP",
+      "enclave-only": "inherited",
+      "enclave-plus-endpoints": "shared",
+      "residual": "Platform recovery planning.",
+      "commercial-cloud": "tenant"
+    },
+    {
+      "ksi": "KSI-RPL-RRO",
+      "enclave-only": "inherited",
+      "enclave-plus-endpoints": "shared",
+      "residual": "Platform recovery to stated objectives, measured by the provider's own restore tests.",
+      "commercial-cloud": "tenant"
+    },
+    {
+      "ksi": "KSI-RPL-TRC",
+      "enclave-only": "inherited",
+      "enclave-plus-endpoints": "shared",
+      "residual": "Provider tests platform restore; a tenant with its own data stores tests those.",
+      "commercial-cloud": "tenant"
+    },
+    {
+      "ksi": "KSI-SCB-ACT",
+      "enclave-only": "tenant",
+      "enclave-plus-endpoints": "tenant",
+      "residual": "Asset categorization accuracy is the tenant's determination and the assessor's first thread to pull.",
+      "commercial-cloud": "tenant"
+    },
+    {
+      "ksi": "KSI-SCB-CRM",
+      "enclave-only": "shared",
+      "enclave-plus-endpoints": "shared",
+      "residual": "The provider publishes its matrix; the tenant proves it consumed the current one and reconciled it.",
+      "commercial-cloud": "tenant"
+    },
+    {
+      "ksi": "KSI-SCB-DFD",
+      "enclave-only": "tenant",
+      "enclave-plus-endpoints": "tenant",
+      "residual": "The tenant declares its own dataflow, including every path into and out of the enclave.",
+      "commercial-cloud": "tenant"
+    },
+    {
+      "ksi": "KSI-SCB-SEP",
+      "enclave-only": "shared",
+      "enclave-plus-endpoints": "shared",
+      "residual": "Provider separates tenants; the tenant separates in-scope from out-of-scope inside its own estate.",
+      "commercial-cloud": "tenant"
+    },
+    {
+      "ksi": "KSI-SCR-MIT",
+      "enclave-only": "inherited",
+      "enclave-plus-endpoints": "inherited",
+      "residual": "Platform supply chain, inherited through the provider's own authorization.",
+      "commercial-cloud": "tenant"
+    },
+    {
+      "ksi": "KSI-SCR-MON",
+      "enclave-only": "shared",
+      "enclave-plus-endpoints": "shared",
+      "residual": "Provider monitors its suppliers; the tenant monitors its own subcontractors and flow-down.",
+      "commercial-cloud": "tenant"
+    },
+    {
+      "ksi": "KSI-SVC-ACM",
+      "enclave-only": "shared",
+      "enclave-plus-endpoints": "shared",
+      "residual": "Platform configuration inherited; tenant slice configuration owned.",
+      "commercial-cloud": "shared"
+    },
+    {
+      "ksi": "KSI-SVC-ASM",
+      "enclave-only": "shared",
+      "enclave-plus-endpoints": "shared",
+      "residual": "Provider manages platform attack surface; the tenant manages what it exposes.",
+      "commercial-cloud": "shared"
+    },
+    {
+      "ksi": "KSI-SVC-EIS",
+      "enclave-only": "inherited",
+      "enclave-plus-endpoints": "shared",
+      "residual": "Storage encryption inside the platform.",
+      "commercial-cloud": "shared"
+    },
+    {
+      "ksi": "KSI-SVC-PRR",
+      "enclave-only": "inherited",
+      "enclave-plus-endpoints": "shared",
+      "residual": "Provider patches the platform; the tenant patches its endpoints and its own software.",
+      "commercial-cloud": "shared"
+    },
+    {
+      "ksi": "KSI-SVC-RUD",
+      "enclave-only": "shared",
+      "enclave-plus-endpoints": "shared",
+      "residual": "Provider restricts platform deployment; the tenant restricts what it deploys into its slice.",
+      "commercial-cloud": "shared"
+    },
+    {
+      "ksi": "KSI-SVC-SIN",
+      "enclave-only": "inherited",
+      "enclave-plus-endpoints": "tenant",
+      "residual": "With no local CUI landing the platform carries system integrity; the moment endpoints process CUI, endpoint integrity is squarely the tenant's.",
+      "commercial-cloud": "shared"
+    },
+    {
+      "ksi": "KSI-SVC-VCM",
+      "enclave-only": "shared",
+      "enclave-plus-endpoints": "shared",
+      "residual": "Provider scans the platform; the tenant scans what it operates.",
+      "commercial-cloud": "shared"
+    },
+    {
+      "ksi": "KSI-SVC-VRI",
+      "enclave-only": "shared",
+      "enclave-plus-endpoints": "shared",
+      "residual": "Provider remediates platform findings on its own clocks; tenant findings remain the tenant's, on the finding-queue clocks.",
+      "commercial-cloud": "shared"
+    }
+  ],
+  "evidence_flow": {
+    "statement": "Inheritance is only real when the proof travels with the control. The provider validation feed is the mechanism.",
+    "steps": [
+      "The provider runs collectors for the controls it operates and computes its own per-objective claim states, exactly as a tenant does.",
+      "It publishes a signed, machine-readable validation feed keyed by objective, carrying status, the class it sustains, the measurement timestamp, and a hash — never the underlying evidence.",
+      "The tenant ingests the feed, verifies the signature, and records provenance in its own manifest. Raw provider evidence stays with the provider; the tenant holds the attested claim and its pointer.",
+      "The tenant's validator re-runs the three-test rule on every inherited objective at ingest, and SIG-INHERIT-FRESH ages the whole inherited set together when the feed stops arriving.",
+      "The tenant's responsibility matrix, Security Decision Record, and posture rollup are then projections that already contain the inherited layer — nothing is transcribed, and a stale feed is visible as staleness rather than as silence."
+    ],
+    "assessor_consequence": "The assessor validates the provider's pipeline once and samples it, rather than re-walking the same inherited stack in every tenant. That single change is where population-scale assessment cost actually falls."
+  },
+  "honest_boundary": {
+    "statement": "Inheritance shrinks the tenant's obligation; it never zeroes it, and this file is written so the residual is impossible to lose.",
+    "points": [
+      "An unvalidated enclave inherits nothing but risk. The provider must itself be assessed at or above the tenant's class.",
+      "The grading invariant does not relax for inherited controls: every mapped objective must still be demonstrated, by the provider rather than by nobody.",
+      "A tenant that exports CUI to an endpoint outside the enclave has re-scoped that endpoint back in, and the three-test rule will fail T3 rather than let the claim stand.",
+      "Personnel, training, marking judgment, incident reporting, governance, log review, scope declaration, and the affirmation itself never inherit.",
+      "Concentration is a real trade: enclaves reduce sprawl across thousands of under-resourced environments while increasing the consequence of one provider's failure. The framework's answer is that provider validation is continuous, machine-checked, and visible to every tenant at once — not that the trade does not exist."
+    ]
+  }
+}

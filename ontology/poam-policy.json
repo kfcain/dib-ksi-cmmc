@@ -1,0 +1,28 @@
+{
+  "policy": "Exception and POA&M eligibility",
+  "version": "0.2.0",
+  "status": "DEFAULT SET — REQUIRES CONFIRMATION AGAINST THE PUBLISHED RULE BEFORE OPERATIONAL USE",
+  "authority": "32 CFR 170.21 and the DoD assessment scoring methodology govern. This file is the carrier of that policy, never its source. An operator adopting this framework replaces the default set below with the list confirmed against the current rule text, and the validator reports which set it used.",
+  "binding_level": "requirement",
+  "note": "Eligibility binds at the REQUIREMENT level, not the KSI level. The engine refuses a clock for any objective under an ineligible requirement regardless of which KSI carries it. KSI-level flags are informational.",
+
+  "ineligible_requirements": {
+    "171r2": ["3.5.3", "3.13.11"],
+    "171r3": ["03.05.03", "03.13.11"]
+  },
+
+  "compensated_failure": {
+    "statement": "A narrow, documented exception to ineligibility, following the treatment the rule already applies to validated cryptography.",
+    "example": "A deployed cryptographic module moves out of active validated status. A clock is permitted only when all three hold: an active validated-replacement or revalidation plan exists, no known exploitable weakness is present in the deployed module, and encryption remains operationally enforced throughout.",
+    "conditions": ["active_replacement_plan", "no_known_exploitable_weakness", "encryption_operationally_enforced"]
+  },
+
+  "void_conditions": [
+    "falsified telemetry or artifacts",
+    "feeds that exclude in-scope assets",
+    "clock abandonment",
+    "class misrepresentation"
+  ],
+
+  "default_window_days": 180
+}

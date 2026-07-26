@@ -1,0 +1,861 @@
+{
+  "registry": "DIB-KSI signal registry",
+  "version": "0.4.0",
+  "date": "2026-07-25",
+  "premise": "The unit of assurance is the signal, not the document. Each indicator names a measurable property of the running environment, the population it is measured over, the method that produces it, how fresh it must be at each assurance class, and the bar it must clear. A claim supported only by prose is not a claim this framework can grade.",
+  "conventions": {
+    "population": "Every percentage publishes its denominator. A measurement without {measured, total} is rejected by the validator, because a coverage number over an undefined population is not a measurement.",
+    "thresholds": "Coverage requirements are universal: the requirement applies to every in-scope subject, and any uncovered subject must carry a justified, dated exception. No aggregate percentage is published, because no authority publishes one — CISA, CIS, DISA and Microsoft all use per-item pass/fail plus documented exceptions.",
+    "cadence": "cadence_days is the maximum age of the newest supporting measurement before the claim it supports goes stale (INV-SIGNAL). It tightens by class: A at affirmation, B monthly, C every three days, D daily.",
+    "independence": "At Class C and above two automated methods must come from collectors in different independence groups. Two queries against the same control plane are one method.",
+    "authority": "Every signal either cites an external authority or is explicitly flagged derived: local-policy with a rationale. The CI suite fails if a signal has neither (INV-AUTHORITY)."
+  },
+  "signals": [
+    {
+      "id": "SIG-MFA-ENF",
+      "name": "Phishing-resistant MFA enforcement",
+      "unit": "coverage",
+      "subject": "All identities with access to CUI assets, measured against the total identity population in scope",
+      "method": "Identity-provider conditional-access and authentication-method state queried through the platform API",
+      "validates": [
+        "KSI-IAM-APM",
+        "KSI-IAM-AAM"
+      ],
+      "evidence_type": "E1",
+      "cadence_days": {
+        "A": 365,
+        "B": 30,
+        "C": 3,
+        "D": 1
+      },
+      "notes": "Authentication failure is the dominant path in third-party compromise. Enforcement percentage is the measurement; a policy that exists but exempts a group is measured at the exemption, not at the policy.",
+      "authority": {
+        "source": "CISA SCuBA — Microsoft 365 Secure Configuration Baseline",
+        "policy_id": "MS.AAD.3.1v1",
+        "criticality": "SHALL",
+        "requirement": "Phishing-resistant MFA SHALL be enforced for all users.",
+        "url": "https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/aad.md",
+        "mandate": "BOD 25-01 binds federal civilian agencies; CISA recommends these policies for all stakeholders.",
+        "also": [
+          {
+            "policy_id": "MS.AAD.3.2v2",
+            "requirement": "MFA SHALL be enforced for all users."
+          },
+          {
+            "policy_id": "MS.AAD.3.5v2",
+            "requirement": "SMS, Voice Call, and Email OTP SHALL be disabled."
+          }
+        ],
+        "criteria_source": "cisa-scuba",
+        "url_note": "The baseline is published inside the tool repository that ships it. The baseline is the authority; the tool is one implementation that evaluates it."
+      },
+      "kind": "coverage",
+      "requirement": "all",
+      "exceptions": {
+        "max_unjustified": 0,
+        "justification_required": true,
+        "expiry_required": true
+      },
+      "methods": [
+        "platform-api",
+        "log-query",
+        "inherited-feed"
+      ]
+    },
+    {
+      "id": "SIG-MFA-PRIV",
+      "name": "Privileged-account MFA enforcement",
+      "unit": "coverage",
+      "subject": "Identities holding privileged roles over in-scope components",
+      "method": "Directory role assignment joined to authentication-method state",
+      "validates": [
+        "KSI-IAM-APM",
+        "KSI-IAM-ELP"
+      ],
+      "evidence_type": "E1",
+      "cadence_days": {
+        "A": 365,
+        "B": 30,
+        "C": 3,
+        "D": 1
+      },
+      "notes": "No class tolerates a privileged account without phishing-resistant MFA. This is the one indicator whose bar does not move with class.",
+      "authority": {
+        "source": "CISA SCuBA — Microsoft 365 Secure Configuration Baseline",
+        "policy_id": "MS.AAD.3.1v1",
+        "criticality": "SHALL",
+        "requirement": "Phishing-resistant MFA SHALL be enforced for all users. Privileged accounts are the subset with the largest blast radius.",
+        "url": "https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/aad.md",
+        "mandate": "BOD 25-01 binds federal civilian agencies; CISA recommends these policies for all stakeholders.",
+        "criteria_source": "cisa-scuba",
+        "url_note": "The baseline is published inside the tool repository that ships it. The baseline is the authority; the tool is one implementation that evaluates it."
+      },
+      "kind": "coverage",
+      "requirement": "all",
+      "exceptions": {
+        "max_unjustified": 0,
+        "justification_required": true,
+        "expiry_required": true
+      },
+      "methods": [
+        "platform-api",
+        "log-query",
+        "inherited-feed"
+      ]
+    },
+    {
+      "id": "SIG-EDR-COV",
+      "name": "Endpoint detection coverage",
+      "unit": "coverage",
+      "subject": "In-scope endpoints reporting healthy to the detection platform within the last 24 hours, over the asset inventory",
+      "method": "Detection-platform agent health joined to the authoritative asset inventory",
+      "validates": [
+        "KSI-SVC-SIN",
+        "KSI-MLA-OSM"
+      ],
+      "evidence_type": "E1",
+      "cadence_days": {
+        "A": 365,
+        "B": 30,
+        "C": 3,
+        "D": 1
+      },
+      "notes": "Coverage is computed against the inventory, not against the endpoints the platform already knows about. Measuring the agent's own view of the world is how coverage gaps hide.",
+      "derived": "local-policy",
+      "rationale": "No authority publishes an endpoint-detection coverage figure. Coverage against the asset inventory is this project’s policy choice, chosen because unmonitored endpoints are where dwell time accumulates.",
+      "kind": "coverage",
+      "requirement": "all",
+      "exceptions": {
+        "max_unjustified": 0,
+        "justification_required": true,
+        "expiry_required": true
+      },
+      "methods": [
+        "agent-report",
+        "platform-api",
+        "record-system"
+      ],
+      "criteria_source": "local-policy"
+    },
+    {
+      "id": "SIG-LOG-COV",
+      "name": "Audit log shipping coverage",
+      "unit": "coverage",
+      "subject": "In-scope components shipping audit events to the retention store within cadence, over the inventory",
+      "method": "Log-pipeline ingestion metadata joined to the asset inventory",
+      "validates": [
+        "KSI-MLA-EVC",
+        "KSI-MLA-LET"
+      ],
+      "evidence_type": "E1",
+      "cadence_days": {
+        "A": 365,
+        "B": 30,
+        "C": 3,
+        "D": 1
+      },
+      "authority": {
+        "source": "CISA SCuBA — Microsoft 365 Secure Configuration Baseline",
+        "policy_id": "MS.DEFENDER.6.1v1",
+        "criticality": "SHALL",
+        "requirement": "Unified Audit logging SHALL be enabled.",
+        "url": "https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/defender.md",
+        "mandate": "BOD 25-01 binds federal civilian agencies; CISA recommends these policies for all stakeholders.",
+        "also": [
+          {
+            "policy_id": "MS.EXO.13.1v1",
+            "requirement": "Mailbox auditing SHALL be enabled."
+          }
+        ],
+        "criteria_source": "cisa-scuba",
+        "url_note": "The baseline is published inside the tool repository that ships it. The baseline is the authority; the tool is one implementation that evaluates it."
+      },
+      "kind": "coverage",
+      "requirement": "all",
+      "exceptions": {
+        "max_unjustified": 0,
+        "justification_required": true,
+        "expiry_required": true
+      },
+      "methods": [
+        "platform-api",
+        "log-query",
+        "inherited-feed"
+      ]
+    },
+    {
+      "id": "SIG-PATCH-LAT-EXT",
+      "name": "Remediation latency, internet-facing",
+      "unit": "days",
+      "subject": "Ninety-fifth-percentile days from detection to remediation for high and critical findings on internet-facing systems",
+      "method": "Vulnerability-management findings joined to exposure classification from the boundary inventory",
+      "validates": [
+        "KSI-SVC-VCM",
+        "KSI-SVC-VRI"
+      ],
+      "evidence_type": "E1",
+      "thresholds": {
+        "A": "<= 60",
+        "B": "<= 30",
+        "C": "<= 14",
+        "D": "<= 7"
+      },
+      "cadence_days": {
+        "A": 365,
+        "B": 30,
+        "C": 3,
+        "D": 1
+      },
+      "notes": "Latency is measured from detection, not from ticket creation, so a slow triage step cannot be hidden inside a fast remediation number.",
+      "derived": "local-policy",
+      "rationale": "No authority publishes a remediation-latency figure outside the known-exploited catalogue. This bar is this project’s policy choice.",
+      "kind": "threshold",
+      "methods": [
+        "platform-api",
+        "config-scan",
+        "external-probe",
+        "inherited-feed"
+      ],
+      "criteria_source": "local-policy"
+    },
+    {
+      "id": "SIG-PATCH-LAT-INT",
+      "name": "Remediation latency, internal",
+      "unit": "days",
+      "subject": "Ninety-fifth-percentile days from detection to remediation for high and critical findings on internal in-scope systems",
+      "method": "Vulnerability-management findings joined to the asset inventory",
+      "validates": [
+        "KSI-SVC-VCM"
+      ],
+      "evidence_type": "E1",
+      "thresholds": {
+        "A": "<= 90",
+        "B": "<= 60",
+        "C": "<= 30",
+        "D": "<= 14"
+      },
+      "cadence_days": {
+        "A": 365,
+        "B": 30,
+        "C": 7,
+        "D": 1
+      },
+      "derived": "local-policy",
+      "rationale": "No authority publishes a remediation-latency figure for internal systems. This bar is this project’s policy choice.",
+      "kind": "threshold",
+      "methods": [
+        "platform-api",
+        "config-scan",
+        "agent-report",
+        "inherited-feed"
+      ],
+      "criteria_source": "local-policy"
+    },
+    {
+      "id": "SIG-KEV-OPEN",
+      "name": "Open known-exploited vulnerabilities",
+      "unit": "count",
+      "subject": "Findings in scope matching the published known-exploited catalog, open past their due date",
+      "method": "Vulnerability findings enriched against the known-exploited catalog and exploitability scoring",
+      "validates": [
+        "KSI-SVC-VRI",
+        "KSI-SCR-MON"
+      ],
+      "evidence_type": "E1",
+      "thresholds": {
+        "A": "<= 2",
+        "B": "<= 1",
+        "C": "== 0",
+        "D": "== 0"
+      },
+      "cadence_days": {
+        "A": 365,
+        "B": 7,
+        "C": 1,
+        "D": 1
+      },
+      "notes": "Feeds the finding queue directly. A known-exploited vulnerability past due is the clearest single statement a posture can make about itself.",
+      "authority": {
+        "source": "CISA Known Exploited Vulnerabilities catalog",
+        "policy_id": "BOD 22-01",
+        "criticality": "SHALL",
+        "requirement": "Remediate catalogued known-exploited vulnerabilities by the due date CISA publishes for each entry.",
+        "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog",
+        "mandate": "BOD 22-01 binds federal civilian agencies; CISA urges all organizations to use the catalog as a prioritisation input.",
+        "criteria_source": "cisa-kev"
+      },
+      "kind": "threshold",
+      "methods": [
+        "platform-api",
+        "config-scan",
+        "inherited-feed"
+      ]
+    },
+    {
+      "id": "SIG-MTTD",
+      "name": "Time to detect",
+      "unit": "hours",
+      "subject": "Median hours from first adversary-observable event to detection, measured across exercised detections and real incidents",
+      "method": "Detection exercise results and incident timelines; demonstrated capability rather than queried configuration",
+      "validates": [
+        "KSI-MLA-ALA",
+        "KSI-APT-SOC"
+      ],
+      "evidence_type": "E5",
+      "thresholds": {
+        "A": "n/a",
+        "B": "<= 168",
+        "C": "<= 24",
+        "D": "<= 4"
+      },
+      "cadence_days": {
+        "A": null,
+        "B": 180,
+        "C": 90,
+        "D": 30
+      },
+      "notes": "Dwell time is the number the losses actually track. It is measured by exercise, which is why it carries E5 rather than E1.",
+      "derived": "local-policy",
+      "rationale": "No authority publishes a detection-time figure. This bar is this project’s policy choice and is the least externally supported number in the registry.",
+      "kind": "threshold",
+      "methods": [
+        "log-query",
+        "platform-api",
+        "agent-report",
+        "record-system",
+        "attested-record"
+      ],
+      "criteria_source": "local-policy"
+    },
+    {
+      "id": "SIG-MTTC",
+      "name": "Time to contain",
+      "unit": "hours",
+      "subject": "Median hours from detection to containment across exercised responses and real incidents",
+      "method": "Response exercise results and incident timelines",
+      "validates": [
+        "KSI-INR-RIR",
+        "KSI-APT-RES"
+      ],
+      "evidence_type": "E5",
+      "thresholds": {
+        "A": "n/a",
+        "B": "<= 72",
+        "C": "<= 12",
+        "D": "<= 4"
+      },
+      "cadence_days": {
+        "A": null,
+        "B": 180,
+        "C": 90,
+        "D": 30
+      },
+      "derived": "local-policy",
+      "rationale": "No authority publishes a containment-time figure. This bar is this project’s policy choice.",
+      "kind": "threshold",
+      "methods": [
+        "log-query",
+        "platform-api",
+        "agent-report",
+        "record-system",
+        "attested-record"
+      ],
+      "criteria_source": "local-policy"
+    },
+    {
+      "id": "SIG-ENC-FIPS",
+      "name": "Validated cryptography coverage for CUI",
+      "unit": "coverage",
+      "subject": "CUI-bearing stores and flows protected by a cryptographic module in active validated status, over all CUI-bearing stores and flows",
+      "method": "Configuration query of encryption state joined to the module inventory and the validation-program status check",
+      "validates": [
+        "KSI-CUI-ENC"
+      ],
+      "evidence_type": "E1",
+      "cadence_days": {
+        "A": 365,
+        "B": 30,
+        "C": 3,
+        "D": 1
+      },
+      "notes": "Validated cryptography for CUI is a floor at every class, so the bar does not move. What moves by class is how often it is re-measured.",
+      "authority": {
+        "source": "NIST FIPS 140-3 / Cryptographic Module Validation Program",
+        "policy_id": "FIPS 140-3",
+        "criticality": "SHALL",
+        "requirement": "Cryptography used to protect the confidentiality of CUI must be a validated module in active status.",
+        "url": "https://csrc.nist.gov/projects/cryptographic-module-validation-program",
+        "mandate": "Flows to contractors through NIST SP 800-171 03.13.11 and DFARS 252.204-7012.",
+        "criteria_source": "nist-cmvp"
+      },
+      "kind": "coverage",
+      "requirement": "all",
+      "exceptions": {
+        "max_unjustified": 0,
+        "justification_required": true,
+        "expiry_required": true
+      },
+      "methods": [
+        "platform-api",
+        "config-scan",
+        "attested-record",
+        "inherited-feed"
+      ]
+    },
+    {
+      "id": "SIG-CMVP-STATUS",
+      "name": "Cryptographic module validation status",
+      "unit": "count",
+      "subject": "Deployed modules whose validation status is no longer active",
+      "method": "Continuous status check of each deployed module against the validation program record",
+      "validates": [
+        "KSI-CUI-ENC"
+      ],
+      "evidence_type": "E1",
+      "thresholds": {
+        "A": "<= 1",
+        "B": "== 0",
+        "C": "== 0",
+        "D": "== 0"
+      },
+      "cadence_days": {
+        "A": 365,
+        "B": 30,
+        "C": 3,
+        "D": 1
+      },
+      "notes": "A module moving out of active status is the compensated-failure case the exception semantics already describe: clockable only with an active replacement plan, no known exploitable weakness, and encryption still operationally enforced.",
+      "authority": {
+        "source": "NIST Cryptographic Module Validation Program",
+        "policy_id": "CMVP status",
+        "criticality": "SHALL",
+        "requirement": "A deployed module whose validation is no longer active no longer satisfies the validated-cryptography requirement.",
+        "url": "https://csrc.nist.gov/projects/cryptographic-module-validation-program",
+        "mandate": "Flows to contractors through NIST SP 800-171 03.13.11.",
+        "criteria_source": "nist-cmvp"
+      },
+      "kind": "threshold",
+      "methods": [
+        "external-probe",
+        "record-system",
+        "attested-record",
+        "inherited-feed"
+      ]
+    },
+    {
+      "id": "SIG-ACC-REVIEW",
+      "name": "Access review currency",
+      "unit": "coverage",
+      "subject": "Access grants to CUI assets reviewed within the review window, over all such grants",
+      "method": "Access-grant records joined to review records",
+      "validates": [
+        "KSI-IAM-ELP",
+        "KSI-IAM-AAM"
+      ],
+      "evidence_type": "E1",
+      "cadence_days": {
+        "A": 365,
+        "B": 90,
+        "C": 30,
+        "D": 30
+      },
+      "derived": "local-policy",
+      "rationale": "No authority publishes an access-review frequency. This bar is this project’s policy choice.",
+      "kind": "coverage",
+      "requirement": "all",
+      "exceptions": {
+        "max_unjustified": 0,
+        "justification_required": true,
+        "expiry_required": true
+      },
+      "methods": [
+        "platform-api",
+        "record-system"
+      ],
+      "criteria_source": "local-policy"
+    },
+    {
+      "id": "SIG-DORMANT",
+      "name": "Dormant and orphaned accounts",
+      "unit": "count",
+      "subject": "Enabled accounts with CUI access and no authentication inside the dormancy window, plus accounts with no owner",
+      "method": "Directory sign-in activity joined to the access-grant and personnel records",
+      "validates": [
+        "KSI-IAM-SNU",
+        "KSI-IAM-SUS"
+      ],
+      "evidence_type": "E1",
+      "thresholds": {
+        "A": "<= 5",
+        "B": "<= 2",
+        "C": "== 0",
+        "D": "== 0"
+      },
+      "cadence_days": {
+        "A": 365,
+        "B": 30,
+        "C": 3,
+        "D": 1
+      },
+      "notes": "Joins to personnel records so a separated employee's live account is a finding rather than an anomaly nobody owns.",
+      "derived": "local-policy",
+      "rationale": "No authority publishes a dormant-account tolerance. Zero is this project’s policy choice.",
+      "kind": "threshold",
+      "methods": [
+        "platform-api",
+        "log-query"
+      ],
+      "criteria_source": "local-policy"
+    },
+    {
+      "id": "SIG-BOUNDARY-DRIFT",
+      "name": "Undeclared flow detections",
+      "unit": "count",
+      "subject": "Observed CUI-bearing flows with no corresponding declared flow in the dataflow model",
+      "method": "Flow and firewall telemetry reconciled against the declared dataflow canvas",
+      "validates": [
+        "KSI-SCB-DFD",
+        "KSI-SCB-ACT",
+        "KSI-SCB-SEP"
+      ],
+      "evidence_type": "E1",
+      "thresholds": {
+        "A": "<= 3",
+        "B": "<= 1",
+        "C": "== 0",
+        "D": "== 0"
+      },
+      "cadence_days": {
+        "A": 365,
+        "B": 30,
+        "C": 3,
+        "D": 1
+      },
+      "notes": "This is the indicator that keeps scope honest. A diagram that agrees with telemetry is worth grading; one that does not is a finding with a clock.",
+      "derived": "local-policy",
+      "rationale": "This measurement exists only because this framework declares a dataflow model to reconcile against. It has no external authority by construction.",
+      "kind": "threshold",
+      "methods": [
+        "admission-control",
+        "pipeline-check",
+        "log-query",
+        "platform-api"
+      ],
+      "criteria_source": "local-policy"
+    },
+    {
+      "id": "SIG-INHERIT-FRESH",
+      "name": "Provider validation feed freshness",
+      "unit": "days",
+      "subject": "Age of the newest signed validation received from each provider or enclave the tenant inherits from",
+      "method": "Ingestion metadata of the provider validation feed, signature verified on receipt",
+      "validates": [
+        "KSI-SCB-CRM"
+      ],
+      "evidence_type": "E2",
+      "thresholds": {
+        "A": "<= 365",
+        "B": "<= 30",
+        "C": "<= 3",
+        "D": "<= 1"
+      },
+      "cadence_days": {
+        "A": 365,
+        "B": 30,
+        "C": 3,
+        "D": 1
+      },
+      "notes": "The second of the three inheritance tests, expressed as a measurement. When this signal breaches, every claim inherited from that provider goes stale at the same moment — which is the intended behavior, not a cascade failure.",
+      "derived": "local-policy",
+      "rationale": "This measurement is the second inheritance test expressed as a signal. It is internal to this framework.",
+      "kind": "threshold",
+      "methods": [
+        "event-stream",
+        "platform-api",
+        "attested-record",
+        "inherited-feed"
+      ],
+      "criteria_source": "local-policy"
+    },
+    {
+      "id": "SIG-BACKUP-RESTORE",
+      "name": "Restore demonstrated to objective",
+      "unit": "days",
+      "subject": "Days since the last successful restore test that met the stated recovery point and recovery time objectives",
+      "method": "Restore exercise records with measured results",
+      "validates": [
+        "KSI-RPL-TRC",
+        "KSI-RPL-RRO",
+        "KSI-RPL-ABO"
+      ],
+      "evidence_type": "E5",
+      "thresholds": {
+        "A": "<= 365",
+        "B": "<= 180",
+        "C": "<= 90",
+        "D": "<= 30"
+      },
+      "cadence_days": {
+        "A": 365,
+        "B": 180,
+        "C": 90,
+        "D": 30
+      },
+      "notes": "A backup that has never been restored is a hypothesis. The measurement is the restore, not the backup job's success code.",
+      "derived": "local-policy",
+      "rationale": "No authority publishes a restore-test interval. This bar is this project’s policy choice, and note that recovery is an availability concern outside the confidentiality scope this framework measures.",
+      "kind": "threshold",
+      "methods": [
+        "attested-record",
+        "platform-api",
+        "inherited-feed"
+      ],
+      "criteria_source": "local-policy"
+    },
+    {
+      "id": "SIG-INCIDENT-RPT",
+      "name": "Incident reporting path exercised",
+      "unit": "days",
+      "subject": "Days since the seventy-two-hour reporting path was last exercised end to end",
+      "method": "Exercise record with timestamps, demonstrating the submission path rather than describing it",
+      "validates": [
+        "KSI-INR-RPI",
+        "KSI-INR-AAR"
+      ],
+      "evidence_type": "E5",
+      "thresholds": {
+        "A": "<= 365",
+        "B": "<= 365",
+        "C": "<= 180",
+        "D": "<= 90"
+      },
+      "cadence_days": {
+        "A": 365,
+        "B": 365,
+        "C": 180,
+        "D": 90
+      },
+      "notes": "The contractual reporting obligation attaches at every class, so the exercise does too. What changes by class is frequency.",
+      "authority": {
+        "source": "DFARS 252.204-7012",
+        "policy_id": "252.204-7012(c)",
+        "criticality": "SHALL",
+        "requirement": "Rapidly report cyber incidents to DoD within 72 hours of discovery.",
+        "url": "https://www.acquisition.gov/dfars/252.204-7012-safeguarding-covered-defense-information-and-cyber-incident-reporting.",
+        "mandate": "Contract clause. Binding on any contractor whose contract includes it.",
+        "criteria_source": "contract-clause"
+      },
+      "kind": "threshold",
+      "methods": [
+        "attested-record",
+        "record-system"
+      ]
+    },
+    {
+      "id": "SIG-TRAINING-CUR",
+      "name": "Role-based training currency",
+      "unit": "coverage",
+      "subject": "Personnel with CUI access holding current role-based training, over all such personnel",
+      "method": "Training records joined to the access-grant and personnel records",
+      "validates": [
+        "KSI-CED-CUI",
+        "KSI-CED-RAT"
+      ],
+      "evidence_type": "E2",
+      "cadence_days": {
+        "A": 365,
+        "B": 90,
+        "C": 30,
+        "D": 30
+      },
+      "notes": "Never inheritable from an enclave. The provider trains its own people; the tenant's people remain the tenant's.",
+      "derived": "local-policy",
+      "rationale": "No authority publishes a training-currency percentage. This bar is this project’s policy choice.",
+      "kind": "coverage",
+      "requirement": "all",
+      "exceptions": {
+        "max_unjustified": 0,
+        "justification_required": true,
+        "expiry_required": true
+      },
+      "methods": [
+        "record-system",
+        "attested-record"
+      ],
+      "criteria_source": "local-policy"
+    },
+    {
+      "id": "SIG-SHARE-DEFAULT",
+      "name": "Default external sharing posture",
+      "kind": "coverage",
+      "unit": "coverage",
+      "subject": "Sites and libraries holding controlled information, measured against the sharing defaults configured for each",
+      "method": "Tenant sharing configuration queried through the platform API",
+      "validates": [
+        "KSI-CNA-RNT",
+        "KSI-SCB-SEP"
+      ],
+      "evidence_type": "E1",
+      "authority": {
+        "source": "CISA SCuBA — Microsoft 365 Secure Configuration Baseline",
+        "policy_id": "MS.SHAREPOINT.2.1v1",
+        "criticality": "SHALL",
+        "requirement": "File and folder default sharing scope SHALL be set to \"Specific People\".",
+        "url": "https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/sharepoint.md",
+        "mandate": "BOD 25-01 binds federal civilian agencies; CISA recommends these policies for all stakeholders.",
+        "also": [
+          {
+            "policy_id": "MS.SHAREPOINT.2.2v1",
+            "requirement": "File and folder default sharing permissions SHALL be set to \"View only\"."
+          }
+        ],
+        "criteria_source": "cisa-scuba",
+        "url_note": "The baseline is published inside the tool repository that ships it. The baseline is the authority; the tool is one implementation that evaluates it."
+      },
+      "requirement": "all",
+      "exceptions": {
+        "max_unjustified": 0,
+        "justification_required": true,
+        "expiry_required": true
+      },
+      "cadence_days": {
+        "A": 365,
+        "B": 30,
+        "C": 3,
+        "D": 1
+      },
+      "notes": "A permissive sharing default leaks controlled drawings faster than any unpatched service. This is the highest-yield confidentiality control in the registry and the framework did not measure it before.",
+      "methods": [
+        "platform-api",
+        "config-scan",
+        "inherited-feed"
+      ]
+    },
+    {
+      "id": "SIG-ADMIN-COUNT",
+      "name": "Standing global administrator count",
+      "kind": "range",
+      "unit": "count",
+      "subject": "Identities holding the tenant-wide global administrator role",
+      "method": "Directory role assignment queried through the platform API",
+      "validates": [
+        "KSI-IAM-ELP",
+        "KSI-IAM-APM"
+      ],
+      "evidence_type": "E1",
+      "authority": {
+        "source": "CISA SCuBA — Microsoft 365 Secure Configuration Baseline",
+        "policy_id": "MS.AAD.7.1v1",
+        "criticality": "SHALL",
+        "requirement": "A minimum of two users and a maximum of eight users SHALL be provisioned with the Global Administrator role.",
+        "url": "https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/aad.md",
+        "mandate": "BOD 25-01 binds federal civilian agencies; CISA recommends these policies for all stakeholders.",
+        "criteria_source": "cisa-scuba",
+        "url_note": "The baseline is published inside the tool repository that ships it. The baseline is the authority; the tool is one implementation that evaluates it."
+      },
+      "range": {
+        "min": 2,
+        "max": 8
+      },
+      "cadence_days": {
+        "A": 365,
+        "B": 30,
+        "C": 3,
+        "D": 1
+      },
+      "notes": "The only literal numeric bound any authority in this space publishes. Two is a resilience floor; eight is a blast-radius ceiling.",
+      "methods": [
+        "platform-api",
+        "log-query",
+        "inherited-feed"
+      ]
+    },
+    {
+      "id": "SIG-RISK-BLOCK",
+      "name": "High-risk sign-in and user blocking",
+      "kind": "coverage",
+      "unit": "coverage",
+      "subject": "Conditional access policy state for identity-risk and sign-in-risk detections",
+      "method": "Conditional access configuration queried through the platform API",
+      "validates": [
+        "KSI-IAM-AAM",
+        "KSI-MLA-ALA"
+      ],
+      "evidence_type": "E1",
+      "authority": {
+        "source": "CISA SCuBA — Microsoft 365 Secure Configuration Baseline",
+        "policy_id": "MS.AAD.2.1v1",
+        "criticality": "SHALL",
+        "requirement": "Users detected as high risk SHALL be blocked.",
+        "url": "https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/aad.md",
+        "mandate": "BOD 25-01 binds federal civilian agencies; CISA recommends these policies for all stakeholders.",
+        "also": [
+          {
+            "policy_id": "MS.AAD.2.3v1",
+            "requirement": "Sign-ins detected as high risk SHALL be blocked."
+          }
+        ],
+        "criteria_source": "cisa-scuba",
+        "url_note": "The baseline is published inside the tool repository that ships it. The baseline is the authority; the tool is one implementation that evaluates it."
+      },
+      "requirement": "all",
+      "exceptions": {
+        "max_unjustified": 0,
+        "justification_required": true,
+        "expiry_required": true
+      },
+      "cadence_days": {
+        "A": 365,
+        "B": 30,
+        "C": 3,
+        "D": 1
+      },
+      "methods": [
+        "platform-api",
+        "log-query",
+        "inherited-feed"
+      ]
+    },
+    {
+      "id": "SIG-DMARC",
+      "name": "Email authentication rejection policy",
+      "kind": "coverage",
+      "unit": "coverage",
+      "subject": "Sending domains associated with the organisation",
+      "method": "Public DNS TXT record inspection for each sending domain",
+      "validates": [
+        "KSI-CNA-DFP"
+      ],
+      "evidence_type": "E1",
+      "authority": {
+        "source": "CISA SCuBA — Microsoft 365 Secure Configuration Baseline",
+        "policy_id": "MS.EXO.4.2v1",
+        "criticality": "SHALL",
+        "requirement": "The DMARC message rejection option SHALL be p=reject.",
+        "url": "https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/exo.md",
+        "mandate": "BOD 25-01 binds federal civilian agencies; CISA recommends these policies for all stakeholders.",
+        "criteria_source": "cisa-scuba",
+        "url_note": "The baseline is published inside the tool repository that ships it. The baseline is the authority; the tool is one implementation that evaluates it."
+      },
+      "requirement": "all",
+      "exceptions": {
+        "max_unjustified": 0,
+        "justification_required": true,
+        "expiry_required": true
+      },
+      "cadence_days": {
+        "A": 365,
+        "B": 30,
+        "C": 3,
+        "D": 1
+      },
+      "notes": "Spoofed mail from a supplier domain is a common route to the credentials that reach controlled data.",
+      "methods": [
+        "external-probe",
+        "platform-api"
+      ]
+    }
+  ],
+  "coverage_note": "Twenty-two indicators do not cover sixty-four KSIs, and the registry does not pretend otherwise. Nine cite an external authority; thirteen are this project’s own policy choices and say so per signal.",
+  "collection_note": "Each signal lists the collection METHODS that can legitimately produce it, not products. Any implementation meeting the interface in ontology/collection.json is valid. Where two or more methods are listed they are ordered by directness, and Class C and above require two that read from different control planes — see the independence rule in that file."
+}

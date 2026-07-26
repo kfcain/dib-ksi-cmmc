@@ -1,0 +1,2448 @@
+{
+ "catalog": "DIB-KSI",
+ "version": "0.1.4",
+ "date": "2026-07-16",
+ "basis": {
+  "adopted_from": "FedRAMP CR26 KSI catalog (launched 2026-06-24; 46 KSIs / 10 families)",
+  "melds": "NIST SP 800-171r2 (110 reqs / 320 AOs) + 800-171r3 (97 reqs / 509 DS, 88 ODP-linked)",
+  "odp_source": "DoD CIO ODP memo, April 10, 2025",
+  "scoping": "32 CFR 170.19 asset categories retained",
+  "levels": "CMMC L1/L2/L3 untouched; classes set proof depth only"
+ },
+ "invariants": [
+  "800-171 remains the requirement floor at every class",
+  "FIPS-validated cryptography required for CUI (KSI-CUI-ENC); CMVP status continuously checked",
+  "DFARS 252.204-7012(b)-(m) obligations attach at every class",
+  "FedRAMP Moderate / Class C equivalency for CSPs retained per DoD CIO memo Dec 21 2023",
+  "A KSI is MET only when ALL mapped AOs/DS are demonstrated by required evidence types; per-AO status retained in the SDR (Security Decision Record)",
+  "Uplift KSIs never substitute for 171-mapped KSIs",
+  "POA&M/exception eligibility binds at the REQUIREMENT level per 32 CFR 170.21 and the DoD scoring methodology: the exception engine refuses a clock for any AO under an ineligible requirement regardless of which KSI carries it; KSI-level non_deferrable flags are informational (crown-jewel families), not the enforcement mechanism",
+  "Uplift KSIs are never required below Class D and never affect level compliance; they are scored transparency, present for CR26/Class-C reciprocity and resilience visibility",
+  "Revision indifference: KSI statements are stable; assessable baselines (171r2/171r3/172-2021/172r3) swap underneath via revision_profiles and per-KSI mapping fields; 172r3+172Ar3 (final May 2026) enter as the L3 forward baseline with NIST-native OSCAL as the machine source"
+ ],
+ "evidence_types": {
+  "E1": "Machine telemetry (API/config query of live state)",
+  "E2": "Provenanced artifact (signed, hash-chained, timestamped; third-party-originated preferred)",
+  "E3": "Bound intent (thin policy bound to enforcing configuration)",
+  "E4": "Human observation (interview, walkthrough, floor inspection)",
+  "E5": "Demonstration (exercised capability with measured results)"
+ },
+ "class_rules": {
+  "A": {
+   "applies": "L1 natural; on-ramp for all",
+   "automatable_ksi": "MAY automate; E3 bound intent + signed attestation",
+   "physical_ksi": "E3 + 1 provenanced artifact (E2)",
+   "cadence_machine": "at affirmation",
+   "cadence_physical": "annual",
+   "history": "n/a",
+   "assessment": "automated package validation; no assessor hours"
+  },
+  "B": {
+   "applies": "L2 self-assessment natural",
+   "automatable_ksi": "SHOULD automate; >=1 automated method (E1) + 1 other type",
+   "physical_ksi": "E2 + E3",
+   "cadence_machine": "monthly",
+   "cadence_physical": "semiannual",
+   "history": "30 days",
+   "assessment": "remote pipeline + evidence review"
+  },
+  "C": {
+   "applies": "L2 C3PAO natural; CUI floor (= FedRAMP Class C)",
+   "automatable_ksi": "MUST automate; >=2 independent automated methods (E1 x2, distinct sources) + E3",
+   "physical_ksi": ">=2 non-machine types (E2+E4/E5); E2 third-party-originated where one exists",
+   "cadence_machine": "<=3 days",
+   "cadence_physical": "<=3 months",
+   "history": "6 months",
+   "assessment": "pipeline-integrity verification + per-KSI sampling + Tier-3 floor walk"
+  },
+  "D": {
+   "applies": "L3 natural; prioritized programs",
+   "automatable_ksi": "MUST automate; >=4 methods incl. 1 adversarial E5",
+   "physical_ksi": ">=3 types incl. exercised E5 + in-person E4",
+   "cadence_machine": "daily / enforce-on-drift",
+   "cadence_physical": "monthly",
+   "history": "18 months",
+   "assessment": "DIBCAC full-scope + adversarial validation"
+  }
+ },
+ "asset_rules": {
+  "CUI": "full KSI set at contract class",
+  "SPA": "full set for protection functions provided",
+  "CRMA": "SCB-ACT + E3 + spot-check cadence",
+  "SPECIALIZED": "fixed archetype E2 artifact set; no telemetry demanded",
+  "OOS": "must be shown separated via SCB-DFD"
+ },
+ "ksis": [
+  {
+   "id": "KSI-APT-PEN",
+   "family": "APT",
+   "family_name": "Advanced Persistent Threat (L3/Class D module)",
+   "name": "Adversarial Testing",
+   "statement": "Periodic penetration testing / red-team with findings fed to exceptions (Class D only).",
+   "origin": "DIB-D",
+   "automatable": false,
+   "uplift": false,
+   "non_deferrable": false,
+   "classes": {
+    "A": "n/a",
+    "B": "n/a",
+    "C": "n/a",
+    "D": "required"
+   },
+   "rev2_requirements": [],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [],
+   "rev3_ds_expansion": "engine-generated per 800-172Ar3 (May 2026) OSCAL dataset; ODP values pending DoD publication",
+   "fallback": "E2 third-party-originated preferred; E4/E5 per class",
+   "levels": {
+    "L1": false,
+    "L2": false,
+    "L3": true
+   },
+   "r172_dod_selected": "mapped subset of the 24 DoD-selected 800-172 (2021) requirements per 32 CFR 170.14 table 1",
+   "r172r3_families": [
+    "03.12 Security Assessment & Monitoring (adversarial testing)"
+   ]
+  },
+  {
+   "id": "KSI-APT-RES",
+   "family": "APT",
+   "family_name": "Advanced Persistent Threat (L3/Class D module)",
+   "name": "Cyber Resiliency Architecture",
+   "statement": "Resiliency/survivability architecture per 800-172 selections (Class D only).",
+   "origin": "DIB-D",
+   "automatable": false,
+   "uplift": false,
+   "non_deferrable": false,
+   "classes": {
+    "A": "n/a",
+    "B": "n/a",
+    "C": "n/a",
+    "D": "required"
+   },
+   "rev2_requirements": [],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [],
+   "rev3_ds_expansion": "engine-generated per 800-172Ar3 (May 2026) OSCAL dataset; ODP values pending DoD publication",
+   "fallback": "E2 third-party-originated preferred; E4/E5 per class",
+   "levels": {
+    "L1": false,
+    "L2": false,
+    "L3": true
+   },
+   "r172_dod_selected": "mapped subset of the 24 DoD-selected 800-172 (2021) requirements per 32 CFR 170.14 table 1",
+   "r172r3_families": [
+    "Planning / System & Services Acquisition / SCRM (resiliency & architecture families)"
+   ]
+  },
+  {
+   "id": "KSI-APT-SOC",
+   "family": "APT",
+   "family_name": "Advanced Persistent Threat (L3/Class D module)",
+   "name": "24/7 Detection & Response",
+   "statement": "Continuous security operations capability (Class D only).",
+   "origin": "DIB-D",
+   "automatable": true,
+   "uplift": false,
+   "non_deferrable": false,
+   "classes": {
+    "A": "n/a",
+    "B": "n/a",
+    "C": "n/a",
+    "D": "required"
+   },
+   "rev2_requirements": [],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [],
+   "rev3_ds_expansion": "engine-generated per 800-172Ar3 (May 2026) OSCAL dataset; ODP values pending DoD publication",
+   "fallback": "E1 unavailable -> signed export on cadence (E2) -> archetype fixed artifact set",
+   "levels": {
+    "L1": false,
+    "L2": false,
+    "L3": true
+   },
+   "r172_dod_selected": "mapped subset of the 24 DoD-selected 800-172 (2021) requirements per 32 CFR 170.14 table 1",
+   "r172r3_families": [
+    "03.06 Incident Response (SOC)",
+    "03.03 Audit & Accountability"
+   ]
+  },
+  {
+   "id": "KSI-APT-THR",
+   "family": "APT",
+   "family_name": "Advanced Persistent Threat (L3/Class D module)",
+   "name": "Threat Hunting",
+   "statement": "Cyber threat hunting on defined cadence (800-172 module; Class D only).",
+   "origin": "DIB-D",
+   "automatable": true,
+   "uplift": false,
+   "non_deferrable": false,
+   "classes": {
+    "A": "n/a",
+    "B": "n/a",
+    "C": "n/a",
+    "D": "required"
+   },
+   "rev2_requirements": [],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [],
+   "rev3_ds_expansion": "engine-generated per 800-172Ar3 (May 2026) OSCAL dataset; ODP values pending DoD publication",
+   "fallback": "E1 unavailable -> signed export on cadence (E2) -> archetype fixed artifact set",
+   "levels": {
+    "L1": false,
+    "L2": false,
+    "L3": true
+   },
+   "r172_dod_selected": "mapped subset of the 24 DoD-selected 800-172 (2021) requirements per 32 CFR 170.14 table 1",
+   "r172r3_families": [
+    "03.11 Risk Assessment (threat awareness)",
+    "03.14 System & Information Integrity (hunting)"
+   ]
+  },
+  {
+   "id": "KSI-CED-CUI",
+   "family": "CED",
+   "family_name": "Cybersecurity Education",
+   "name": "CUI & Insider Threat Training",
+   "statement": "Role-based CUI handling and insider-threat training content verified, not just tracked.",
+   "origin": "DIB",
+   "automatable": false,
+   "uplift": false,
+   "non_deferrable": false,
+   "classes": {
+    "A": "required",
+    "B": "required",
+    "C": "required",
+    "D": "required"
+   },
+   "rev2_requirements": [
+    "3.2.3"
+   ],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [
+    "03.02"
+   ],
+   "rev3_ds_expansion": "engine-generated per 800-171A r3 (509 DS; ODP values per DoD memo 2025-04-10)",
+   "fallback": "E2 third-party-originated preferred; E4/E5 per class",
+   "levels": {
+    "L1": false,
+    "L2": true,
+    "L3": true
+   },
+   "rev3_requirements": [
+    "03.02.03",
+    "03.15.03 (Rules of Behavior) [new in r3]"
+   ],
+   "rev3_derivation": "structural renumber + verified absorption exceptions; engine lint vs NIST CPRT/OSCAL 171Ar3 dataset is the release gate for withdrawn/consolidated ordinals beyond the verified set"
+  },
+  {
+   "id": "KSI-CED-RAT",
+   "family": "CED",
+   "family_name": "Cybersecurity Education",
+   "name": "Reviewing All Training",
+   "statement": "Effectiveness of cybersecurity training (general, role-specific, secure delivery, IR/DR) is persistently reviewed.",
+   "origin": "CR26",
+   "automatable": false,
+   "uplift": false,
+   "non_deferrable": false,
+   "classes": {
+    "A": "required",
+    "B": "required",
+    "C": "required",
+    "D": "required"
+   },
+   "rev2_requirements": [
+    "3.2.1",
+    "3.2.2"
+   ],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [
+    "03.02"
+   ],
+   "rev3_ds_expansion": "engine-generated per 800-171A r3 (509 DS; ODP values per DoD memo 2025-04-10)",
+   "fallback": "E2 third-party-originated preferred; E4/E5 per class",
+   "levels": {
+    "L1": false,
+    "L2": true,
+    "L3": true
+   },
+   "rev3_requirements": [
+    "03.02.01",
+    "03.02.02"
+   ],
+   "rev3_derivation": "structural renumber + verified absorption exceptions; engine lint vs NIST CPRT/OSCAL 171Ar3 dataset is the release gate for withdrawn/consolidated ordinals beyond the verified set"
+  },
+  {
+   "id": "KSI-CMT-LMC",
+   "family": "CMT",
+   "family_name": "Change Management",
+   "name": "Logging Changes",
+   "statement": "Modifications to in-scope systems are logged and monitored.",
+   "origin": "CR26",
+   "automatable": true,
+   "uplift": false,
+   "non_deferrable": false,
+   "classes": {
+    "A": "required",
+    "B": "required",
+    "C": "required",
+    "D": "required"
+   },
+   "rev2_requirements": [
+    "3.4.3"
+   ],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [
+    "03.04"
+   ],
+   "rev3_ds_expansion": "engine-generated per 800-171A r3 (509 DS; ODP values per DoD memo 2025-04-10)",
+   "fallback": "E1 unavailable -> signed export on cadence (E2) -> archetype fixed artifact set",
+   "levels": {
+    "L1": false,
+    "L2": true,
+    "L3": true
+   },
+   "rev3_requirements": [
+    "03.04.03"
+   ],
+   "rev3_derivation": "structural renumber + verified absorption exceptions; engine lint vs NIST CPRT/OSCAL 171Ar3 dataset is the release gate for withdrawn/consolidated ordinals beyond the verified set"
+  },
+  {
+   "id": "KSI-CMT-RMV",
+   "family": "CMT",
+   "family_name": "Change Management",
+   "name": "Redeploying vs Modifying",
+   "statement": "Changes execute through redeployment of version-controlled resources; change access is restricted.",
+   "origin": "CR26",
+   "automatable": true,
+   "uplift": false,
+   "non_deferrable": false,
+   "classes": {
+    "A": "required",
+    "B": "required",
+    "C": "required",
+    "D": "required"
+   },
+   "rev2_requirements": [
+    "3.4.5"
+   ],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [
+    "03.04"
+   ],
+   "rev3_ds_expansion": "engine-generated per 800-171A r3 (509 DS; ODP values per DoD memo 2025-04-10)",
+   "fallback": "E1 unavailable -> signed export on cadence (E2) -> archetype fixed artifact set",
+   "levels": {
+    "L1": false,
+    "L2": true,
+    "L3": true
+   },
+   "rev3_requirements": [
+    "03.04.05"
+   ],
+   "rev3_derivation": "structural renumber + verified absorption exceptions; engine lint vs NIST CPRT/OSCAL 171Ar3 dataset is the release gate for withdrawn/consolidated ordinals beyond the verified set"
+  },
+  {
+   "id": "KSI-CMT-RVP",
+   "family": "CMT",
+   "family_name": "Change Management",
+   "name": "Reviewing Change Procedures",
+   "statement": "Effectiveness of documented change management procedures is persistently reviewed.",
+   "origin": "CR26",
+   "automatable": false,
+   "uplift": false,
+   "non_deferrable": false,
+   "classes": {
+    "A": "required",
+    "B": "required",
+    "C": "required",
+    "D": "required"
+   },
+   "rev2_requirements": [],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [],
+   "rev3_ds_expansion": "engine-generated per 800-171A r3 (509 DS; ODP values per DoD memo 2025-04-10)",
+   "fallback": "E2 third-party-originated preferred; E4/E5 per class",
+   "levels": {
+    "L1": false,
+    "L2": true,
+    "L3": true
+   },
+   "rev3_requirements": [],
+   "rev3_derivation": "structural renumber + verified absorption exceptions; engine lint vs NIST CPRT/OSCAL 171Ar3 dataset is the release gate for withdrawn/consolidated ordinals beyond the verified set"
+  },
+  {
+   "id": "KSI-CMT-VTD",
+   "family": "CMT",
+   "family_name": "Change Management",
+   "name": "Validating Throughout Deployment",
+   "statement": "Testing and security impact analysis of changes is automated throughout deployment.",
+   "origin": "CR26",
+   "automatable": true,
+   "uplift": false,
+   "non_deferrable": false,
+   "classes": {
+    "A": "required",
+    "B": "required",
+    "C": "required",
+    "D": "required"
+   },
+   "rev2_requirements": [
+    "3.4.4"
+   ],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [
+    "03.04"
+   ],
+   "rev3_ds_expansion": "engine-generated per 800-171A r3 (509 DS; ODP values per DoD memo 2025-04-10)",
+   "fallback": "E1 unavailable -> signed export on cadence (E2) -> archetype fixed artifact set",
+   "levels": {
+    "L1": false,
+    "L2": true,
+    "L3": true
+   },
+   "rev3_requirements": [
+    "03.04.04"
+   ],
+   "rev3_derivation": "structural renumber + verified absorption exceptions; engine lint vs NIST CPRT/OSCAL 171Ar3 dataset is the release gate for withdrawn/consolidated ordinals beyond the verified set"
+  },
+  {
+   "id": "KSI-CNA-DFP",
+   "family": "CNA",
+   "family_name": "Defensible Architecture",
+   "name": "Defining Functionality and Privileges",
+   "statement": "Functionality and privileges strictly defined: least functionality, application control, malicious-code protection.",
+   "origin": "CR26",
+   "automatable": true,
+   "uplift": false,
+   "non_deferrable": false,
+   "classes": {
+    "A": "required",
+    "B": "required",
+    "C": "required",
+    "D": "required"
+   },
+   "rev2_requirements": [
+    "3.4.6",
+    "3.4.8",
+    "3.4.9",
+    "3.13.3",
+    "3.13.13",
+    "3.14.2",
+    "3.14.4",
+    "3.14.5"
+   ],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [
+    "03.04",
+    "03.13",
+    "03.14"
+   ],
+   "rev3_ds_expansion": "engine-generated per 800-171A r3 (509 DS; ODP values per DoD memo 2025-04-10)",
+   "fallback": "E1 unavailable -> signed export on cadence (E2) -> archetype fixed artifact set",
+   "levels": {
+    "L1": true,
+    "L2": true,
+    "L3": true
+   },
+   "rev3_requirements": [
+    "03.04.06",
+    "03.04.08",
+    "03.04.09",
+    "03.13.03",
+    "03.13.13",
+    "03.14.02",
+    "03.14.04",
+    "03.14.05"
+   ],
+   "rev3_derivation": "structural renumber + verified absorption exceptions; engine lint vs NIST CPRT/OSCAL 171Ar3 dataset is the release gate for withdrawn/consolidated ordinals beyond the verified set"
+  },
+  {
+   "id": "KSI-CNA-EIS",
+   "family": "CNA",
+   "family_name": "Defensible Architecture",
+   "name": "Enforcing Intended State",
+   "statement": "Automated services persistently assess machine-based resources and enforce intended state (continuous monitoring).",
+   "origin": "CR26",
+   "automatable": true,
+   "uplift": false,
+   "non_deferrable": false,
+   "classes": {
+    "A": "n/a",
+    "B": "optional",
+    "C": "required",
+    "D": "required"
+   },
+   "rev2_requirements": [
+    "3.12.3"
+   ],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [
+    "03.12"
+   ],
+   "rev3_ds_expansion": "engine-generated per 800-171A r3 (509 DS; ODP values per DoD memo 2025-04-10)",
+   "fallback": "E1 unavailable -> signed export on cadence (E2) -> archetype fixed artifact set",
+   "levels": {
+    "L1": false,
+    "L2": true,
+    "L3": true
+   },
+   "rev3_requirements": [
+    "03.12.03"
+   ],
+   "rev3_derivation": "structural renumber + verified absorption exceptions; engine lint vs NIST CPRT/OSCAL 171Ar3 dataset is the release gate for withdrawn/consolidated ordinals beyond the verified set"
+  },
+  {
+   "id": "KSI-CNA-IBP",
+   "family": "CNA",
+   "family_name": "Defensible Architecture",
+   "name": "Implementing Best Practices",
+   "statement": "Third-party resource configuration persistently compared against provider best practices.",
+   "origin": "CR26",
+   "automatable": true,
+   "uplift": true,
+   "non_deferrable": false,
+   "classes": {
+    "A": "n/a",
+    "B": "recommended",
+    "C": "recommended",
+    "D": "required"
+   },
+   "rev2_requirements": [],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [],
+   "rev3_ds_expansion": "engine-generated per 800-171A r3 (509 DS; ODP values per DoD memo 2025-04-10)",
+   "fallback": "E1 unavailable -> signed export on cadence (E2) -> archetype fixed artifact set",
+   "levels": {
+    "L1": false,
+    "L2": true,
+    "L3": true
+   },
+   "rev3_requirements": [],
+   "rev3_derivation": "structural renumber + verified absorption exceptions; engine lint vs NIST CPRT/OSCAL 171Ar3 dataset is the release gate for withdrawn/consolidated ordinals beyond the verified set"
+  },
+  {
+   "id": "KSI-CNA-MAT",
+   "family": "CNA",
+   "family_name": "Defensible Architecture",
+   "name": "Minimizing Attack Surface",
+   "statement": "Resources persistently reviewed for minimal attack surface and limited lateral movement; wireless access authorized and constrained.",
+   "origin": "CR26",
+   "automatable": true,
+   "uplift": false,
+   "non_deferrable": false,
+   "classes": {
+    "A": "required",
+    "B": "required",
+    "C": "required",
+    "D": "required"
+   },
+   "rev2_requirements": [
+    "3.1.16"
+   ],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [
+    "03.01"
+   ],
+   "rev3_ds_expansion": "engine-generated per 800-171A r3 (509 DS; ODP values per DoD memo 2025-04-10)",
+   "fallback": "E1 unavailable -> signed export on cadence (E2) -> archetype fixed artifact set",
+   "levels": {
+    "L1": false,
+    "L2": true,
+    "L3": true
+   },
+   "rev3_requirements": [
+    "03.01.16"
+   ],
+   "rev3_derivation": "structural renumber + verified absorption exceptions; engine lint vs NIST CPRT/OSCAL 171Ar3 dataset is the release gate for withdrawn/consolidated ordinals beyond the verified set"
+  },
+  {
+   "id": "KSI-CNA-OFA",
+   "family": "CNA",
+   "family_name": "Defensible Architecture",
+   "name": "Optimizing for Availability",
+   "statement": "Resources persistently reviewed for availability and rapid recovery (availability uplift beyond 171A confidentiality floor).",
+   "origin": "CR26",
+   "automatable": true,
+   "uplift": true,
+   "non_deferrable": false,
+   "classes": {
+    "A": "n/a",
+    "B": "recommended",
+    "C": "recommended",
+    "D": "required"
+   },
+   "rev2_requirements": [],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [],
+   "rev3_ds_expansion": "engine-generated per 800-171A r3 (509 DS; ODP values per DoD memo 2025-04-10)",
+   "fallback": "E1 unavailable -> signed export on cadence (E2) -> archetype fixed artifact set",
+   "levels": {
+    "L1": false,
+    "L2": true,
+    "L3": true
+   },
+   "rev3_requirements": [],
+   "rev3_derivation": "structural renumber + verified absorption exceptions; engine lint vs NIST CPRT/OSCAL 171Ar3 dataset is the release gate for withdrawn/consolidated ordinals beyond the verified set"
+  },
+  {
+   "id": "KSI-CNA-RNT",
+   "family": "CNA",
+   "family_name": "Defensible Architecture",
+   "name": "Restricting Network Traffic",
+   "statement": "Boundary protection: inbound/outbound traffic limited, deny-by-default, split tunneling prevented, remote access monitored.",
+   "origin": "CR26",
+   "automatable": true,
+   "uplift": false,
+   "non_deferrable": true,
+   "classes": {
+    "A": "required",
+    "B": "required",
+    "C": "required",
+    "D": "required"
+   },
+   "rev2_requirements": [
+    "3.1.12",
+    "3.4.7",
+    "3.13.1",
+    "3.13.6",
+    "3.13.7"
+   ],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [
+    "03.01",
+    "03.04",
+    "03.13"
+   ],
+   "rev3_ds_expansion": "engine-generated per 800-171A r3 (509 DS; ODP values per DoD memo 2025-04-10)",
+   "fallback": "E1 unavailable -> signed export on cadence (E2) -> archetype fixed artifact set",
+   "levels": {
+    "L1": true,
+    "L2": true,
+    "L3": true
+   },
+   "rev3_requirements": [
+    "03.01.12",
+    "03.04.07",
+    "03.13.01",
+    "03.13.06",
+    "03.13.07"
+   ],
+   "rev3_derivation": "structural renumber + verified absorption exceptions; engine lint vs NIST CPRT/OSCAL 171Ar3 dataset is the release gate for withdrawn/consolidated ordinals beyond the verified set"
+  },
+  {
+   "id": "KSI-CNA-RVP",
+   "family": "CNA",
+   "family_name": "Defensible Architecture",
+   "name": "Reviewing Protections",
+   "statement": "Effectiveness of DoS and unwanted-activity protections persistently reviewed.",
+   "origin": "CR26",
+   "automatable": true,
+   "uplift": true,
+   "non_deferrable": false,
+   "classes": {
+    "A": "n/a",
+    "B": "recommended",
+    "C": "recommended",
+    "D": "required"
+   },
+   "rev2_requirements": [],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [],
+   "rev3_ds_expansion": "engine-generated per 800-171A r3 (509 DS; ODP values per DoD memo 2025-04-10)",
+   "fallback": "E1 unavailable -> signed export on cadence (E2) -> archetype fixed artifact set",
+   "levels": {
+    "L1": false,
+    "L2": true,
+    "L3": true
+   },
+   "rev3_requirements": [],
+   "rev3_derivation": "structural renumber + verified absorption exceptions; engine lint vs NIST CPRT/OSCAL 171Ar3 dataset is the release gate for withdrawn/consolidated ordinals beyond the verified set"
+  },
+  {
+   "id": "KSI-CNA-ULN",
+   "family": "CNA",
+   "family_name": "Defensible Architecture",
+   "name": "Using Logical Networking",
+   "statement": "Logical networking persistently enforces flow control, connection termination, managed access points.",
+   "origin": "CR26",
+   "automatable": true,
+   "uplift": false,
+   "non_deferrable": false,
+   "classes": {
+    "A": "required",
+    "B": "required",
+    "C": "required",
+    "D": "required"
+   },
+   "rev2_requirements": [
+    "3.1.3",
+    "3.1.14",
+    "3.13.9"
+   ],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [
+    "03.01",
+    "03.13"
+   ],
+   "rev3_ds_expansion": "engine-generated per 800-171A r3 (509 DS; ODP values per DoD memo 2025-04-10)",
+   "fallback": "E1 unavailable -> signed export on cadence (E2) -> archetype fixed artifact set",
+   "levels": {
+    "L1": false,
+    "L2": true,
+    "L3": true
+   },
+   "rev3_requirements": [
+    "03.01.03",
+    "03.01.12 (absorbs 3.1.14)",
+    "03.13.09"
+   ],
+   "rev3_derivation": "structural renumber + verified absorption exceptions; engine lint vs NIST CPRT/OSCAL 171Ar3 dataset is the release gate for withdrawn/consolidated ordinals beyond the verified set"
+  },
+  {
+   "id": "KSI-CUI-ENC",
+   "family": "CUI",
+   "family_name": "CUI Handling & Cryptography",
+   "name": "FIPS-Validated CUI Cryptography",
+   "statement": "CUI at rest and in transit protected with FIPS-validated cryptography (CMVP-checked continuously); covers remote access, wireless, mobile.",
+   "origin": "DIB",
+   "automatable": true,
+   "uplift": false,
+   "non_deferrable": true,
+   "classes": {
+    "A": "required",
+    "B": "required",
+    "C": "required",
+    "D": "required"
+   },
+   "rev2_requirements": [
+    "3.1.13",
+    "3.1.17",
+    "3.1.19",
+    "3.8.6",
+    "3.8.9",
+    "3.13.8",
+    "3.13.11",
+    "3.13.16"
+   ],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [
+    "03.01",
+    "03.08",
+    "03.13"
+   ],
+   "rev3_ds_expansion": "engine-generated per 800-171A r3 (509 DS; ODP values per DoD memo 2025-04-10)",
+   "fallback": "E1 unavailable -> signed export on cadence (E2) -> archetype fixed artifact set",
+   "levels": {
+    "L1": false,
+    "L2": true,
+    "L3": true
+   },
+   "rev3_requirements": [
+    "03.01.16 (absorbs 3.1.17)",
+    "03.01.18 (absorbs 3.1.19)",
+    "03.08.06",
+    "03.08.09",
+    "03.13.08",
+    "03.13.08 (absorbs 3.1.13)",
+    "03.13.11",
+    "03.13.16"
+   ],
+   "rev3_derivation": "structural renumber + verified absorption exceptions; engine lint vs NIST CPRT/OSCAL 171Ar3 dataset is the release gate for withdrawn/consolidated ordinals beyond the verified set"
+  },
+  {
+   "id": "KSI-CUI-MRK",
+   "family": "CUI",
+   "family_name": "CUI Handling & Cryptography",
+   "name": "CUI Marking & Handling",
+   "statement": "CUI marked and handled per contract identification; publicly accessible content controlled.",
+   "origin": "DIB",
+   "automatable": false,
+   "uplift": false,
+   "non_deferrable": false,
+   "classes": {
+    "A": "required",
+    "B": "required",
+    "C": "required",
+    "D": "required"
+   },
+   "rev2_requirements": [
+    "3.1.22",
+    "3.8.4"
+   ],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [
+    "03.01",
+    "03.08"
+   ],
+   "rev3_ds_expansion": "engine-generated per 800-171A r3 (509 DS; ODP values per DoD memo 2025-04-10)",
+   "fallback": "E2 third-party-originated preferred; E4/E5 per class",
+   "levels": {
+    "L1": true,
+    "L2": true,
+    "L3": true
+   },
+   "rev3_requirements": [
+    "03.01.22",
+    "03.08.04"
+   ],
+   "rev3_derivation": "structural renumber + verified absorption exceptions; engine lint vs NIST CPRT/OSCAL 171Ar3 dataset is the release gate for withdrawn/consolidated ordinals beyond the verified set"
+  },
+  {
+   "id": "KSI-IAM-AAM",
+   "family": "IAM",
+   "family_name": "Identity & Access Management",
+   "name": "Automating Account Management",
+   "statement": "Lifecycle and privileges of all accounts/roles/groups managed with automation; identifiers unique, non-reused, disabled when inactive.",
+   "origin": "CR26",
+   "automatable": true,
+   "uplift": false,
+   "non_deferrable": false,
+   "classes": {
+    "A": "required",
+    "B": "required",
+    "C": "required",
+    "D": "required"
+   },
+   "rev2_requirements": [
+    "3.1.1",
+    "3.5.1",
+    "3.5.5",
+    "3.5.6",
+    "3.9.2"
+   ],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [
+    "03.01",
+    "03.05",
+    "03.09"
+   ],
+   "rev3_ds_expansion": "engine-generated per 800-171A r3 (509 DS; ODP values per DoD memo 2025-04-10)",
+   "fallback": "E1 unavailable -> signed export on cadence (E2) -> archetype fixed artifact set",
+   "levels": {
+    "L1": true,
+    "L2": true,
+    "L3": true
+   },
+   "rev3_requirements": [
+    "03.01.01",
+    "03.05.01",
+    "03.05.05",
+    "03.05.06",
+    "03.09.02"
+   ],
+   "rev3_derivation": "structural renumber + verified absorption exceptions; engine lint vs NIST CPRT/OSCAL 171Ar3 dataset is the release gate for withdrawn/consolidated ordinals beyond the verified set"
+  },
+  {
+   "id": "KSI-IAM-APM",
+   "family": "IAM",
+   "family_name": "Identity & Access Management",
+   "name": "Adopting Phishing-Resistant Methods",
+   "statement": "MFA enforced for local, network, and privileged access (3.5.3 floor); phishing-resistant methods recommended at Class C and required at Class D; replay resistance; password protections where passwords persist; MFA for nonlocal maintenance.",
+   "origin": "CR26",
+   "automatable": true,
+   "uplift": false,
+   "non_deferrable": true,
+   "classes": {
+    "A": "required",
+    "B": "required",
+    "C": "required",
+    "D": "required"
+   },
+   "rev2_requirements": [
+    "3.5.2",
+    "3.5.3",
+    "3.5.4",
+    "3.5.7",
+    "3.5.8",
+    "3.5.9",
+    "3.5.10",
+    "3.5.11",
+    "3.7.5"
+   ],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [
+    "03.05",
+    "03.07"
+   ],
+   "rev3_ds_expansion": "engine-generated per 800-171A r3 (509 DS; ODP values per DoD memo 2025-04-10)",
+   "fallback": "E1 unavailable -> signed export on cadence (E2) -> archetype fixed artifact set",
+   "levels": {
+    "L1": true,
+    "L2": true,
+    "L3": true
+   },
+   "rev3_requirements": [
+    "03.05.02",
+    "03.05.03",
+    "03.05.04",
+    "03.05.07",
+    "03.05.08",
+    "03.05.09",
+    "03.05.10",
+    "03.05.11",
+    "03.07.05"
+   ],
+   "rev3_derivation": "structural renumber + verified absorption exceptions; engine lint vs NIST CPRT/OSCAL 171Ar3 dataset is the release gate for withdrawn/consolidated ordinals beyond the verified set"
+  },
+  {
+   "id": "KSI-IAM-ELP",
+   "family": "IAM",
+   "family_name": "Identity & Access Management",
+   "name": "Ensuring Least Privilege",
+   "statement": "Least privilege persistently reviewed for every user and device; session lock and termination enforced.",
+   "origin": "CR26",
+   "automatable": true,
+   "uplift": false,
+   "non_deferrable": true,
+   "classes": {
+    "A": "required",
+    "B": "required",
+    "C": "required",
+    "D": "required"
+   },
+   "rev2_requirements": [
+    "3.1.2",
+    "3.1.5",
+    "3.1.10",
+    "3.1.11"
+   ],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [
+    "03.01"
+   ],
+   "rev3_ds_expansion": "engine-generated per 800-171A r3 (509 DS; ODP values per DoD memo 2025-04-10)",
+   "fallback": "E1 unavailable -> signed export on cadence (E2) -> archetype fixed artifact set",
+   "levels": {
+    "L1": true,
+    "L2": true,
+    "L3": true
+   },
+   "rev3_requirements": [
+    "03.01.02",
+    "03.01.05",
+    "03.01.10",
+    "03.01.11"
+   ],
+   "rev3_derivation": "structural renumber + verified absorption exceptions; engine lint vs NIST CPRT/OSCAL 171Ar3 dataset is the release gate for withdrawn/consolidated ordinals beyond the verified set"
+  },
+  {
+   "id": "KSI-IAM-JIT",
+   "family": "IAM",
+   "family_name": "Identity & Access Management",
+   "name": "Authorizing Just-in-Time",
+   "statement": "Role/attribute-based, just-in-time authorization; separation of duties; privileged function control and logging.",
+   "origin": "CR26",
+   "automatable": true,
+   "uplift": false,
+   "non_deferrable": false,
+   "classes": {
+    "A": "required",
+    "B": "required",
+    "C": "required",
+    "D": "required"
+   },
+   "rev2_requirements": [
+    "3.1.4",
+    "3.1.5",
+    "3.1.6",
+    "3.1.7",
+    "3.1.15"
+   ],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [
+    "03.01"
+   ],
+   "rev3_ds_expansion": "engine-generated per 800-171A r3 (509 DS; ODP values per DoD memo 2025-04-10)",
+   "fallback": "E1 unavailable -> signed export on cadence (E2) -> archetype fixed artifact set",
+   "levels": {
+    "L1": false,
+    "L2": true,
+    "L3": true
+   },
+   "rev3_requirements": [
+    "03.01.04",
+    "03.01.05",
+    "03.01.06",
+    "03.01.07",
+    "03.01.12 (absorbs 3.1.15)"
+   ],
+   "rev3_derivation": "structural renumber + verified absorption exceptions; engine lint vs NIST CPRT/OSCAL 171Ar3 dataset is the release gate for withdrawn/consolidated ordinals beyond the verified set"
+  },
+  {
+   "id": "KSI-IAM-SNU",
+   "family": "IAM",
+   "family_name": "Identity & Access Management",
+   "name": "Securing Non-User Authentication",
+   "statement": "Secure authentication for service and non-user accounts persistently reviewed.",
+   "origin": "CR26",
+   "automatable": true,
+   "uplift": false,
+   "non_deferrable": false,
+   "classes": {
+    "A": "required",
+    "B": "required",
+    "C": "required",
+    "D": "required"
+   },
+   "rev2_requirements": [],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [],
+   "rev3_ds_expansion": "engine-generated per 800-171A r3 (509 DS; ODP values per DoD memo 2025-04-10)",
+   "fallback": "E1 unavailable -> signed export on cadence (E2) -> archetype fixed artifact set",
+   "levels": {
+    "L1": false,
+    "L2": true,
+    "L3": true
+   },
+   "rev3_requirements": [],
+   "rev3_derivation": "structural renumber + verified absorption exceptions; engine lint vs NIST CPRT/OSCAL 171Ar3 dataset is the release gate for withdrawn/consolidated ordinals beyond the verified set"
+  },
+  {
+   "id": "KSI-IAM-SUS",
+   "family": "IAM",
+   "family_name": "Identity & Access Management",
+   "name": "Responding to Suspicious Activity",
+   "statement": "Privileged accounts disabled/secured on suspicious activity; unsuccessful logon attempts limited.",
+   "origin": "CR26",
+   "automatable": true,
+   "uplift": false,
+   "non_deferrable": false,
+   "classes": {
+    "A": "required",
+    "B": "required",
+    "C": "required",
+    "D": "required"
+   },
+   "rev2_requirements": [
+    "3.1.8"
+   ],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [
+    "03.01"
+   ],
+   "rev3_ds_expansion": "engine-generated per 800-171A r3 (509 DS; ODP values per DoD memo 2025-04-10)",
+   "fallback": "E1 unavailable -> signed export on cadence (E2) -> archetype fixed artifact set",
+   "levels": {
+    "L1": false,
+    "L2": true,
+    "L3": true
+   },
+   "rev3_requirements": [
+    "03.01.08"
+   ],
+   "rev3_derivation": "structural renumber + verified absorption exceptions; engine lint vs NIST CPRT/OSCAL 171Ar3 dataset is the release gate for withdrawn/consolidated ordinals beyond the verified set"
+  },
+  {
+   "id": "KSI-INR-AAR",
+   "family": "INR",
+   "family_name": "Incident Response",
+   "name": "Generating After Action Reports",
+   "statement": "Incident response capability is tested; after-action reports generated and lessons incorporated.",
+   "origin": "CR26",
+   "automatable": false,
+   "uplift": false,
+   "non_deferrable": false,
+   "classes": {
+    "A": "required",
+    "B": "required",
+    "C": "required",
+    "D": "required"
+   },
+   "rev2_requirements": [
+    "3.6.3"
+   ],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [
+    "03.06"
+   ],
+   "rev3_ds_expansion": "engine-generated per 800-171A r3 (509 DS; ODP values per DoD memo 2025-04-10)",
+   "fallback": "E2 third-party-originated preferred; E4/E5 per class",
+   "levels": {
+    "L1": false,
+    "L2": true,
+    "L3": true
+   },
+   "rev3_requirements": [
+    "03.06.03"
+   ],
+   "rev3_derivation": "structural renumber + verified absorption exceptions; engine lint vs NIST CPRT/OSCAL 171Ar3 dataset is the release gate for withdrawn/consolidated ordinals beyond the verified set"
+  },
+  {
+   "id": "KSI-INR-RIR",
+   "family": "INR",
+   "family_name": "Incident Response",
+   "name": "Reviewing IR Procedures (incl. DIBNet 72-hr)",
+   "statement": "Operational IR capability with tracking and reporting; 72-hour DIBNet reporting exercised at every class.",
+   "origin": "CR26",
+   "automatable": false,
+   "uplift": false,
+   "non_deferrable": true,
+   "classes": {
+    "A": "required",
+    "B": "required",
+    "C": "required",
+    "D": "required"
+   },
+   "rev2_requirements": [
+    "3.6.1",
+    "3.6.2"
+   ],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [
+    "03.06"
+   ],
+   "rev3_ds_expansion": "engine-generated per 800-171A r3 (509 DS; ODP values per DoD memo 2025-04-10)",
+   "fallback": "E2 third-party-originated preferred; E4/E5 per class",
+   "levels": {
+    "L1": false,
+    "L2": true,
+    "L3": true
+   },
+   "rev3_requirements": [
+    "03.06.01",
+    "03.06.02"
+   ],
+   "rev3_derivation": "structural renumber + verified absorption exceptions; engine lint vs NIST CPRT/OSCAL 171Ar3 dataset is the release gate for withdrawn/consolidated ordinals beyond the verified set"
+  },
+  {
+   "id": "KSI-INR-RPI",
+   "family": "INR",
+   "family_name": "Incident Response",
+   "name": "Reviewing Past Incidents",
+   "statement": "Past incidents persistently reviewed for latent patterns and vulnerabilities.",
+   "origin": "CR26",
+   "automatable": false,
+   "uplift": true,
+   "non_deferrable": false,
+   "classes": {
+    "A": "n/a",
+    "B": "recommended",
+    "C": "recommended",
+    "D": "required"
+   },
+   "rev2_requirements": [],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [],
+   "rev3_ds_expansion": "engine-generated per 800-171A r3 (509 DS; ODP values per DoD memo 2025-04-10)",
+   "fallback": "E2 third-party-originated preferred; E4/E5 per class",
+   "levels": {
+    "L1": false,
+    "L2": true,
+    "L3": true
+   },
+   "rev3_requirements": [],
+   "rev3_derivation": "structural renumber + verified absorption exceptions; engine lint vs NIST CPRT/OSCAL 171Ar3 dataset is the release gate for withdrawn/consolidated ordinals beyond the verified set"
+  },
+  {
+   "id": "KSI-MED-PPR",
+   "family": "MED",
+   "family_name": "Media Protection",
+   "name": "Physical & Paper CUI Protection",
+   "statement": "Physical media and paper CUI protected and access-limited.",
+   "origin": "DIB",
+   "automatable": false,
+   "uplift": false,
+   "non_deferrable": false,
+   "classes": {
+    "A": "required",
+    "B": "required",
+    "C": "required",
+    "D": "required"
+   },
+   "rev2_requirements": [
+    "3.8.1",
+    "3.8.2"
+   ],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [
+    "03.08"
+   ],
+   "rev3_ds_expansion": "engine-generated per 800-171A r3 (509 DS; ODP values per DoD memo 2025-04-10)",
+   "fallback": "E2 third-party-originated preferred; E4/E5 per class",
+   "levels": {
+    "L1": false,
+    "L2": true,
+    "L3": true
+   },
+   "rev3_requirements": [
+    "03.08.01",
+    "03.08.02"
+   ],
+   "rev3_derivation": "structural renumber + verified absorption exceptions; engine lint vs NIST CPRT/OSCAL 171Ar3 dataset is the release gate for withdrawn/consolidated ordinals beyond the verified set"
+  },
+  {
+   "id": "KSI-MED-RMC",
+   "family": "MED",
+   "family_name": "Media Protection",
+   "name": "Removable Media Control",
+   "statement": "Removable/portable storage restricted, owned, checked; use persistently reviewed.",
+   "origin": "DIB",
+   "automatable": true,
+   "uplift": false,
+   "non_deferrable": false,
+   "classes": {
+    "A": "required",
+    "B": "required",
+    "C": "required",
+    "D": "required"
+   },
+   "rev2_requirements": [
+    "3.1.21",
+    "3.7.4",
+    "3.8.7",
+    "3.8.8"
+   ],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [
+    "03.01",
+    "03.07",
+    "03.08"
+   ],
+   "rev3_ds_expansion": "engine-generated per 800-171A r3 (509 DS; ODP values per DoD memo 2025-04-10)",
+   "fallback": "E1 unavailable -> signed export on cadence (E2) -> archetype fixed artifact set",
+   "levels": {
+    "L1": false,
+    "L2": true,
+    "L3": true
+   },
+   "rev3_requirements": [
+    "03.01.21",
+    "03.07.04",
+    "03.08.07",
+    "03.08.08"
+   ],
+   "rev3_derivation": "structural renumber + verified absorption exceptions; engine lint vs NIST CPRT/OSCAL 171Ar3 dataset is the release gate for withdrawn/consolidated ordinals beyond the verified set"
+  },
+  {
+   "id": "KSI-MED-SAN",
+   "family": "MED",
+   "family_name": "Media Protection",
+   "name": "Media Sanitization",
+   "statement": "Media sanitized or destroyed before disposal/reuse/offsite maintenance; third-party-originated destruction records as signed artifacts.",
+   "origin": "DIB",
+   "automatable": false,
+   "uplift": false,
+   "non_deferrable": true,
+   "classes": {
+    "A": "required",
+    "B": "required",
+    "C": "required",
+    "D": "required"
+   },
+   "rev2_requirements": [
+    "3.7.3",
+    "3.8.3"
+   ],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [
+    "03.07",
+    "03.08"
+   ],
+   "rev3_ds_expansion": "engine-generated per 800-171A r3 (509 DS; ODP values per DoD memo 2025-04-10)",
+   "fallback": "E2 third-party-originated preferred; E4/E5 per class",
+   "levels": {
+    "L1": true,
+    "L2": true,
+    "L3": true
+   },
+   "rev3_requirements": [
+    "03.07.03",
+    "03.08.03"
+   ],
+   "rev3_derivation": "structural renumber + verified absorption exceptions; engine lint vs NIST CPRT/OSCAL 171Ar3 dataset is the release gate for withdrawn/consolidated ordinals beyond the verified set"
+  },
+  {
+   "id": "KSI-MED-TRN",
+   "family": "MED",
+   "family_name": "Media Protection",
+   "name": "Media Transport",
+   "statement": "Media protected and encrypted during transport outside controlled areas; accountability maintained.",
+   "origin": "DIB",
+   "automatable": false,
+   "uplift": false,
+   "non_deferrable": false,
+   "classes": {
+    "A": "required",
+    "B": "required",
+    "C": "required",
+    "D": "required"
+   },
+   "rev2_requirements": [
+    "3.8.5",
+    "3.8.6"
+   ],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [
+    "03.08"
+   ],
+   "rev3_ds_expansion": "engine-generated per 800-171A r3 (509 DS; ODP values per DoD memo 2025-04-10)",
+   "fallback": "E2 third-party-originated preferred; E4/E5 per class",
+   "levels": {
+    "L1": false,
+    "L2": true,
+    "L3": true
+   },
+   "rev3_requirements": [
+    "03.08.05",
+    "03.08.06"
+   ],
+   "rev3_derivation": "structural renumber + verified absorption exceptions; engine lint vs NIST CPRT/OSCAL 171Ar3 dataset is the release gate for withdrawn/consolidated ordinals beyond the verified set"
+  },
+  {
+   "id": "KSI-MLA-ALA",
+   "family": "MLA",
+   "family_name": "Monitoring, Logging & Auditing",
+   "name": "Authorizing Log Access",
+   "statement": "Least-privileged, JIT access to audit information; audit management privileges restricted.",
+   "origin": "CR26",
+   "automatable": true,
+   "uplift": false,
+   "non_deferrable": false,
+   "classes": {
+    "A": "n/a",
+    "B": "optional",
+    "C": "required",
+    "D": "required"
+   },
+   "rev2_requirements": [
+    "3.3.8",
+    "3.3.9"
+   ],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [
+    "03.03"
+   ],
+   "rev3_ds_expansion": "engine-generated per 800-171A r3 (509 DS; ODP values per DoD memo 2025-04-10)",
+   "fallback": "E1 unavailable -> signed export on cadence (E2) -> archetype fixed artifact set",
+   "levels": {
+    "L1": false,
+    "L2": true,
+    "L3": true
+   },
+   "rev3_requirements": [
+    "03.03.08",
+    "03.03.09"
+   ],
+   "rev3_derivation": "structural renumber + verified absorption exceptions; engine lint vs NIST CPRT/OSCAL 171Ar3 dataset is the release gate for withdrawn/consolidated ordinals beyond the verified set"
+  },
+  {
+   "id": "KSI-MLA-EVC",
+   "family": "MLA",
+   "family_name": "Monitoring, Logging & Auditing",
+   "name": "Evaluating Configurations",
+   "statement": "Configurations persistently evaluated and tested, including vulnerability scanning of the estate.",
+   "origin": "CR26",
+   "automatable": true,
+   "uplift": false,
+   "non_deferrable": false,
+   "classes": {
+    "A": "required",
+    "B": "required",
+    "C": "required",
+    "D": "required"
+   },
+   "rev2_requirements": [
+    "3.11.2"
+   ],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [
+    "03.11"
+   ],
+   "rev3_ds_expansion": "engine-generated per 800-171A r3 (509 DS; ODP values per DoD memo 2025-04-10)",
+   "fallback": "E1 unavailable -> signed export on cadence (E2) -> archetype fixed artifact set",
+   "levels": {
+    "L1": false,
+    "L2": true,
+    "L3": true
+   },
+   "rev3_requirements": [
+    "03.11.02"
+   ],
+   "rev3_derivation": "structural renumber + verified absorption exceptions; engine lint vs NIST CPRT/OSCAL 171Ar3 dataset is the release gate for withdrawn/consolidated ordinals beyond the verified set"
+  },
+  {
+   "id": "KSI-MLA-LET",
+   "family": "MLA",
+   "family_name": "Monitoring, Logging & Auditing",
+   "name": "Logging Event Types",
+   "statement": "Defined event types logged with individual accountability; coverage persistently reviewed.",
+   "origin": "CR26",
+   "automatable": true,
+   "uplift": false,
+   "non_deferrable": true,
+   "classes": {
+    "A": "required",
+    "B": "required",
+    "C": "required",
+    "D": "required"
+   },
+   "rev2_requirements": [
+    "3.1.7",
+    "3.1.12",
+    "3.3.1",
+    "3.3.2"
+   ],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [
+    "03.01",
+    "03.03"
+   ],
+   "rev3_ds_expansion": "engine-generated per 800-171A r3 (509 DS; ODP values per DoD memo 2025-04-10)",
+   "fallback": "E1 unavailable -> signed export on cadence (E2) -> archetype fixed artifact set",
+   "levels": {
+    "L1": false,
+    "L2": true,
+    "L3": true
+   },
+   "rev3_requirements": [
+    "03.01.07",
+    "03.01.12",
+    "03.03.01",
+    "03.03.02"
+   ],
+   "rev3_derivation": "structural renumber + verified absorption exceptions; engine lint vs NIST CPRT/OSCAL 171Ar3 dataset is the release gate for withdrawn/consolidated ordinals beyond the verified set"
+  },
+  {
+   "id": "KSI-MLA-OSM",
+   "family": "MLA",
+   "family_name": "Monitoring, Logging & Auditing",
+   "name": "Operating SIEM Capability",
+   "statement": "Centralized tamper-resistant logging with correlation, alerting on failure, time sync, attack monitoring.",
+   "origin": "CR26",
+   "automatable": true,
+   "uplift": false,
+   "non_deferrable": false,
+   "classes": {
+    "A": "required",
+    "B": "required",
+    "C": "required",
+    "D": "required"
+   },
+   "rev2_requirements": [
+    "3.3.4",
+    "3.3.5",
+    "3.3.6",
+    "3.3.7",
+    "3.14.6"
+   ],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [
+    "03.03",
+    "03.14"
+   ],
+   "rev3_ds_expansion": "engine-generated per 800-171A r3 (509 DS; ODP values per DoD memo 2025-04-10)",
+   "fallback": "E1 unavailable -> signed export on cadence (E2) -> archetype fixed artifact set",
+   "levels": {
+    "L1": false,
+    "L2": true,
+    "L3": true
+   },
+   "rev3_requirements": [
+    "03.03.04",
+    "03.03.05",
+    "03.03.06",
+    "03.03.07",
+    "03.14.06"
+   ],
+   "rev3_derivation": "structural renumber + verified absorption exceptions; engine lint vs NIST CPRT/OSCAL 171Ar3 dataset is the release gate for withdrawn/consolidated ordinals beyond the verified set"
+  },
+  {
+   "id": "KSI-MLA-RVL",
+   "family": "MLA",
+   "family_name": "Monitoring, Logging & Auditing",
+   "name": "Reviewing Logs",
+   "statement": "Logs persistently reviewed/audited; unauthorized use identified.",
+   "origin": "CR26",
+   "automatable": true,
+   "uplift": false,
+   "non_deferrable": false,
+   "classes": {
+    "A": "required",
+    "B": "required",
+    "C": "required",
+    "D": "required"
+   },
+   "rev2_requirements": [
+    "3.3.3",
+    "3.14.7"
+   ],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [
+    "03.03",
+    "03.14"
+   ],
+   "rev3_ds_expansion": "engine-generated per 800-171A r3 (509 DS; ODP values per DoD memo 2025-04-10)",
+   "fallback": "E1 unavailable -> signed export on cadence (E2) -> archetype fixed artifact set",
+   "levels": {
+    "L1": false,
+    "L2": true,
+    "L3": true
+   },
+   "rev3_requirements": [
+    "03.03.03",
+    "03.14.07"
+   ],
+   "rev3_derivation": "structural renumber + verified absorption exceptions; engine lint vs NIST CPRT/OSCAL 171Ar3 dataset is the release gate for withdrawn/consolidated ordinals beyond the verified set"
+  },
+  {
+   "id": "KSI-PER-SCR",
+   "family": "PER",
+   "family_name": "Personnel Security",
+   "name": "Personnel Screening & Separation",
+   "statement": "Individuals screened before CUI access; access revoked on termination/transfer via the automated account pipeline.",
+   "origin": "DIB",
+   "automatable": false,
+   "uplift": false,
+   "non_deferrable": false,
+   "classes": {
+    "A": "required",
+    "B": "required",
+    "C": "required",
+    "D": "required"
+   },
+   "rev2_requirements": [
+    "3.9.1",
+    "3.9.2"
+   ],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [
+    "03.09"
+   ],
+   "rev3_ds_expansion": "engine-generated per 800-171A r3 (509 DS; ODP values per DoD memo 2025-04-10)",
+   "fallback": "E2 third-party-originated preferred; E4/E5 per class",
+   "levels": {
+    "L1": false,
+    "L2": true,
+    "L3": true
+   },
+   "rev3_requirements": [
+    "03.09.01",
+    "03.09.02"
+   ],
+   "rev3_derivation": "structural renumber + verified absorption exceptions; engine lint vs NIST CPRT/OSCAL 171Ar3 dataset is the release gate for withdrawn/consolidated ordinals beyond the verified set"
+  },
+  {
+   "id": "KSI-PHY-LPA",
+   "family": "PHY",
+   "family_name": "Physical Protection",
+   "name": "Limiting Physical Access",
+   "statement": "Physical access to CUI spaces limited, logged, devices controlled, facility monitored; alternative work sites safeguarded.",
+   "origin": "DIB",
+   "automatable": false,
+   "uplift": false,
+   "non_deferrable": true,
+   "classes": {
+    "A": "required",
+    "B": "required",
+    "C": "required",
+    "D": "required"
+   },
+   "rev2_requirements": [
+    "3.10.1",
+    "3.10.2",
+    "3.10.5",
+    "3.10.6"
+   ],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [
+    "03.10"
+   ],
+   "rev3_ds_expansion": "engine-generated per 800-171A r3 (509 DS; ODP values per DoD memo 2025-04-10)",
+   "fallback": "E2 third-party-originated preferred; E4/E5 per class",
+   "levels": {
+    "L1": true,
+    "L2": true,
+    "L3": true
+   },
+   "rev3_requirements": [
+    "03.10.01",
+    "03.10.02",
+    "03.10.05",
+    "03.10.06"
+   ],
+   "rev3_derivation": "structural renumber + verified absorption exceptions; engine lint vs NIST CPRT/OSCAL 171Ar3 dataset is the release gate for withdrawn/consolidated ordinals beyond the verified set"
+  },
+  {
+   "id": "KSI-PHY-MEV",
+   "family": "PHY",
+   "family_name": "Physical Protection",
+   "name": "Managing Escorts & Visitors",
+   "statement": "Visitors escorted and logged; maintenance personnel supervised; activity persistently reviewed.",
+   "origin": "DIB",
+   "automatable": false,
+   "uplift": false,
+   "non_deferrable": false,
+   "classes": {
+    "A": "required",
+    "B": "required",
+    "C": "required",
+    "D": "required"
+   },
+   "rev2_requirements": [
+    "3.7.6",
+    "3.10.3",
+    "3.10.4"
+   ],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [
+    "03.07",
+    "03.10"
+   ],
+   "rev3_ds_expansion": "engine-generated per 800-171A r3 (509 DS; ODP values per DoD memo 2025-04-10)",
+   "fallback": "E2 third-party-originated preferred; E4/E5 per class",
+   "levels": {
+    "L1": true,
+    "L2": true,
+    "L3": true
+   },
+   "rev3_requirements": [
+    "03.07.06",
+    "03.10.03",
+    "03.10.04"
+   ],
+   "rev3_derivation": "structural renumber + verified absorption exceptions; engine lint vs NIST CPRT/OSCAL 171Ar3 dataset is the release gate for withdrawn/consolidated ordinals beyond the verified set"
+  },
+  {
+   "id": "KSI-PIY-GIV",
+   "family": "PIY",
+   "family_name": "Program, Inventory & Governance",
+   "name": "Generating Inventories",
+   "statement": "Authoritative sources auto-generate real-time inventories of all information resources.",
+   "origin": "CR26",
+   "automatable": true,
+   "uplift": false,
+   "non_deferrable": false,
+   "classes": {
+    "A": "required",
+    "B": "required",
+    "C": "required",
+    "D": "required"
+   },
+   "rev2_requirements": [
+    "3.4.1"
+   ],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [
+    "03.04"
+   ],
+   "rev3_ds_expansion": "engine-generated per 800-171A r3 (509 DS; ODP values per DoD memo 2025-04-10)",
+   "fallback": "E1 unavailable -> signed export on cadence (E2) -> archetype fixed artifact set",
+   "levels": {
+    "L1": false,
+    "L2": true,
+    "L3": true
+   },
+   "rev3_requirements": [
+    "03.04.01"
+   ],
+   "rev3_derivation": "structural renumber + verified absorption exceptions; engine lint vs NIST CPRT/OSCAL 171Ar3 dataset is the release gate for withdrawn/consolidated ordinals beyond the verified set"
+  },
+  {
+   "id": "KSI-PIY-RES",
+   "family": "PIY",
+   "family_name": "Program, Inventory & Governance",
+   "name": "Reviewing Executive Support",
+   "statement": "Executive support for security goals persistently demonstrated.",
+   "origin": "CR26",
+   "automatable": false,
+   "uplift": true,
+   "non_deferrable": false,
+   "classes": {
+    "A": "n/a",
+    "B": "recommended",
+    "C": "recommended",
+    "D": "required"
+   },
+   "rev2_requirements": [],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [],
+   "rev3_ds_expansion": "engine-generated per 800-171A r3 (509 DS; ODP values per DoD memo 2025-04-10)",
+   "fallback": "E2 third-party-originated preferred; E4/E5 per class",
+   "levels": {
+    "L1": false,
+    "L2": true,
+    "L3": true
+   },
+   "rev3_requirements": [],
+   "rev3_derivation": "structural renumber + verified absorption exceptions; engine lint vs NIST CPRT/OSCAL 171Ar3 dataset is the release gate for withdrawn/consolidated ordinals beyond the verified set"
+  },
+  {
+   "id": "KSI-PIY-RIS",
+   "family": "PIY",
+   "family_name": "Program, Inventory & Governance",
+   "name": "Reviewing Investments in Security",
+   "statement": "Security requirement and risk assessment on defined cadence; deficiencies tracked to closure via the exception queue.",
+   "origin": "CR26",
+   "automatable": false,
+   "uplift": false,
+   "non_deferrable": false,
+   "classes": {
+    "A": "required",
+    "B": "required",
+    "C": "required",
+    "D": "required"
+   },
+   "rev2_requirements": [
+    "3.11.1",
+    "3.12.1",
+    "3.12.2"
+   ],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [
+    "03.11",
+    "03.12"
+   ],
+   "rev3_ds_expansion": "engine-generated per 800-171A r3 (509 DS; ODP values per DoD memo 2025-04-10)",
+   "fallback": "E2 third-party-originated preferred; E4/E5 per class",
+   "levels": {
+    "L1": false,
+    "L2": true,
+    "L3": true
+   },
+   "rev3_requirements": [
+    "03.11.01",
+    "03.12.01",
+    "03.12.02",
+    "03.15.01 (Policy & Procedures) [new in r3]"
+   ],
+   "rev3_derivation": "structural renumber + verified absorption exceptions; engine lint vs NIST CPRT/OSCAL 171Ar3 dataset is the release gate for withdrawn/consolidated ordinals beyond the verified set"
+  },
+  {
+   "id": "KSI-PIY-RSD",
+   "family": "PIY",
+   "family_name": "Program, Inventory & Governance",
+   "name": "Reviewing Security in the SDLC",
+   "statement": "Security built into SDLC per Secure-by-Design; persistently reviewed.",
+   "origin": "CR26",
+   "automatable": false,
+   "uplift": true,
+   "non_deferrable": false,
+   "classes": {
+    "A": "n/a",
+    "B": "recommended",
+    "C": "recommended",
+    "D": "required"
+   },
+   "rev2_requirements": [],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [],
+   "rev3_ds_expansion": "engine-generated per 800-171A r3 (509 DS; ODP values per DoD memo 2025-04-10)",
+   "fallback": "E2 third-party-originated preferred; E4/E5 per class",
+   "levels": {
+    "L1": false,
+    "L2": true,
+    "L3": true
+   },
+   "rev3_requirements": [
+    "03.16.01 (Security Engineering Principles) [new in r3]"
+   ],
+   "rev3_derivation": "structural renumber + verified absorption exceptions; engine lint vs NIST CPRT/OSCAL 171Ar3 dataset is the release gate for withdrawn/consolidated ordinals beyond the verified set"
+  },
+  {
+   "id": "KSI-PIY-RVD",
+   "family": "PIY",
+   "family_name": "Program, Inventory & Governance",
+   "name": "Reviewing Vulnerability Disclosures",
+   "statement": "Vulnerability disclosure program effectiveness persistently reviewed.",
+   "origin": "CR26",
+   "automatable": false,
+   "uplift": true,
+   "non_deferrable": false,
+   "classes": {
+    "A": "n/a",
+    "B": "recommended",
+    "C": "recommended",
+    "D": "required"
+   },
+   "rev2_requirements": [],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [],
+   "rev3_ds_expansion": "engine-generated per 800-171A r3 (509 DS; ODP values per DoD memo 2025-04-10)",
+   "fallback": "E2 third-party-originated preferred; E4/E5 per class",
+   "levels": {
+    "L1": false,
+    "L2": true,
+    "L3": true
+   },
+   "rev3_requirements": [],
+   "rev3_derivation": "structural renumber + verified absorption exceptions; engine lint vs NIST CPRT/OSCAL 171Ar3 dataset is the release gate for withdrawn/consolidated ordinals beyond the verified set"
+  },
+  {
+   "id": "KSI-RPL-ABO",
+   "family": "RPL",
+   "family_name": "Recovery Planning",
+   "name": "Aligning Backups with Objectives",
+   "statement": "Backups of CUI and systems align with recovery objectives; backup CUI protected.",
+   "origin": "CR26",
+   "automatable": true,
+   "uplift": false,
+   "non_deferrable": false,
+   "classes": {
+    "A": "required",
+    "B": "required",
+    "C": "required",
+    "D": "required"
+   },
+   "rev2_requirements": [
+    "3.8.9"
+   ],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [
+    "03.08"
+   ],
+   "rev3_ds_expansion": "engine-generated per 800-171A r3 (509 DS; ODP values per DoD memo 2025-04-10)",
+   "fallback": "E1 unavailable -> signed export on cadence (E2) -> archetype fixed artifact set",
+   "levels": {
+    "L1": false,
+    "L2": true,
+    "L3": true
+   },
+   "rev3_requirements": [
+    "03.08.09"
+   ],
+   "rev3_derivation": "structural renumber + verified absorption exceptions; engine lint vs NIST CPRT/OSCAL 171Ar3 dataset is the release gate for withdrawn/consolidated ordinals beyond the verified set"
+  },
+  {
+   "id": "KSI-RPL-ARP",
+   "family": "RPL",
+   "family_name": "Recovery Planning",
+   "name": "Aligning Recovery Plan",
+   "statement": "Recovery plans persistently aligned with objectives (resilience uplift).",
+   "origin": "CR26",
+   "automatable": false,
+   "uplift": true,
+   "non_deferrable": false,
+   "classes": {
+    "A": "n/a",
+    "B": "recommended",
+    "C": "recommended",
+    "D": "required"
+   },
+   "rev2_requirements": [],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [],
+   "rev3_ds_expansion": "engine-generated per 800-171A r3 (509 DS; ODP values per DoD memo 2025-04-10)",
+   "fallback": "E2 third-party-originated preferred; E4/E5 per class",
+   "levels": {
+    "L1": false,
+    "L2": true,
+    "L3": true
+   },
+   "rev3_requirements": [],
+   "rev3_derivation": "structural renumber + verified absorption exceptions; engine lint vs NIST CPRT/OSCAL 171Ar3 dataset is the release gate for withdrawn/consolidated ordinals beyond the verified set"
+  },
+  {
+   "id": "KSI-RPL-RRO",
+   "family": "RPL",
+   "family_name": "Recovery Planning",
+   "name": "Reviewing Recovery Objectives",
+   "statement": "RTO/RPO defined and persistently reviewed (resilience uplift).",
+   "origin": "CR26",
+   "automatable": false,
+   "uplift": true,
+   "non_deferrable": false,
+   "classes": {
+    "A": "n/a",
+    "B": "recommended",
+    "C": "recommended",
+    "D": "required"
+   },
+   "rev2_requirements": [],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [],
+   "rev3_ds_expansion": "engine-generated per 800-171A r3 (509 DS; ODP values per DoD memo 2025-04-10)",
+   "fallback": "E2 third-party-originated preferred; E4/E5 per class",
+   "levels": {
+    "L1": false,
+    "L2": true,
+    "L3": true
+   },
+   "rev3_requirements": [],
+   "rev3_derivation": "structural renumber + verified absorption exceptions; engine lint vs NIST CPRT/OSCAL 171Ar3 dataset is the release gate for withdrawn/consolidated ordinals beyond the verified set"
+  },
+  {
+   "id": "KSI-RPL-TRC",
+   "family": "RPL",
+   "family_name": "Recovery Planning",
+   "name": "Testing Recovery Capabilities",
+   "statement": "Recovery capability persistently tested with measured results (resilience uplift; E5 evidence).",
+   "origin": "CR26",
+   "automatable": false,
+   "uplift": true,
+   "non_deferrable": false,
+   "classes": {
+    "A": "n/a",
+    "B": "recommended",
+    "C": "recommended",
+    "D": "required"
+   },
+   "rev2_requirements": [],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [],
+   "rev3_ds_expansion": "engine-generated per 800-171A r3 (509 DS; ODP values per DoD memo 2025-04-10)",
+   "fallback": "E2 third-party-originated preferred; E4/E5 per class",
+   "levels": {
+    "L1": false,
+    "L2": true,
+    "L3": true
+   },
+   "rev3_requirements": [],
+   "rev3_derivation": "structural renumber + verified absorption exceptions; engine lint vs NIST CPRT/OSCAL 171Ar3 dataset is the release gate for withdrawn/consolidated ordinals beyond the verified set"
+  },
+  {
+   "id": "KSI-SCB-ACT",
+   "family": "SCB",
+   "family_name": "Scope & Boundary",
+   "name": "Asset Categorization",
+   "statement": "Every in-scope asset categorized into the five 32 CFR 170.19 categories from the authoritative inventory; persistently reviewed.",
+   "origin": "DIB",
+   "automatable": true,
+   "uplift": false,
+   "non_deferrable": false,
+   "classes": {
+    "A": "required",
+    "B": "required",
+    "C": "required",
+    "D": "required"
+   },
+   "rev2_requirements": [],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [],
+   "rev3_ds_expansion": "engine-generated per 800-171A r3 (509 DS; ODP values per DoD memo 2025-04-10)",
+   "fallback": "E1 unavailable -> signed export on cadence (E2) -> archetype fixed artifact set",
+   "levels": {
+    "L1": false,
+    "L2": true,
+    "L3": true
+   },
+   "rev3_requirements": [],
+   "rev3_derivation": "structural renumber + verified absorption exceptions; engine lint vs NIST CPRT/OSCAL 171Ar3 dataset is the release gate for withdrawn/consolidated ordinals beyond the verified set"
+  },
+  {
+   "id": "KSI-SCB-CRM",
+   "family": "SCB",
+   "family_name": "Scope & Boundary",
+   "name": "Inheritance & External Systems",
+   "statement": "Every inherited control recorded in a current CRM/SRM; provider status persistently retrieved; external system connections authorized.",
+   "origin": "DIB",
+   "automatable": true,
+   "uplift": false,
+   "non_deferrable": false,
+   "classes": {
+    "A": "required",
+    "B": "required",
+    "C": "required",
+    "D": "required"
+   },
+   "rev2_requirements": [
+    "3.1.20"
+   ],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [
+    "03.01"
+   ],
+   "rev3_ds_expansion": "engine-generated per 800-171A r3 (509 DS; ODP values per DoD memo 2025-04-10)",
+   "fallback": "E1 unavailable -> signed export on cadence (E2) -> archetype fixed artifact set",
+   "levels": {
+    "L1": true,
+    "L2": true,
+    "L3": true
+   },
+   "rev3_requirements": [
+    "03.01.20",
+    "03.16.03 (External System Services) [new in r3]"
+   ],
+   "rev3_derivation": "structural renumber + verified absorption exceptions; engine lint vs NIST CPRT/OSCAL 171Ar3 dataset is the release gate for withdrawn/consolidated ordinals beyond the verified set"
+  },
+  {
+   "id": "KSI-SCB-DFD",
+   "family": "SCB",
+   "family_name": "Scope & Boundary",
+   "name": "Generated Network & CUI Dataflow Diagram",
+   "statement": "L0/L1 network and CUI dataflow views generated from live inventory on every change and validated against observed flows; the SDR is generated from the same source and checked for completeness (every in-scope requirement populated with current status) \u2014 the demonstrable successor to 3.12.4.",
+   "origin": "DIB",
+   "automatable": true,
+   "uplift": false,
+   "non_deferrable": false,
+   "classes": {
+    "A": "required",
+    "B": "required",
+    "C": "required",
+    "D": "required"
+   },
+   "rev2_requirements": [
+    "3.1.3",
+    "3.12.4"
+   ],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [
+    "03.01",
+    "03.12"
+   ],
+   "rev3_ds_expansion": "engine-generated per 800-171A r3 (509 DS; ODP values per DoD memo 2025-04-10)",
+   "fallback": "E1 unavailable -> signed export on cadence (E2) -> archetype fixed artifact set",
+   "levels": {
+    "L1": false,
+    "L2": true,
+    "L3": true
+   },
+   "rev3_requirements": [
+    "03.01.03",
+    "03.12.04",
+    "03.15.02 (System Security Plan) [new in r3]"
+   ],
+   "rev3_derivation": "structural renumber + verified absorption exceptions; engine lint vs NIST CPRT/OSCAL 171Ar3 dataset is the release gate for withdrawn/consolidated ordinals beyond the verified set"
+  },
+  {
+   "id": "KSI-SCB-SEP",
+   "family": "SCB",
+   "family_name": "Scope & Boundary",
+   "name": "Boundary Separation",
+   "statement": "Enclave/segmentation separation implemented and persistently validated; public-access subnetworks separated; secure architecture.",
+   "origin": "DIB",
+   "automatable": true,
+   "uplift": false,
+   "non_deferrable": true,
+   "classes": {
+    "A": "required",
+    "B": "required",
+    "C": "required",
+    "D": "required"
+   },
+   "rev2_requirements": [
+    "3.13.2",
+    "3.13.5"
+   ],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [
+    "03.13"
+   ],
+   "rev3_ds_expansion": "engine-generated per 800-171A r3 (509 DS; ODP values per DoD memo 2025-04-10)",
+   "fallback": "E1 unavailable -> signed export on cadence (E2) -> archetype fixed artifact set",
+   "levels": {
+    "L1": true,
+    "L2": true,
+    "L3": true
+   },
+   "rev3_requirements": [
+    "03.13.02",
+    "03.13.05"
+   ],
+   "rev3_derivation": "structural renumber + verified absorption exceptions; engine lint vs NIST CPRT/OSCAL 171Ar3 dataset is the release gate for withdrawn/consolidated ordinals beyond the verified set"
+  },
+  {
+   "id": "KSI-SCR-MIT",
+   "family": "SCR",
+   "family_name": "Supply Chain Risk",
+   "name": "Mitigating Supply Chain Risk",
+   "statement": "Supply chain risks persistently identified, reviewed, mitigated.",
+   "origin": "CR26",
+   "automatable": false,
+   "uplift": true,
+   "non_deferrable": false,
+   "classes": {
+    "A": "n/a",
+    "B": "recommended",
+    "C": "recommended",
+    "D": "required"
+   },
+   "rev2_requirements": [],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [],
+   "rev3_ds_expansion": "engine-generated per 800-171A r3 (509 DS; ODP values per DoD memo 2025-04-10)",
+   "fallback": "E2 third-party-originated preferred; E4/E5 per class",
+   "levels": {
+    "L1": false,
+    "L2": true,
+    "L3": true
+   },
+   "rev3_requirements": [
+    "03.17.01 (SCRM Plan) [new in r3]",
+    "03.17.02 (Acquisition Strategies) [new in r3]"
+   ],
+   "rev3_derivation": "structural renumber + verified absorption exceptions; engine lint vs NIST CPRT/OSCAL 171Ar3 dataset is the release gate for withdrawn/consolidated ordinals beyond the verified set"
+  },
+  {
+   "id": "KSI-SCR-MON",
+   "family": "SCR",
+   "family_name": "Supply Chain Risk",
+   "name": "Monitoring Supply Chain Risk",
+   "statement": "Third-party software monitored for upstream vulnerabilities; security alerts/advisories actioned.",
+   "origin": "CR26",
+   "automatable": true,
+   "uplift": false,
+   "non_deferrable": false,
+   "classes": {
+    "A": "required",
+    "B": "required",
+    "C": "required",
+    "D": "required"
+   },
+   "rev2_requirements": [
+    "3.14.3"
+   ],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [
+    "03.14"
+   ],
+   "rev3_ds_expansion": "engine-generated per 800-171A r3 (509 DS; ODP values per DoD memo 2025-04-10)",
+   "fallback": "E1 unavailable -> signed export on cadence (E2) -> archetype fixed artifact set",
+   "levels": {
+    "L1": false,
+    "L2": true,
+    "L3": true
+   },
+   "rev3_requirements": [
+    "03.14.03",
+    "03.17.03 (Supply Chain Requirements & Processes) [new in r3]"
+   ],
+   "rev3_derivation": "structural renumber + verified absorption exceptions; engine lint vs NIST CPRT/OSCAL 171Ar3 dataset is the release gate for withdrawn/consolidated ordinals beyond the verified set"
+  },
+  {
+   "id": "KSI-SVC-ACM",
+   "family": "SVC",
+   "family_name": "Service & Configuration",
+   "name": "Automating Configuration Management",
+   "statement": "Baseline configurations enforced and drift-checked by automation: settings, banners, session/device configs, collaborative devices, VoIP, mobile.",
+   "origin": "CR26",
+   "automatable": true,
+   "uplift": false,
+   "non_deferrable": false,
+   "classes": {
+    "A": "required",
+    "B": "required",
+    "C": "required",
+    "D": "required"
+   },
+   "rev2_requirements": [
+    "3.1.9",
+    "3.1.18",
+    "3.4.1",
+    "3.4.2",
+    "3.13.12",
+    "3.13.14"
+   ],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [
+    "03.01",
+    "03.04",
+    "03.13"
+   ],
+   "rev3_ds_expansion": "engine-generated per 800-171A r3 (509 DS; ODP values per DoD memo 2025-04-10)",
+   "fallback": "E1 unavailable -> signed export on cadence (E2) -> archetype fixed artifact set",
+   "levels": {
+    "L1": false,
+    "L2": true,
+    "L3": true
+   },
+   "rev3_requirements": [
+    "03.01.09",
+    "03.01.18",
+    "03.04.01",
+    "03.04.02",
+    "03.13.12",
+    "03.13.14"
+   ],
+   "rev3_derivation": "structural renumber + verified absorption exceptions; engine lint vs NIST CPRT/OSCAL 171Ar3 dataset is the release gate for withdrawn/consolidated ordinals beyond the verified set"
+  },
+  {
+   "id": "KSI-SVC-ASM",
+   "family": "SVC",
+   "family_name": "Service & Configuration",
+   "name": "Automating Secret Management",
+   "statement": "Keys, certificates, secrets managed, protected, rotated with automation.",
+   "origin": "CR26",
+   "automatable": true,
+   "uplift": false,
+   "non_deferrable": false,
+   "classes": {
+    "A": "required",
+    "B": "required",
+    "C": "required",
+    "D": "required"
+   },
+   "rev2_requirements": [
+    "3.5.10",
+    "3.13.10"
+   ],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [
+    "03.05",
+    "03.13"
+   ],
+   "rev3_ds_expansion": "engine-generated per 800-171A r3 (509 DS; ODP values per DoD memo 2025-04-10)",
+   "fallback": "E1 unavailable -> signed export on cadence (E2) -> archetype fixed artifact set",
+   "levels": {
+    "L1": false,
+    "L2": true,
+    "L3": true
+   },
+   "rev3_requirements": [
+    "03.05.10",
+    "03.13.10"
+   ],
+   "rev3_derivation": "structural renumber + verified absorption exceptions; engine lint vs NIST CPRT/OSCAL 171Ar3 dataset is the release gate for withdrawn/consolidated ordinals beyond the verified set"
+  },
+  {
+   "id": "KSI-SVC-EIS",
+   "family": "SVC",
+   "family_name": "Service & Configuration",
+   "name": "Evaluating and Improving Security",
+   "statement": "Flaws remediated on clocks; maintenance controlled; improvements persistently made.",
+   "origin": "CR26",
+   "automatable": true,
+   "uplift": false,
+   "non_deferrable": false,
+   "classes": {
+    "A": "required",
+    "B": "required",
+    "C": "required",
+    "D": "required"
+   },
+   "rev2_requirements": [
+    "3.7.1",
+    "3.7.2",
+    "3.11.3",
+    "3.14.1"
+   ],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [
+    "03.07",
+    "03.11",
+    "03.14"
+   ],
+   "rev3_ds_expansion": "engine-generated per 800-171A r3 (509 DS; ODP values per DoD memo 2025-04-10)",
+   "fallback": "E1 unavailable -> signed export on cadence (E2) -> archetype fixed artifact set",
+   "levels": {
+    "L1": true,
+    "L2": true,
+    "L3": true
+   },
+   "rev3_requirements": [
+    "03.07.01",
+    "03.07.02",
+    "03.11.03",
+    "03.14.01",
+    "03.16.02 (Unsupported System Components) [new in r3]"
+   ],
+   "rev3_derivation": "structural renumber + verified absorption exceptions; engine lint vs NIST CPRT/OSCAL 171Ar3 dataset is the release gate for withdrawn/consolidated ordinals beyond the verified set"
+  },
+  {
+   "id": "KSI-SVC-PRR",
+   "family": "SVC",
+   "family_name": "Service & Configuration",
+   "name": "Preventing Residual Risk",
+   "statement": "Shared system resources controlled; residual data elements removed after change.",
+   "origin": "CR26",
+   "automatable": true,
+   "uplift": false,
+   "non_deferrable": false,
+   "classes": {
+    "A": "n/a",
+    "B": "optional",
+    "C": "required",
+    "D": "required"
+   },
+   "rev2_requirements": [
+    "3.13.4"
+   ],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [
+    "03.13"
+   ],
+   "rev3_ds_expansion": "engine-generated per 800-171A r3 (509 DS; ODP values per DoD memo 2025-04-10)",
+   "fallback": "E1 unavailable -> signed export on cadence (E2) -> archetype fixed artifact set",
+   "levels": {
+    "L1": false,
+    "L2": true,
+    "L3": true
+   },
+   "rev3_requirements": [
+    "03.13.04"
+   ],
+   "rev3_derivation": "structural renumber + verified absorption exceptions; engine lint vs NIST CPRT/OSCAL 171Ar3 dataset is the release gate for withdrawn/consolidated ordinals beyond the verified set"
+  },
+  {
+   "id": "KSI-SVC-RUD",
+   "family": "SVC",
+   "family_name": "Service & Configuration",
+   "name": "Removing Unwanted Data (CUI Spill)",
+   "statement": "CUI spills removed promptly on direction, including from backups (DFARS-adjacent uplift).",
+   "origin": "CR26",
+   "automatable": true,
+   "uplift": true,
+   "non_deferrable": false,
+   "classes": {
+    "A": "n/a",
+    "B": "recommended",
+    "C": "recommended",
+    "D": "required"
+   },
+   "rev2_requirements": [],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [],
+   "rev3_ds_expansion": "engine-generated per 800-171A r3 (509 DS; ODP values per DoD memo 2025-04-10)",
+   "fallback": "E1 unavailable -> signed export on cadence (E2) -> archetype fixed artifact set",
+   "levels": {
+    "L1": false,
+    "L2": true,
+    "L3": true
+   },
+   "rev3_requirements": [],
+   "rev3_derivation": "structural renumber + verified absorption exceptions; engine lint vs NIST CPRT/OSCAL 171Ar3 dataset is the release gate for withdrawn/consolidated ordinals beyond the verified set"
+  },
+  {
+   "id": "KSI-SVC-SIN",
+   "family": "SVC",
+   "family_name": "Service & Configuration",
+   "name": "Securing Information",
+   "statement": "Information secured from unwanted access or modification at rest and in transit (KSI-CUI-ENC supplies the FIPS bar).",
+   "origin": "CR26",
+   "automatable": true,
+   "uplift": false,
+   "non_deferrable": true,
+   "classes": {
+    "A": "required",
+    "B": "required",
+    "C": "required",
+    "D": "required"
+   },
+   "rev2_requirements": [
+    "3.13.8",
+    "3.13.16"
+   ],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [
+    "03.13"
+   ],
+   "rev3_ds_expansion": "engine-generated per 800-171A r3 (509 DS; ODP values per DoD memo 2025-04-10)",
+   "fallback": "E1 unavailable -> signed export on cadence (E2) -> archetype fixed artifact set",
+   "levels": {
+    "L1": false,
+    "L2": true,
+    "L3": true
+   },
+   "rev3_requirements": [
+    "03.13.08",
+    "03.13.16"
+   ],
+   "rev3_derivation": "structural renumber + verified absorption exceptions; engine lint vs NIST CPRT/OSCAL 171Ar3 dataset is the release gate for withdrawn/consolidated ordinals beyond the verified set"
+  },
+  {
+   "id": "KSI-SVC-VCM",
+   "family": "SVC",
+   "family_name": "Service & Configuration",
+   "name": "Validating Communications",
+   "statement": "Authenticity/integrity of communications sessions validated.",
+   "origin": "CR26",
+   "automatable": true,
+   "uplift": false,
+   "non_deferrable": false,
+   "classes": {
+    "A": "n/a",
+    "B": "optional",
+    "C": "required",
+    "D": "required"
+   },
+   "rev2_requirements": [
+    "3.13.15"
+   ],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [
+    "03.13"
+   ],
+   "rev3_ds_expansion": "engine-generated per 800-171A r3 (509 DS; ODP values per DoD memo 2025-04-10)",
+   "fallback": "E1 unavailable -> signed export on cadence (E2) -> archetype fixed artifact set",
+   "levels": {
+    "L1": false,
+    "L2": true,
+    "L3": true
+   },
+   "rev3_requirements": [
+    "03.13.15"
+   ],
+   "rev3_derivation": "structural renumber + verified absorption exceptions; engine lint vs NIST CPRT/OSCAL 171Ar3 dataset is the release gate for withdrawn/consolidated ordinals beyond the verified set"
+  },
+  {
+   "id": "KSI-SVC-VRI",
+   "family": "SVC",
+   "family_name": "Service & Configuration",
+   "name": "Validating Resource Integrity",
+   "statement": "Cryptographic integrity validation of resources (SI-7 uplift).",
+   "origin": "CR26",
+   "automatable": true,
+   "uplift": true,
+   "non_deferrable": false,
+   "classes": {
+    "A": "n/a",
+    "B": "recommended",
+    "C": "recommended",
+    "D": "required"
+   },
+   "rev2_requirements": [],
+   "rev2_ao_expansion": "engine-generated: all 800-171A r2 AOs of each mapped requirement",
+   "rev3_families": [],
+   "rev3_ds_expansion": "engine-generated per 800-171A r3 (509 DS; ODP values per DoD memo 2025-04-10)",
+   "fallback": "E1 unavailable -> signed export on cadence (E2) -> archetype fixed artifact set",
+   "levels": {
+    "L1": false,
+    "L2": true,
+    "L3": true
+   },
+   "rev3_requirements": [],
+   "rev3_derivation": "structural renumber + verified absorption exceptions; engine lint vs NIST CPRT/OSCAL 171Ar3 dataset is the release gate for withdrawn/consolidated ordinals beyond the verified set"
+  }
+ ],
+ "exception_semantics": {
+  "eligibility": "requirement-level per 32 CFR 170.21 (ineligible requirements cannot be clocked; today's 180-day POA&M window governs until rule amendment)",
+  "compensated_failure_example": "CUI-ENC with a module moved to CMVP Historical status: clock permitted only with (1) active validated-replacement or revalidation plan, (2) no known exploitable weakness in the deployed module, (3) encryption operationally enforced throughout \u2014 the analog of 170.21's 3.13.11 treatment",
+  "void_conditions": [
+   "falsified telemetry or artifacts",
+   "feeds excluding in-scope assets",
+   "clock abandonment",
+   "class misrepresentation"
+  ]
+ },
+ "changelog": [
+  "0.1.4 (2026-07-16): SSR renamed SDR (Security Decision Record), adopting FedRAMP CR26's SSP-successor term for one artifact language across programs; artifact-disposition, evidence-storage/CUI-handling, audience-disclosure, and levels-vs-classes rationale content added to both HTML artifacts",
+  "0.1.3 (2026-07-15): requirement-level Rev3 mappings shipped per KSI (renumber + verified absorptions + new PL/SA/SR families); AO math reconciled (509 DS = ~421 AOs + 88 ODP)",
+  "0.1.2 (2026-07-15): revision_profiles added for 171r2/171r3/172(2021)/172r3; APT module dual-rev mappings; 172Ar3 (final 2026-05-13) integrated as engine source",
+  "0.1.1 (2026-07-15): red-team fixes \u2014 uplift class-gated below D; CR26 B-optional conditionality restored for 5 KSIs; per-KSI level applicability added; non-deferrability moved to requirement level; IAM-APM aligned to 3.5.3 floor; SCB-DFD carries SSR completeness check; exception semantics added",
+  "0.1.0: initial"
+ ],
+ "revision_profiles": {
+  "171r2": {
+   "pub": "SP 800-171r2 + 171Ar2",
+   "reqs": 110,
+   "aos": 320,
+   "odp": 0,
+   "status": "CMMC assessable baseline today (Rev 2 pinned by class deviation)",
+   "mapping": "requirement-level, shipped (rev2_requirements per KSI; 110/110, zero orphans)"
+  },
+  "171r3": {
+   "pub": "SP 800-171r3 + 171Ar3 (May 2024)",
+   "reqs": 97,
+   "ds": 509,
+   "odp_linked_ds": 88,
+   "odp_values": "DoD CIO memo 2025-04-10",
+   "status": "forward baseline; FAR CUI rule rebaselines to r3",
+   "mapping": "requirement-level shipped (rev3_requirements per KSI): structural renumber of retained Rev2 ordinals + verified absorptions (03.01.13->03.13.08; 03.01.14/.15->03.01.12; 03.01.17->03.01.16; 3.1.19->03.01.18) + new 03.15/03.16/03.17 families mapped; CPRT/OSCAL lint is the release gate",
+   "ao_math": "509 determination statements total = ~421 substantive AOs + 88 ODP determinations (the commonly cited '422 AOs' is the substantive count)"
+  },
+  "172_2021": {
+   "pub": "SP 800-172 (2021) + 172A (2022)",
+   "reqs_selected_by_dod": 24,
+   "status": "CMMC L3 assessable baseline today (32 CFR 170.14 selection + DoD parameters)",
+   "mapping": "APT module KSIs carry the DoD-selected set (r172_dod_selected)"
+  },
+  "172r3": {
+   "pub": "SP 800-172r3 + 172Ar3 (FINAL May 13, 2026; supersedes 2021/2022)",
+   "families": 17,
+   "structure": "aligned to 171r3 (03.xx numbering); ODPs introduced; protection strategies (PRA/DLO) and adversary-effects tagging",
+   "machine_sources": "NIST publishes r3 requirements AND 172Ar3 assessment procedures in OSCAL + CPRT natively",
+   "status": "forward L3 baseline pending DoD re-selection + ODP values; catalog adapts by mapping-table swap, statements unchanged",
+   "mapping": "APT KSIs carry r172r3_families; per-DS expansion engine-generated from the NIST OSCAL dataset"
+  }
+ }
+}
