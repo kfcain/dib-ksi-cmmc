@@ -40,6 +40,8 @@ The moment a file lands on a workstation, that workstation is in scope and those
 
 Three pages, generated from the registries, no network access once loaded: the [overview](https://kfcain.github.io/dib-ksi-cmmc/index.html), the [reference](https://kfcain.github.io/dib-ksi-cmmc/reference.html) with every indicator's evidence card, and the [self-assessment](https://kfcain.github.io/dib-ksi-cmmc/assess.html), which returns a named gap list rather than a readiness score — three unanswered indicators is a specific afternoon's work; "82% ready" is an argument.
 
+Each page is one self-contained file. Download it from [`site/`](site/) and open it locally, or mirror it to a gist for a rendered snapshot (for example via [gistpreview](https://gistpreview.github.io)): it renders identically anywhere, because it loads nothing from the network.
+
 ## Try it
 
 ```bash
