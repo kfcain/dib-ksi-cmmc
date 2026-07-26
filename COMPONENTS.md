@@ -12,7 +12,7 @@ Dataset version `0.6.1`, released `2026-07-26`.
 | `ontology/signals.json` | 0.4.1 | 22 measurable indicators with per-class thresholds and cadence |
 | `ontology/responsibility-patterns.json` | 0.2.1 | 64 responsibility assignments across 3 deployment profiles, plus the three-test inheritance rule |
 | `ontology/poam-policy.json` | 0.2.0 | Requirement-level exception eligibility (DEFAULT SET) |
-| `ontology/ksi-catalog.json` | 0.2.0 | 64 key security indicators across 16 families |
+| `ontology/ksi-catalog.json` | 0.2.1 | 64 key security indicators across 16 families |
 
 ## The five ontology layers
 
