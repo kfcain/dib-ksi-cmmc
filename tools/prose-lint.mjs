@@ -1,5 +1,6 @@
 // prose-lint.mjs — catches the machine-generated tells this project has shipped before, so they
-// cannot creep back in. Scans every Markdown file in the repository.
+// cannot creep back in. Scans every Markdown file in the repository, and every string value in
+// the ontology registries — registry prose renders on the site and is held to the same bar.
 // Run: node tools/prose-lint.mjs
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -75,9 +76,28 @@ for (const file of files) {
   }
 }
 
+// Registry JSON: apply the banned list to every string value. The em-dash density rule stays
+// Markdown-only — registry strings are single sentences, not paragraphs.
+const jsonFiles = readdirSync(join(ROOT, 'ontology')).filter(f => f.endsWith('.json'));
+for (const f of jsonFiles) {
+  const name = join('ontology', f);
+  const walk = (node, path) => {
+    if (typeof node === 'string') {
+      for (const [re, why] of BANNED) {
+        if (re.test(node)) hits.push({ name: `${name} (${path})`, line: 0, why, ctx: node.slice(0, 100) });
+      }
+    } else if (Array.isArray(node)) {
+      node.forEach((v, i) => walk(v, `${path}[${i}]`));
+    } else if (node && typeof node === 'object') {
+      for (const [k, v] of Object.entries(node)) walk(v, path ? `${path}.${k}` : k);
+    }
+  };
+  walk(JSON.parse(readFileSync(join(ROOT, name), 'utf8')), '');
+}
+
 if (hits.length) {
   console.error(`PROSE LINT: ${hits.length} issue(s)\n`);
   for (const h of hits) console.error(`  ${h.name}${h.line ? ':' + h.line : ''}  [${h.why}]\n    "${h.ctx}"`);
   process.exit(1);
 }
-console.log(`PROSE OK — ${files.length} Markdown files, 0 issues`);
+console.log(`PROSE OK — ${files.length} Markdown files + ${jsonFiles.length} registries, 0 issues`);

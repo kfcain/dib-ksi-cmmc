@@ -1,6 +1,6 @@
 # Guidance for AI agents
 
-This repository is designed to be operated by agents as well as read by people. That is not a slogan: the ontology exists so that an agent has enough context to assemble facts into any requested shape without inventing any. This file tells an agent what it may do here, and what it must never do.
+This repository is designed to be operated by agents as well as read by people: the ontology gives an agent enough context to assemble facts into any requested shape without inventing any. This file tells an agent what it may do here, and what it must never do.
 
 ## Read this first
 
@@ -49,10 +49,10 @@ Every invariant in `ontology/dib-ksi-ontology.json` carries an `enforced_by` fie
 Regenerate after any registry edit, and both checks must pass:
 
 ```bash
-node tools/gen-consolidated.mjs && node tools/gen-summary.mjs
+node tools/gen-consolidated.mjs && node tools/gen-summary.mjs && node tools/gen-ksi-doc.mjs
 ./tools/ci.sh
 ```
 
 ## The standing instruction
 
-When the data does not support a conclusion, say that. The value of this repository is that its checks are not advisory, and an agent that smooths over a gap to produce a tidy answer has removed the only thing that made the answer worth having.
+When the data does not support a conclusion, say that. `determination_needed`, `stale`, `unmeasured`, and `unsigned` are answers.

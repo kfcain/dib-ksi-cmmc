@@ -393,6 +393,9 @@ console.log('\n=== registry integrity ===');
   check('every signal publishes a cadence for every class',
     db.signals.signals.every(s => ['A', 'B', 'C', 'D'].every(c => c in s.cadence_days)));
   check('every ontology invariant names its enforcement', db.ontology.invariants.every(i => i.enforced_by && i.statement));
+  check('every KSI states its CUI-confidentiality impact', db.catalog.ksis.every(k => typeof k.cui_impact === 'string' && k.cui_impact.length > 0));
+  check('every uplift KSI admits it sits beyond the confidentiality floor',
+    db.catalog.ksis.filter(k => k.uplift).every(k => /beyond the 800-171 confidentiality floor/.test(k.cui_impact)));
   check('the POA&M policy declares that it needs confirmation against the rule', /REQUIRES CONFIRMATION/.test(db.poam.status));
 }
 

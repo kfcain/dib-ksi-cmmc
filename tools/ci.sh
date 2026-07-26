@@ -35,6 +35,9 @@ if out=$(node tools/gen-consolidated.mjs --check 2>&1); then ok "$out"; else bad
 step "3. Component index is in sync with the registries"
 if out=$(node tools/gen-summary.mjs --check 2>&1); then ok "$out"; else bad "$out"; fi
 
+step "3b. KSI reference doc is in sync with the catalog"
+if out=$(node tools/gen-ksi-doc.mjs --check 2>&1); then ok "$out"; else bad "$out"; fi
+
 step "4. Every instance validates"
 for i in instances/*.json; do
   if node tools/validate.mjs "$i" >/dev/null 2>&1; then ok "VALID  $i"; else bad "invalid: $i"; fi
@@ -55,11 +58,10 @@ step "8. Prose holds up"
 if out=$(node tools/prose-lint.mjs 2>&1 | tail -1); then ok "$out"; else node tools/prose-lint.mjs 2>&1 | sed 's/^/   /'; bad "prose lint"; fi
 
 step "9. Prose numbers match the registries"
-node tools/claims-lint.mjs
+if out=$(node tools/claims-lint.mjs 2>&1 | tail -1); then ok "$out"; else node tools/claims-lint.mjs 2>&1 | sed 's/^/   /'; bad "claims lint"; fi
 
 step "10. Published pages match the registries"
-node tools/gen-pages.mjs
-say "  pages regenerated from ontology/"
+if node tools/gen-pages.mjs >/dev/null 2>&1; then ok "pages regenerated from ontology/"; else bad "gen-pages failed"; fi
 
 step "11. Rebuilding leaves generated files unchanged"
 if command -v git >/dev/null && git rev-parse --git-dir >/dev/null 2>&1; then

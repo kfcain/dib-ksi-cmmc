@@ -1,90 +1,46 @@
 # DIB-KSI
 
-**Keeping defense information out of the wrong hands is not complicated. Proving you're doing it has become absurd.**
+**Measurement-based proof of NIST SP 800-171 security, built around one outcome: the confidentiality of CUI, for any organization in the DIB.**
 
-If you make parts for a defense program, someone sent you drawings. Those drawings are worth stealing. That is the entire problem, and it is a confidentiality problem before it is anything else — an adversary reading your technical data does damage whether or not your systems stay up.
+If you hold CUI for a defense program, an adversary reading it is the loss that matters — the damage is done whether or not your systems stay up. The security question is four lines:
 
-So the security question is small enough to hold in your head:
-
-1. **What sensitive information do you actually have, and could you have less of it?**
+1. **What CUI do you hold, and could you hold less?**
 2. **Who can reach it?**
-3. **Are the protections actually turned on right now?**
-4. **If one of them turns off, how fast do you find out?**
+3. **Are the protections actually on right now?**
+4. **If one turns off, how fast do you find out?**
 
-That's it. Every real breach in this sector is a failure of one of those four. Stolen credentials, an endpoint nobody was watching, an attacker sitting quietly for months.
-
-The current way we prove security answers none of them. It asks for a System Security Plan — a document describing an intended design, written once, graded by a human reading prose. A 40-person machine shop now navigates scoping guides, asset categories, service provider tables, responsibility matrices, and 320 assessment objectives, most of it before anyone confirms the admin accounts have MFA.
-
-**This repository answers the four questions with measurements instead of paperwork.**
-
-**It does not add requirements.** NIST SP 800-171 asks for 110 things and that does not change. What changes is what you hand over as proof — a reading of the running system with an expiry date, instead of a paragraph describing an intended one. If you only read one page, read [START-HERE](START-HERE.md).
-
-**Two pages you can click through:** the [explainer](https://kfcain.github.io/dib-ksi-cmmc/explainer.html) in plain language, and the [practitioner view](https://kfcain.github.io/dib-ksi-cmmc/practitioner.html) with all 64 indicators, the 22 measurements and their sources, the collectors that produce them, and the invariants the build enforces. Both run entirely in the browser and reach the network zero times once loaded.
+This repository answers those four with measurements instead of paperwork. It adds no requirements: 800-171's 110 stay the floor at every assurance class. What changes is the proof — a reading of the running system with an expiry date, instead of a paragraph describing an intended design. [docs/00-why](docs/00-why.md) is the five-minute version.
 
 > Independent and unofficial. Not affiliated with or endorsed by DoD, the CMMC Program Management Office, the Cyber AB, FedRAMP, GSA, or NIST. Not an adopted standard, not an assessment, not legal advice. See [DISCLAIMER.md](DISCLAIMER.md).
 
-## How it answers them
+## The rule sets
 
-**What do you have, and could you have less?** Every piece of controlled information in the model carries a reason it exists: which contract needs it, and when someone last checked that's still true. Data with no stated reason is flagged. This is the cheapest control there is, because information you never took requires nothing of you afterward: nothing to encrypt, nobody's access to review, and never a monitor to keep running.
+Three, each a registry with a reference generated from it:
 
-**Who can reach it?** Access is recorded as a thing you can query — who, what they can do with it, why they need it, when that was last reviewed, and how strong their authentication is. Not reconstructed from a spreadsheet at audit time. "Who can read the drawings" should be a question with an answer.
+- **64 KSIs** ([`ontology/ksi-catalog.json`](ontology/ksi-catalog.json)) — what must be true. Each carries a statement, a line stating how it protects the confidentiality of CUI, class and level applicability, and its 800-171 mapping. The 13 uplift KSIs (availability, integrity, program maturity) say plainly that they sit beyond the confidentiality floor and are never required below Class D. Reference: [docs/01-ksi-reference](docs/01-ksi-reference.md), generated from the catalog and drift-checked in CI.
+- **22 measurements** ([`ontology/signals.json`](ontology/signals.json)) — what a machine checks continuously: MFA enforcement, endpoint coverage, external sharing defaults, standing administrator count, patch latency, encryption on the stores holding CUI, dormant accounts, undeclared flows. Eleven cite an external authority for their requirement (CISA's cloud baselines, the known-exploited-vulnerability catalogue, CMVP, the incident-reporting clause); eleven are this project's own policy choices and say so per signal. Conventions: [docs/03-signals](docs/03-signals.md); the generated list is in [COMPONENTS.md](COMPONENTS.md).
+- **10 invariants** ([`ontology/dib-ksi-ontology.json`](ontology/dib-ksi-ontology.json)) — what the software refuses to let you claim: it rejects self-graded status, aggregate coverage percentages, unverified inheritance, hand-typed deliverables, and unsigned attestations treated as signed. [docs/05-invariants](docs/05-invariants.md).
 
-**Are the protections on?** Twenty-two measurements of the running environment: multi-factor enforcement, endpoint coverage, external sharing defaults, standing administrator count, patch latency on internet-facing systems, encryption on the stores holding controlled data, dormant accounts, undeclared network flows.
+Two rules do most of the work. **Coverage is universal**: an uncovered subject is named (*one uncovered: WKS-SHOP-04*), never averaged into a percentage, and an exception must carry a justification and an expiry date. **Claims go stale**: every measurement has a shelf life, and past it the claim it supported reports stale, not passing, not failing. Confidentiality decays quietly — an MFA exemption, a share opened for a vendor, an agent that stopped reporting — and staleness is how that drift surfaces on its own.
 
-Coverage requirements are universal rather than statistical. There is no "95% is good enough" bar, because no authority publishes one — CISA, CIS, the Defense Information Systems Agency and Microsoft all use per-item pass or fail plus documented exceptions. So an uncovered subject is named, not averaged away: the finding reads *one uncovered: WKS-SHOP-04*, which somebody can go fix, rather than *97.6% against a 99% bar*, which somebody will argue about. An exception is allowed, but it has to carry a justification and an expiry date.
+## It applies across the whole DIB
 
-Eleven of the twenty-two cite an external authority for their requirement. `MS.AAD.3.1v1` from CISA's Microsoft 365 baseline says phishing-resistant multi-factor authentication shall be enforced for all users; `MS.AAD.7.1v1` sets a floor of two and a ceiling of eight standing global administrators. The other eleven are this project's own judgment, and each says so in the registry rather than in a footnote.
+Levels decide *what* is required (CMMC L1/L2/L3, unchanged). Classes decide *how much proof* (A cheapest, D deepest). Deployment profiles decide *who runs each indicator* — the same rule set serves a 12-person shop inside a rented enclave, a 200-person manufacturer whose laptops handle CUI, and a subcontractor with data across three clouds. For the enclave-only shape, the share of the catalog that leaves the tenant entirely:
 
-**How fast would you know?** Every measurement has a shelf life. When the newest one ages past it, the claim it supported goes **stale** — not passing, not failing, stale — automatically and visibly. A document written in March still reads as true in December. A measurement does not.
+| Class | In scope | Off the tenant |
+|---|---|---|
+| A | 43 | 13 (30%) |
+| B | 60 | 21 (35%) |
+| C | 60 | 21 (35%) |
+| D | 64 | 23 (36%) |
 
-That last rule is what the design turns on. **Confidentiality decays quietly.** An MFA exemption added for one contractor, a share opened for a vendor, an agent that stopped reporting — none of them announce themselves, and all of them show up here as something going stale or breaching a threshold.
+The moment a file lands on a workstation, that workstation is in scope and those figures collapse to 7–10%. The full splits, the three-test inheritance rule, and what never transfers (screening, training, marking, reporting, log review, the signature) are in [docs/04-enclave-pattern](docs/04-enclave-pattern.md); the generated tables are in [COMPONENTS.md](COMPONENTS.md).
 
-## If you're a small shop, the practical advice is: don't build this yourself
+## The site
 
-Rent a defended enclave. Put the controlled information inside it, work on it through a thin client, and let the provider run the infrastructure controls they already run for everyone else.
+Three pages, generated from the registries, no network access once loaded: the [overview](https://kfcain.github.io/dib-ksi-cmmc/index.html), the [reference](https://kfcain.github.io/dib-ksi-cmmc/reference.html) with every indicator's evidence card, and the [self-assessment](https://kfcain.github.io/dib-ksi-cmmc/assess.html), which returns a named gap list rather than a readiness score — three unanswered indicators is a specific afternoon's work; "82% ready" is an argument.
 
-The model computes what that buys you, and it depends on which assurance class you are working toward, because the classes bring different numbers of controls into scope:
-
-| Class | In scope | Off your plate | Shared | Yours alone |
-|---|---|---|---|---|
-| A | 43 | 13 (**30%**) | 19 | 11 |
-| B | 60 | 21 (**35%**) | 24 | 15 |
-| C | 60 | 21 (**35%**) | 24 | 15 |
-| D | 64 | 23 (**36%**) | 26 | 15 |
-
-If files also land on your laptops, those numbers collapse to 7% at Class A and 9–10% everywhere else. The moment a drawing reaches a workstation, that workstation is in scope, and endpoint protection, disk encryption, patching, and removable media come straight back to you. The enclave protects what is inside it. Nothing else.
-
-**The class ladder deepens proof, it does not hand you more solo work.** Look down the last column: work you own alone barely moves, 11 to 15 and then flat. The shared column is what grows, 19 to 26. Climbing from B to C brings no new controls into scope at all — the two classes are identical at 60 — and instead demands two independent automated methods where one used to do, a three-day measurement cadence instead of monthly, and six months of history instead of thirty days. You are not taking on more responsibility. You are proving the same responsibility harder.
-
-Some things never transfer, whatever you buy: screening your people, training your people, deciding what gets marked, reporting your incidents, reviewing your logs, and signing the attestation. The provider does those for its own staff, not for yours.
-
-## What we know, and what we're guessing
-
-Worth being blunt, since this project's entire argument is about not trusting unverifiable claims.
-
-**Reasonably solid:** the problem statement. The 2026 Verizon DBIR put third-party involvement at 48% of breaches, up from 30%, driven mostly by authentication failures — and only 23% of those third parties had fully fixed missing MFA. Credentials and unwatched endpoints are where the losses come from.
-
-**Cited, not invented:** eleven of the twenty-two measurements now carry an external authority — CISA's cloud baselines, the known-exploited vulnerability catalogue, the cryptographic module validation program, and the incident-reporting clause. Where an authority exists, we cite it instead of picking a number.
-
-**Internally checked:** the model is consistent. All 110 underlying requirements map to something, every measurement points at a real control and at a named collector, the tooling fails closed, and 58 tests confirm it. The enclave percentages above are arithmetic over our own analysis.
-
-**Guessing, honestly:** the other eleven. Detection and containment time, remediation latency, restore-test intervals, training currency — no authority publishes figures for those, so they are our judgment and the registry says so per measurement. Nobody has yet shown that a green board here predicts fewer incidents. That is the claim worth testing, and it is untested.
-
-**Throughput is not outcome.** FedRAMP's pilot of this approach produced 12 authorizations from 26 submissions in its first phase, and the program reports authorizing 114 services in six months. Those are speed numbers. No published study shows this style of assurance produced better security results.
-
-The difference from a written plan is that a wrong number here is *visibly* wrong the moment you measure against it. A wrong paragraph in a security plan never is.
-
-## The reference is large. The work is not.
-
-The catalogue covers every arrangement so the model can be correct about any of them. No organisation holds all of it:
-
-| If you are | You own alone | Across | Automatable | Human judgment |
-|---|---|---|---|---|
-| A 12-person shop entirely inside a rented enclave | 15 | 9 families | 4 | 11 |
-| A 200-person manufacturer, laptops handle CUI | 18 | 11 families | 5 | 13 |
-| A subcontractor with data in three clouds | 23 | 10 families | 6 | 17 |
-
-Four things worth automating at the small end, and the rest is training, screening, marking, reporting, and a signature — work that was always yours and that no framework removes.
+Each page is one self-contained file. Download it from [`site/`](site/) and open it locally, or mirror it to a gist for a rendered snapshot (for example via [gistpreview](https://gistpreview.github.io)): it renders identically anywhere, because it loads nothing from the network.
 
 ## Try it
 
@@ -92,29 +48,30 @@ Four things worth automating at the small end, and the rest is training, screeni
 node tools/validate.mjs instances/ostrander-enclave.json      # check the model holds together
 node tools/project.mjs  instances/ostrander-enclave.json all  # what the answers look like
 ./tools/ci.sh                                                 # everything, same as CI
-node tools/gen-pages.mjs                                      # re-bind the pages to the registries
 ```
 
-Node's standard library, nothing to install — it has to run inside a disconnected network where there's no package manager.
+Node's standard library, nothing to install — it has to run inside a disconnected network with no package manager. The worked example is a made-up 40-person manufacturer and it deliberately does not pass: 14 of 22 measured indicators clear, the attestation is unsigned, and the output names the uncovered shop workstation and the three people with lapsed training. An example that passes everything has not shown you it can fail.
 
-The example is a made-up 40-person manufacturer, and it deliberately **doesn't** pass: 14 of 22 measurements clear, the attestation is unsigned, and the output says so. It names the uncovered shop workstation and the three people with lapsed training rather than reporting a percentage. An example that passes everything hasn't shown you it can fail.
+## What is known and what is guessed
+
+The problem statement is solid: the 2026 Verizon DBIR put third-party involvement at 48% of breaches, driven mostly by authentication failures, with only 23% of those third parties having fully fixed missing MFA. The model is internally checked: all 110 underlying requirements map to a KSI, every measurement points at a real indicator and a named collection method, and the tooling fails closed. The eleven locally chosen thresholds are honest guesses, flagged as such per signal. And nobody has shown that a green board here predicts fewer incidents — that is the claim worth testing, and it is untested.
 
 ## What's here
 
 | Path | |
 |---|---|
-| [`docs/`](docs/) | Why this exists, starting with [00-why](docs/00-why.md). [The ten rules](docs/06-invariants.md) and [the same rules at three sizes](docs/07-at-three-sizes.md) are the two most useful entry points after that |
-| [`ontology/`](ontology/) | What gets measured and on whose authority, how a reading may be collected, what an enclave carries, how exceptions work |
+| [`docs/`](docs/) | [00-why](docs/00-why.md), the generated [KSI reference](docs/01-ksi-reference.md), and the model reference docs |
+| [`ontology/`](ontology/) | The registries: KSIs, measurements, invariants, collection methods, responsibility patterns, exception policy |
 | [`instances/`](instances/) | A worked example |
-| [`tools/`](tools/) | Validator, report generator, tests |
+| [`tools/`](tools/) | Validator, projection engine, generators, tests, linters, CI |
 | [`COMPONENTS.md`](COMPONENTS.md) | Generated index of everything above |
-| [`site/`](site/) | The overview, the self-assessment, and the reference tool, all generated from the registries |
+| [`site/`](site/) | The three pages, generated from the registries |
 | [`AGENTS.md`](AGENTS.md) | Rules for AI agents working with this data |
 
 ## Push back on it
 
-The useful contributions are a threshold you can show is wrong, an enclave assumption that doesn't match a real provider's contract, a way to make the tooling report something false, or a setup the model can't describe. See [CONTRIBUTING.md](CONTRIBUTING.md).
+The useful contributions: a threshold you can show is wrong, an enclave assumption that doesn't match a real provider's contract, a way to make the tooling report something false, or a setup the model can't describe. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 
-Apache-2.0 for code, CC BY 4.0 for the writing. See [LICENSE](LICENSE), [LICENSE-DOCS](LICENSE-DOCS), and [NOTICE](NOTICE) for attribution and trademarks.
+Apache-2.0 for code, CC BY 4.0 for the writing. See [LICENSE](LICENSE), [LICENSE-DOCS](LICENSE-DOCS), and [NOTICE](NOTICE).

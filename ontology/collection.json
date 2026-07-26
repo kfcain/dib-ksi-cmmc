@@ -1,9 +1,9 @@
 {
   "registry": "DIB-KSI collection",
-  "version": "0.4.0",
-  "date": "2026-07-25",
+  "version": "0.4.1",
+  "date": "2026-07-26",
   "supersedes": "ontology/collectors.json (0.3.0), which conflated three separate things: the baseline that defines a requirement, the method used to read state, and the product that happens to implement that method.",
-  "premise": "This framework does not maintain a list of approved products, and it should not be read as endorsing any tool named here. A measurement is fed by whatever can retrieve the state and emit a conforming reading — a vendor API, a webhook, an agent, a SIEM query, a CI job, a spreadsheet export, a script somebody wrote on a Tuesday. What the framework is definitive about is the shape of the reading and the assurance properties of the method that produced it. Anything meeting the interface below is a valid collector.",
+  "premise": "This framework does not maintain a list of approved products, and it should not be read as endorsing any tool named here. A measurement is fed by whatever can retrieve the state and emit a conforming reading — a vendor API, a webhook, an agent, a SIEM query, a CI job, a spreadsheet export, a script you wrote yourself. What the framework is definitive about is the shape of the reading and the assurance properties of the method that produced it. Anything meeting the interface below is a valid collector.",
   "separation_of_concerns": {
     "statement": "Three things get confused constantly, including by earlier versions of this file. They are separate and belong in separate fields.",
     "concerns": [
@@ -31,7 +31,7 @@
     ]
   },
   "interface": {
-    "statement": "A collector is anything that emits this shape. There is no registration, no approval, and no vendor list. If a reading carries these fields and can be re-derived from the source named in it, the framework will grade it.",
+    "statement": "A collector is anything that emits this shape; nothing has to be registered, approved, or vendor-listed. If a reading carries these fields and can be re-derived from the source named in it, the framework will grade it.",
     "required": [
       {
         "field": "signal",
