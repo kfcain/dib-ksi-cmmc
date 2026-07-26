@@ -10,7 +10,7 @@
     "signals_version": "0.4.1",
     "responsibility_patterns_version": "0.2.1",
     "poam_policy_version": "0.2.0",
-    "catalog_version": "0.2.0"
+    "catalog_version": "0.2.1"
   },
   "counts": {
     "ksis": 64,
@@ -48,7 +48,7 @@
     },
     "catalog": {
       "path": "ontology/ksi-catalog.json",
-      "sha256": "5155e06cdc3360618a52f93985d7f3563ad9076a5554f3571f2ddc7c425c4fc9"
+      "sha256": "1d24792a418e30cddfca8fda18cf1f80be61de583ef0f9f2039fa25e1262e68f"
     },
     "collection": {
       "path": "ontology/collection.json",
@@ -2418,7 +2418,7 @@
     },
     "catalog": {
       "catalog": "DIB-KSI",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "date": "2026-07-26",
       "basis": {
         "adopted_from": "FedRAMP CR26 KSI catalog (launched 2026-06-24; 46 KSIs / 10 families)",
@@ -2435,8 +2435,8 @@
         "A KSI is MET only when ALL mapped AOs/DS are demonstrated by required evidence types; per-AO status retained in the SDR (Security Decision Record)",
         "Uplift KSIs never substitute for 171-mapped KSIs",
         "POA&M/exception eligibility binds at the requirement level per 32 CFR 170.21 and the DoD scoring methodology; the exception engine refuses a clock for any AO under an ineligible requirement. KSI-level non_deferrable flags are informational, not the enforcement mechanism.",
-        "Uplift KSIs are never required below Class D and never affect level compliance; they are scored transparency, present for CR26/Class-C reciprocity and resilience visibility",
-        "Uplift KSIs are never required below Class D and never affect level compliance; they are reported for CR26/Class-C reciprocity."
+        "Uplift KSIs are never required below Class D and never affect level compliance; they are reported for CR26/Class-C reciprocity.",
+        "Revision indifference: KSI statements are stable; assessable baselines (171r2/171r3/172-2021/172r3) swap underneath via revision_profiles and per-KSI mapping fields; 172r3+172Ar3 (final May 2026) enter as the L3 forward baseline with NIST-native OSCAL as the machine source"
       ],
       "evidence_types": {
         "E1": "Machine telemetry (API/config query of live state)",
@@ -4887,7 +4887,8 @@
         ]
       },
       "changelog": [
-        "0.2.0 (2026-07-26): cui_impact added to every KSI stating how it protects CUI confidentiality (uplift KSIs state they sit beyond the 800-171 confidentiality floor); SCB-DFD, IAM-APM, SVC-SIN statements tightened; catalog invariants 7 and 9 tightened",
+        "0.2.1 (2026-07-26): restore the Revision indifference invariant, clobbered in 0.2.0 by an off-by-one that also left the uplift invariant duplicated; the intended tightening now applies to invariant 8",
+        "0.2.0 (2026-07-26): cui_impact added to every KSI stating how it protects CUI confidentiality (uplift KSIs state they sit beyond the 800-171 confidentiality floor); SCB-DFD, IAM-APM, SVC-SIN statements tightened; catalog invariants 7 and 8 tightened",
         "0.1.4 (2026-07-16): SSR renamed SDR (Security Decision Record), adopting FedRAMP CR26's SSP-successor term for one artifact language across programs; artifact-disposition, evidence-storage/CUI-handling, audience-disclosure, and levels-vs-classes rationale content added to both HTML artifacts",
         "0.1.3 (2026-07-15): requirement-level Rev3 mappings shipped per KSI (renumber + verified absorptions + new PL/SA/SR families); AO math reconciled (509 DS = ~421 AOs + 88 ODP)",
         "0.1.2 (2026-07-15): revision_profiles added for 171r2/171r3/172(2021)/172r3; APT module dual-rev mappings; 172Ar3 (final 2026-05-13) integrated as engine source",
