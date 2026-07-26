@@ -1,16 +1,16 @@
 {
   "title": "DIB-KSI Consolidated Dataset",
-  "version": "0.6.0",
-  "released": "2026-07-25",
+  "version": "0.6.1",
+  "released": "2026-07-26",
   "status": "working draft, published for adversarial comment",
   "generated_by": "tools/gen-consolidated.mjs",
   "generated_note": "Generated from the source registries. Do not hand-edit; edit the sources and regenerate.",
   "identifies": {
-    "ontology_version": "0.6.0",
-    "signals_version": "0.4.0",
-    "responsibility_patterns_version": "0.2.0",
+    "ontology_version": "0.6.1",
+    "signals_version": "0.4.1",
+    "responsibility_patterns_version": "0.2.1",
     "poam_policy_version": "0.2.0",
-    "catalog_version": "0.1.4"
+    "catalog_version": "0.2.0"
   },
   "counts": {
     "ksis": 64,
@@ -32,15 +32,15 @@
   "sources": {
     "ontology": {
       "path": "ontology/dib-ksi-ontology.json",
-      "sha256": "3b66037d7bd7eb96c9e76cc911c71df68d5faf7c3739b119477d85621a14f721"
+      "sha256": "5f6e4bd992d2afe979ca4f4ba429adfdef503676aa23ca132203b94895d93a9d"
     },
     "signals": {
       "path": "ontology/signals.json",
-      "sha256": "c576e58a8ce305a0ce72c20bda564bbe6afa0bff3a15dc7a898af0bd95d9d5fd"
+      "sha256": "567cfa0cd14c11c55c509e452a8f1bb4266a54b3234b2a88597cce1b6a5cdc58"
     },
     "responsibility_patterns": {
       "path": "ontology/responsibility-patterns.json",
-      "sha256": "35769cd2edb2867db9790705b1dfea89cf6d33ca1bf4e51f3bcbc0678a4c6dc7"
+      "sha256": "bccb0a35ce0a2e25cb907ac91c58f60c8fefc5f1d59fc19b6f2708a6ebf1b69b"
     },
     "poam_policy": {
       "path": "ontology/poam-policy.json",
@@ -48,11 +48,11 @@
     },
     "catalog": {
       "path": "ontology/ksi-catalog.json",
-      "sha256": "c05b836c51656a482f7513752fa9e20698c5265f2d02ade733fc61da5e9b20b3"
+      "sha256": "5155e06cdc3360618a52f93985d7f3563ad9076a5554f3571f2ddc7c425c4fc9"
     },
     "collection": {
       "path": "ontology/collection.json",
-      "sha256": "5679d0fe24648b375199951074513d370daf10a9bf7cd41b1ce8118f503ae1af"
+      "sha256": "2f57d2f54b65f5e62f183cafac6954d0e3b9aa61f5ae6aac4715ba238e9db8b5"
     },
     "guidance": {
       "path": "ontology/guidance.json",
@@ -62,8 +62,8 @@
   "data": {
     "ontology": {
       "ontology": "DIB-KSI",
-      "version": "0.6.0",
-      "date": "2026-07-25",
+      "version": "0.6.1",
+      "date": "2026-07-26",
       "basis": "NIST SP 800-171 r2/r3 + 800-171A, 800-172/172A, 32 CFR 170, DFARS 252.204-7012, FedRAMP CR26 assurance-class semantics",
       "purpose": "A deterministic system of record for defense-industrial-base CUI assurance. Entities and relations are the source; every deliverable (SDR/SSP, responsibility matrix, POA&M, affirmation package, dataflow diagram) is a projection over this graph. Nothing is authored twice, and no document can age into truth.",
       "first_principles": [
@@ -847,10 +847,10 @@
             "inheritance_note": "Four indicators are genuinely inherited: datacenter physical access, environmental protection, and the physical media lifecycle inside the provider estate. Thirty-three are shared. That shared column is the honest picture of commercial cloud — the provider is doing real work, and you still own the configuration, the evidence, and the answer."
           }
         ],
-        "reading_the_numbers": "The gap between the second and third rows is worth sitting with. Both are Class C, and they differ mainly in whether there is an arrangement scoped to controlled information with evidence that flows on a cadence. That single difference moves work between columns without changing what any provider is physically doing."
+        "reading_the_numbers": "The second and third shapes are both Class C; they differ in whether an arrangement scoped to controlled information emits evidence on a cadence. That difference moves work between columns without changing what any provider physically does."
       },
       "evidence_types": {
-        "statement": "Five kinds of evidence, ordered by how hard they are to fake and how much work they are to produce. Assurance classes differ mainly in which of these they will accept: lower classes take an assertion backed by configuration, higher classes want telemetry and a demonstration. Most arguments about \"is this good enough evidence\" are really arguments about which of these five somebody produced.",
+        "statement": "Five kinds of evidence, ordered by how hard they are to fake and how much work they are to produce. Assurance classes differ mainly in which of these they will accept: lower classes take an assertion backed by configuration, higher classes want telemetry and a demonstration.",
         "types": [
           {
             "id": "E1",
@@ -967,7 +967,7 @@
       },
       "working_sets": {
         "statement": "The catalogue is exhaustive so the model can be correct about any arrangement. No single organisation is expected to hold it in its head. This is what each of the three shapes actually touches.",
-        "point": "The reference is large. The work is not. If a framework asks you to read all of it before you can do any of it, that is a documentation failure, not a security requirement.",
+        "point": "The reference is large. The work is not.",
         "sets": [
           {
             "id": "small-enclave",
@@ -1007,8 +1007,8 @@
     },
     "signals": {
       "registry": "DIB-KSI signal registry",
-      "version": "0.4.0",
-      "date": "2026-07-25",
+      "version": "0.4.1",
+      "date": "2026-07-26",
       "premise": "The unit of assurance is the signal, not the document. Each indicator names a measurable property of the running environment, the population it is measured over, the method that produces it, how fresh it must be at each assurance class, and the bar it must clear. A claim supported only by prose is not a claim this framework can grade.",
       "conventions": {
         "population": "Every percentage publishes its denominator. A measurement without {measured, total} is rejected by the validator, because a coverage number over an undefined population is not a measurement.",
@@ -1086,7 +1086,7 @@
             "C": 3,
             "D": 1
           },
-          "notes": "No class tolerates a privileged account without phishing-resistant MFA. This is the one indicator whose bar does not move with class.",
+          "notes": "The bar does not move with class: no class tolerates a privileged account without phishing-resistant MFA.",
           "authority": {
             "source": "CISA SCuBA — Microsoft 365 Secure Configuration Baseline",
             "policy_id": "MS.AAD.3.1v1",
@@ -1281,7 +1281,7 @@
             "C": 1,
             "D": 1
           },
-          "notes": "Feeds the finding queue directly. A known-exploited vulnerability past due is the clearest single statement a posture can make about itself.",
+          "notes": "Feeds the finding queue directly; the due dates come from the catalogue, not from this project.",
           "authority": {
             "source": "CISA Known Exploited Vulnerabilities catalog",
             "policy_id": "BOD 22-01",
@@ -1321,7 +1321,7 @@
             "C": 90,
             "D": 30
           },
-          "notes": "Dwell time is the number the losses actually track. It is measured by exercise, which is why it carries E5 rather than E1.",
+          "notes": "Measured by exercise rather than query, which is why it carries E5 rather than E1.",
           "derived": "local-policy",
           "rationale": "No authority publishes a detection-time figure. This bar is this project’s policy choice and is the least externally supported number in the registry.",
           "kind": "threshold",
@@ -1538,7 +1538,7 @@
             "C": 3,
             "D": 1
           },
-          "notes": "This is the indicator that keeps scope honest. A diagram that agrees with telemetry is worth grading; one that does not is a finding with a clock.",
+          "notes": "Reconciles the declared dataflow model against observed telemetry; an undeclared flow is a finding with a clock.",
           "derived": "local-policy",
           "rationale": "This measurement exists only because this framework declares a dataflow model to reconcile against. It has no external authority by construction.",
           "kind": "threshold",
@@ -1608,7 +1608,7 @@
             "C": 90,
             "D": 30
           },
-          "notes": "A backup that has never been restored is a hypothesis. The measurement is the restore, not the backup job's success code.",
+          "notes": "The measurement is the demonstrated restore against the stated objective, not the backup job's success code.",
           "derived": "local-policy",
           "rationale": "No authority publishes a restore-test interval. This bar is this project’s policy choice, and note that recovery is an availability concern outside the confidentiality scope this framework measures.",
           "kind": "threshold",
@@ -1731,7 +1731,7 @@
             "C": 3,
             "D": 1
           },
-          "notes": "A permissive sharing default leaks controlled drawings faster than any unpatched service. This is the highest-yield confidentiality control in the registry and the framework did not measure it before.",
+          "notes": "A permissive external-sharing default exposes CUI directly, with no vulnerability required.",
           "methods": [
             "platform-api",
             "config-scan",
@@ -1770,7 +1770,7 @@
             "C": 3,
             "D": 1
           },
-          "notes": "The only literal numeric bound any authority in this space publishes. Two is a resilience floor; eight is a blast-radius ceiling.",
+          "notes": "CISA publishes the literal bound: at least two standing global administrators for continuity, at most eight to limit blast radius.",
           "methods": [
             "platform-api",
             "log-query",
@@ -1863,13 +1863,13 @@
           ]
         }
       ],
-      "coverage_note": "Twenty-two indicators do not cover sixty-four KSIs, and the registry does not pretend otherwise. Nine cite an external authority; thirteen are this project’s own policy choices and say so per signal.",
+      "coverage_note": "Twenty-two indicators do not cover sixty-four KSIs, and the registry does not pretend otherwise. Eleven cite an external authority; eleven are this project’s own policy choices and say so per signal.",
       "collection_note": "Each signal lists the collection METHODS that can legitimately produce it, not products. Any implementation meeting the interface in ontology/collection.json is valid. Where two or more methods are listed they are ordered by directness, and Class C and above require two that read from different control planes — see the independence rule in that file."
     },
     "responsibility_patterns": {
       "registry": "DIB-KSI responsibility patterns",
-      "version": "0.2.0",
-      "date": "2026-07-19",
+      "version": "0.2.1",
+      "date": "2026-07-26",
       "premise": "A defended enclave is a deployment pattern, not a product. This file expresses the shared-responsibility split as data so a tenant's responsibility matrix is generated from its architecture rather than transcribed from a provider's PDF. Modes are defaults for a tenant that has actually moved its CUI into the enclave; the validator re-tests every inherited assignment against the three-test rule before it will grade one.",
       "three_test_rule": {
         "statement": "An objective may be marked inherited only when all three tests pass. A failed test degrades the assignment to shared or tenant. Inheritance is never a status a tenant simply declares.",
@@ -2374,7 +2374,7 @@
       "honest_boundary": {
         "statement": "Inheritance shrinks the tenant's obligation; it never zeroes it, and this file is written so the residual is impossible to lose.",
         "points": [
-          "An unvalidated enclave inherits nothing but risk. The provider must itself be assessed at or above the tenant's class.",
+          "An unvalidated enclave inherits nothing. The provider must itself be assessed at or above the tenant's class.",
           "The grading invariant does not relax for inherited controls: every mapped objective must still be demonstrated, by the provider rather than by nobody.",
           "A tenant that exports CUI to an endpoint outside the enclave has re-scoped that endpoint back in, and the three-test rule will fail T3 rather than let the claim stand.",
           "Personnel, training, marking judgment, incident reporting, governance, log review, scope declaration, and the affirmation itself never inherit.",
@@ -2418,8 +2418,8 @@
     },
     "catalog": {
       "catalog": "DIB-KSI",
-      "version": "0.1.4",
-      "date": "2026-07-16",
+      "version": "0.2.0",
+      "date": "2026-07-26",
       "basis": {
         "adopted_from": "FedRAMP CR26 KSI catalog (launched 2026-06-24; 46 KSIs / 10 families)",
         "melds": "NIST SP 800-171r2 (110 reqs / 320 AOs) + 800-171r3 (97 reqs / 509 DS, 88 ODP-linked)",
@@ -2434,9 +2434,9 @@
         "FedRAMP Moderate / Class C equivalency for CSPs retained per DoD CIO memo Dec 21 2023",
         "A KSI is MET only when ALL mapped AOs/DS are demonstrated by required evidence types; per-AO status retained in the SDR (Security Decision Record)",
         "Uplift KSIs never substitute for 171-mapped KSIs",
-        "POA&M/exception eligibility binds at the REQUIREMENT level per 32 CFR 170.21 and the DoD scoring methodology: the exception engine refuses a clock for any AO under an ineligible requirement regardless of which KSI carries it; KSI-level non_deferrable flags are informational (crown-jewel families), not the enforcement mechanism",
+        "POA&M/exception eligibility binds at the requirement level per 32 CFR 170.21 and the DoD scoring methodology; the exception engine refuses a clock for any AO under an ineligible requirement. KSI-level non_deferrable flags are informational, not the enforcement mechanism.",
         "Uplift KSIs are never required below Class D and never affect level compliance; they are scored transparency, present for CR26/Class-C reciprocity and resilience visibility",
-        "Revision indifference: KSI statements are stable; assessable baselines (171r2/171r3/172-2021/172r3) swap underneath via revision_profiles and per-KSI mapping fields; 172r3+172Ar3 (final May 2026) enter as the L3 forward baseline with NIST-native OSCAL as the machine source"
+        "Uplift KSIs are never required below Class D and never affect level compliance; they are reported for CR26/Class-C reciprocity."
       ],
       "evidence_types": {
         "E1": "Machine telemetry (API/config query of live state)",
@@ -2497,6 +2497,7 @@
           "family_name": "Advanced Persistent Threat (L3/Class D module)",
           "name": "Adversarial Testing",
           "statement": "Periodic penetration testing / red-team with findings fed to exceptions (Class D only).",
+          "cui_impact": "Finds exploitable paths to CUI before an adversary does; validates that the confidentiality controls hold under attack.",
           "origin": "DIB-D",
           "automatable": false,
           "uplift": false,
@@ -2528,6 +2529,7 @@
           "family_name": "Advanced Persistent Threat (L3/Class D module)",
           "name": "Cyber Resiliency Architecture",
           "statement": "Resiliency/survivability architecture per 800-172 selections (Class D only).",
+          "cui_impact": "Limits what a successful intrusion can reach, so a single foothold does not expose the full CUI estate.",
           "origin": "DIB-D",
           "automatable": false,
           "uplift": false,
@@ -2559,6 +2561,7 @@
           "family_name": "Advanced Persistent Threat (L3/Class D module)",
           "name": "24/7 Detection & Response",
           "statement": "Continuous security operations capability (Class D only).",
+          "cui_impact": "Shortens the window between compromise and response; unwatched hours are when CUI leaves quietly.",
           "origin": "DIB-D",
           "automatable": true,
           "uplift": false,
@@ -2591,6 +2594,7 @@
           "family_name": "Advanced Persistent Threat (L3/Class D module)",
           "name": "Threat Hunting",
           "statement": "Cyber threat hunting on defined cadence (800-172 module; Class D only).",
+          "cui_impact": "Hunts for the adversary already inside; long dwell time is how CUI is exfiltrated without an alarm.",
           "origin": "DIB-D",
           "automatable": true,
           "uplift": false,
@@ -2623,6 +2627,7 @@
           "family_name": "Cybersecurity Education",
           "name": "CUI & Insider Threat Training",
           "statement": "Role-based CUI handling and insider-threat training content verified, not just tracked.",
+          "cui_impact": "People are the widest disclosure channel; verified handling and insider-threat training reduce mismarking, mishandling, and deliberate leaks.",
           "origin": "DIB",
           "automatable": false,
           "uplift": false,
@@ -2659,6 +2664,7 @@
           "family_name": "Cybersecurity Education",
           "name": "Reviewing All Training",
           "statement": "Effectiveness of cybersecurity training (general, role-specific, secure delivery, IR/DR) is persistently reviewed.",
+          "cui_impact": "Untrained users defeat technical controls; reviewed training keeps phishing and mishandling from becoming disclosure.",
           "origin": "CR26",
           "automatable": false,
           "uplift": false,
@@ -2696,6 +2702,7 @@
           "family_name": "Change Management",
           "name": "Logging Changes",
           "statement": "Modifications to in-scope systems are logged and monitored.",
+          "cui_impact": "An unlogged change can silently remove a protection on CUI; logged changes make weakening visible.",
           "origin": "CR26",
           "automatable": true,
           "uplift": false,
@@ -2731,6 +2738,7 @@
           "family_name": "Change Management",
           "name": "Redeploying vs Modifying",
           "statement": "Changes execute through redeployment of version-controlled resources; change access is restricted.",
+          "cui_impact": "Version-controlled redeployment with restricted change access prevents unreviewed hand-applied changes that quietly open access to CUI.",
           "origin": "CR26",
           "automatable": true,
           "uplift": false,
@@ -2766,6 +2774,7 @@
           "family_name": "Change Management",
           "name": "Reviewing Change Procedures",
           "statement": "Effectiveness of documented change management procedures is persistently reviewed.",
+          "cui_impact": "Weak change control is how protections on CUI drift off without record; reviewed procedures keep the change path trustworthy.",
           "origin": "CR26",
           "automatable": false,
           "uplift": false,
@@ -2795,6 +2804,7 @@
           "family_name": "Change Management",
           "name": "Validating Throughout Deployment",
           "statement": "Testing and security impact analysis of changes is automated throughout deployment.",
+          "cui_impact": "Security impact analysis catches changes that would expose CUI before they reach production.",
           "origin": "CR26",
           "automatable": true,
           "uplift": false,
@@ -2830,6 +2840,7 @@
           "family_name": "Defensible Architecture",
           "name": "Defining Functionality and Privileges",
           "statement": "Functionality and privileges strictly defined: least functionality, application control, malicious-code protection.",
+          "cui_impact": "Least functionality shrinks the code an attacker can use to reach CUI; malicious-code protection blocks common exfiltration tooling.",
           "origin": "CR26",
           "automatable": true,
           "uplift": false,
@@ -2881,6 +2892,7 @@
           "family_name": "Defensible Architecture",
           "name": "Enforcing Intended State",
           "statement": "Automated services persistently assess machine-based resources and enforce intended state (continuous monitoring).",
+          "cui_impact": "Drift is how a protection on CUI turns off without anyone deciding it; continuous enforcement turns it back on.",
           "origin": "CR26",
           "automatable": true,
           "uplift": false,
@@ -2916,6 +2928,7 @@
           "family_name": "Defensible Architecture",
           "name": "Implementing Best Practices",
           "statement": "Third-party resource configuration persistently compared against provider best practices.",
+          "cui_impact": "Provider-baseline comparison catches misconfigurations that can expose CUI. Uplift beyond the 800-171 confidentiality floor; never required below Class D.",
           "origin": "CR26",
           "automatable": true,
           "uplift": true,
@@ -2945,6 +2958,7 @@
           "family_name": "Defensible Architecture",
           "name": "Minimizing Attack Surface",
           "statement": "Resources persistently reviewed for minimal attack surface and limited lateral movement; wireless access authorized and constrained.",
+          "cui_impact": "Fewer exposed services and constrained wireless mean fewer paths to CUI; limited lateral movement contains a foothold away from it.",
           "origin": "CR26",
           "automatable": true,
           "uplift": false,
@@ -2980,6 +2994,7 @@
           "family_name": "Defensible Architecture",
           "name": "Optimizing for Availability",
           "statement": "Resources persistently reviewed for availability and rapid recovery (availability uplift beyond 171A confidentiality floor).",
+          "cui_impact": "Availability engineering, not confidentiality. Uplift beyond the 800-171 confidentiality floor; never required below Class D.",
           "origin": "CR26",
           "automatable": true,
           "uplift": true,
@@ -3009,6 +3024,7 @@
           "family_name": "Defensible Architecture",
           "name": "Restricting Network Traffic",
           "statement": "Boundary protection: inbound/outbound traffic limited, deny-by-default, split tunneling prevented, remote access monitored.",
+          "cui_impact": "Deny-by-default boundaries block the way in to CUI and the way out for it; unmonitored remote access and split tunnels are exfiltration paths.",
           "origin": "CR26",
           "automatable": true,
           "uplift": false,
@@ -3054,6 +3070,7 @@
           "family_name": "Defensible Architecture",
           "name": "Reviewing Protections",
           "statement": "Effectiveness of DoS and unwanted-activity protections persistently reviewed.",
+          "cui_impact": "DoS protection is availability, not confidentiality. Uplift beyond the 800-171 confidentiality floor; never required below Class D.",
           "origin": "CR26",
           "automatable": true,
           "uplift": true,
@@ -3083,6 +3100,7 @@
           "family_name": "Defensible Architecture",
           "name": "Using Logical Networking",
           "statement": "Logical networking persistently enforces flow control, connection termination, managed access points.",
+          "cui_impact": "Flow control and managed access points decide which segments may carry CUI; unmanaged paths are undeclared disclosure routes.",
           "origin": "CR26",
           "automatable": true,
           "uplift": false,
@@ -3123,6 +3141,7 @@
           "family_name": "CUI Handling & Cryptography",
           "name": "FIPS-Validated CUI Cryptography",
           "statement": "CUI at rest and in transit protected with FIPS-validated cryptography (CMVP-checked continuously); covers remote access, wireless, mobile.",
+          "cui_impact": "Validated encryption is the control that holds when the others fail: intercepted or stolen CUI stays unreadable.",
           "origin": "DIB",
           "automatable": true,
           "uplift": false,
@@ -3174,6 +3193,7 @@
           "family_name": "CUI Handling & Cryptography",
           "name": "CUI Marking & Handling",
           "statement": "CUI marked and handled per contract identification; publicly accessible content controlled.",
+          "cui_impact": "Unmarked CUI is unprotected CUI: marking tells every downstream control and person that confidentiality applies.",
           "origin": "DIB",
           "automatable": false,
           "uplift": false,
@@ -3212,6 +3232,7 @@
           "family_name": "Identity & Access Management",
           "name": "Automating Account Management",
           "statement": "Lifecycle and privileges of all accounts/roles/groups managed with automation; identifiers unique, non-reused, disabled when inactive.",
+          "cui_impact": "Manual account lifecycle leaves live credentials after people leave; automation closes account paths to CUI on time.",
           "origin": "CR26",
           "automatable": true,
           "uplift": false,
@@ -3256,7 +3277,8 @@
           "family": "IAM",
           "family_name": "Identity & Access Management",
           "name": "Adopting Phishing-Resistant Methods",
-          "statement": "MFA enforced for local, network, and privileged access (3.5.3 floor); phishing-resistant methods recommended at Class C and required at Class D; replay resistance; password protections where passwords persist; MFA for nonlocal maintenance.",
+          "statement": "MFA enforced for local, network, privileged, and nonlocal-maintenance access (3.5.3 floor); replay resistance; password protections where passwords persist; phishing-resistant methods recommended at Class C, required at Class D.",
+          "cui_impact": "Stolen credentials are the leading route to CUI; MFA makes a password alone insufficient to reach it.",
           "origin": "CR26",
           "automatable": true,
           "uplift": false,
@@ -3309,6 +3331,7 @@
           "family_name": "Identity & Access Management",
           "name": "Ensuring Least Privilege",
           "statement": "Least privilege persistently reviewed for every user and device; session lock and termination enforced.",
+          "cui_impact": "Bounds who can read CUI and for how long; excess or unreviewed privilege widens the disclosure surface.",
           "origin": "CR26",
           "automatable": true,
           "uplift": false,
@@ -3350,6 +3373,7 @@
           "family_name": "Identity & Access Management",
           "name": "Authorizing Just-in-Time",
           "statement": "Role/attribute-based, just-in-time authorization; separation of duties; privileged function control and logging.",
+          "cui_impact": "Standing broad access is standing disclosure risk; just-in-time grants and separation of duties keep access to CUI narrow and short-lived.",
           "origin": "CR26",
           "automatable": true,
           "uplift": false,
@@ -3393,6 +3417,7 @@
           "family_name": "Identity & Access Management",
           "name": "Securing Non-User Authentication",
           "statement": "Secure authentication for service and non-user accounts persistently reviewed.",
+          "cui_impact": "Service accounts reach CUI with no person attached; weak non-user authentication is an unwatched door.",
           "origin": "CR26",
           "automatable": true,
           "uplift": false,
@@ -3422,6 +3447,7 @@
           "family_name": "Identity & Access Management",
           "name": "Responding to Suspicious Activity",
           "statement": "Privileged accounts disabled/secured on suspicious activity; unsuccessful logon attempts limited.",
+          "cui_impact": "A privileged account behaving strangely may be an exfiltration in progress; disabling it fast cuts off access to CUI.",
           "origin": "CR26",
           "automatable": true,
           "uplift": false,
@@ -3457,6 +3483,7 @@
           "family_name": "Incident Response",
           "name": "Generating After Action Reports",
           "statement": "Incident response capability is tested; after-action reports generated and lessons incorporated.",
+          "cui_impact": "Tested response with lessons applied shortens the next disclosure; untested plans extend it.",
           "origin": "CR26",
           "automatable": false,
           "uplift": false,
@@ -3492,6 +3519,7 @@
           "family_name": "Incident Response",
           "name": "Reviewing IR Procedures (incl. DIBNet 72-hr)",
           "statement": "Operational IR capability with tracking and reporting; 72-hour DIBNet reporting exercised at every class.",
+          "cui_impact": "An exercised 72-hour DIBNet reporting path bounds how long a CUI compromise goes unreported.",
           "origin": "CR26",
           "automatable": false,
           "uplift": false,
@@ -3529,6 +3557,7 @@
           "family_name": "Incident Response",
           "name": "Reviewing Past Incidents",
           "statement": "Past incidents persistently reviewed for latent patterns and vulnerabilities.",
+          "cui_impact": "Past-incident review finds the recurring weaknesses that keep exposing CUI. Uplift beyond the 800-171 confidentiality floor; never required below Class D.",
           "origin": "CR26",
           "automatable": false,
           "uplift": true,
@@ -3558,6 +3587,7 @@
           "family_name": "Media Protection",
           "name": "Physical & Paper CUI Protection",
           "statement": "Physical media and paper CUI protected and access-limited.",
+          "cui_impact": "Paper and physical media carry CUI outside every technical control; physical protection is the only control they get.",
           "origin": "DIB",
           "automatable": false,
           "uplift": false,
@@ -3595,6 +3625,7 @@
           "family_name": "Media Protection",
           "name": "Removable Media Control",
           "statement": "Removable/portable storage restricted, owned, checked; use persistently reviewed.",
+          "cui_impact": "Removable media is the quietest bulk-exfiltration channel; restriction and ownership checks keep CUI off unaccounted devices.",
           "origin": "DIB",
           "automatable": true,
           "uplift": false,
@@ -3638,6 +3669,7 @@
           "family_name": "Media Protection",
           "name": "Media Sanitization",
           "statement": "Media sanitized or destroyed before disposal/reuse/offsite maintenance; third-party-originated destruction records as signed artifacts.",
+          "cui_impact": "Unsanitized media leaves the building with CUI still on it; verified destruction closes the disposal path.",
           "origin": "DIB",
           "automatable": false,
           "uplift": false,
@@ -3676,6 +3708,7 @@
           "family_name": "Media Protection",
           "name": "Media Transport",
           "statement": "Media protected and encrypted during transport outside controlled areas; accountability maintained.",
+          "cui_impact": "Media in transit is outside the boundary; encryption and accountability keep transported CUI confidential.",
           "origin": "DIB",
           "automatable": false,
           "uplift": false,
@@ -3713,6 +3746,7 @@
           "family_name": "Monitoring, Logging & Auditing",
           "name": "Authorizing Log Access",
           "statement": "Least-privileged, JIT access to audit information; audit management privileges restricted.",
+          "cui_impact": "Logs record who touched CUI; unrestricted log access lets an intruder read the record or erase their tracks.",
           "origin": "CR26",
           "automatable": true,
           "uplift": false,
@@ -3750,6 +3784,7 @@
           "family_name": "Monitoring, Logging & Auditing",
           "name": "Evaluating Configurations",
           "statement": "Configurations persistently evaluated and tested, including vulnerability scanning of the estate.",
+          "cui_impact": "Vulnerability scanning finds the exploitable weaknesses that lead to CUI before an adversary uses them.",
           "origin": "CR26",
           "automatable": true,
           "uplift": false,
@@ -3785,6 +3820,7 @@
           "family_name": "Monitoring, Logging & Auditing",
           "name": "Logging Event Types",
           "statement": "Defined event types logged with individual accountability; coverage persistently reviewed.",
+          "cui_impact": "Access to CUI that is not logged cannot be reviewed, attributed, or investigated; coverage gaps are blind spots.",
           "origin": "CR26",
           "automatable": true,
           "uplift": false,
@@ -3827,6 +3863,7 @@
           "family_name": "Monitoring, Logging & Auditing",
           "name": "Operating SIEM Capability",
           "statement": "Centralized tamper-resistant logging with correlation, alerting on failure, time sync, attack monitoring.",
+          "cui_impact": "Correlation and alerting turn individual events into a detected intrusion; tamper resistance keeps the record trustworthy after one.",
           "origin": "CR26",
           "automatable": true,
           "uplift": false,
@@ -3871,6 +3908,7 @@
           "family_name": "Monitoring, Logging & Auditing",
           "name": "Reviewing Logs",
           "statement": "Logs persistently reviewed/audited; unauthorized use identified.",
+          "cui_impact": "Unreviewed logs detect nothing; review turns recorded access to CUI into caught misuse.",
           "origin": "CR26",
           "automatable": true,
           "uplift": false,
@@ -3909,6 +3947,7 @@
           "family_name": "Personnel Security",
           "name": "Personnel Screening & Separation",
           "statement": "Individuals screened before CUI access; access revoked on termination/transfer via the automated account pipeline.",
+          "cui_impact": "Screening bounds who is trusted with CUI; automated revocation ends that trust the day it should end.",
           "origin": "DIB",
           "automatable": false,
           "uplift": false,
@@ -3946,6 +3985,7 @@
           "family_name": "Physical Protection",
           "name": "Limiting Physical Access",
           "statement": "Physical access to CUI spaces limited, logged, devices controlled, facility monitored; alternative work sites safeguarded.",
+          "cui_impact": "Physical access defeats logical controls; limiting and logging entry to CUI spaces protects what the network cannot.",
           "origin": "DIB",
           "automatable": false,
           "uplift": false,
@@ -3987,6 +4027,7 @@
           "family_name": "Physical Protection",
           "name": "Managing Escorts & Visitors",
           "statement": "Visitors escorted and logged; maintenance personnel supervised; activity persistently reviewed.",
+          "cui_impact": "Unescorted visitors and unsupervised maintenance are physical access to CUI without accountability.",
           "origin": "DIB",
           "automatable": false,
           "uplift": false,
@@ -4027,6 +4068,7 @@
           "family_name": "Program, Inventory & Governance",
           "name": "Generating Inventories",
           "statement": "Authoritative sources auto-generate real-time inventories of all information resources.",
+          "cui_impact": "The inventory is the denominator for every coverage claim; an asset missing from it holds CUI outside every control.",
           "origin": "CR26",
           "automatable": true,
           "uplift": false,
@@ -4062,6 +4104,7 @@
           "family_name": "Program, Inventory & Governance",
           "name": "Reviewing Executive Support",
           "statement": "Executive support for security goals persistently demonstrated.",
+          "cui_impact": "Executive support sustains the program funding the confidentiality controls. Uplift beyond the 800-171 confidentiality floor; never required below Class D.",
           "origin": "CR26",
           "automatable": false,
           "uplift": true,
@@ -4091,6 +4134,7 @@
           "family_name": "Program, Inventory & Governance",
           "name": "Reviewing Investments in Security",
           "statement": "Security requirement and risk assessment on defined cadence; deficiencies tracked to closure via the exception queue.",
+          "cui_impact": "Risk assessment on cadence finds where CUI protection falls short; tracked closure keeps the gaps from standing.",
           "origin": "CR26",
           "automatable": false,
           "uplift": false,
@@ -4132,6 +4176,7 @@
           "family_name": "Program, Inventory & Governance",
           "name": "Reviewing Security in the SDLC",
           "statement": "Security built into SDLC per Secure-by-Design; persistently reviewed.",
+          "cui_impact": "Secure SDLC reduces the flaws shipped into systems handling CUI. Uplift beyond the 800-171 confidentiality floor; never required below Class D.",
           "origin": "CR26",
           "automatable": false,
           "uplift": true,
@@ -4163,6 +4208,7 @@
           "family_name": "Program, Inventory & Governance",
           "name": "Reviewing Vulnerability Disclosures",
           "statement": "Vulnerability disclosure program effectiveness persistently reviewed.",
+          "cui_impact": "A vulnerability disclosure program surfaces exposures outsiders find first. Uplift beyond the 800-171 confidentiality floor; never required below Class D.",
           "origin": "CR26",
           "automatable": false,
           "uplift": true,
@@ -4192,6 +4238,7 @@
           "family_name": "Recovery Planning",
           "name": "Aligning Backups with Objectives",
           "statement": "Backups of CUI and systems align with recovery objectives; backup CUI protected.",
+          "cui_impact": "Backups are full copies of CUI; an unprotected backup is a second, quieter place to steal it from.",
           "origin": "CR26",
           "automatable": true,
           "uplift": false,
@@ -4227,6 +4274,7 @@
           "family_name": "Recovery Planning",
           "name": "Aligning Recovery Plan",
           "statement": "Recovery plans persistently aligned with objectives (resilience uplift).",
+          "cui_impact": "Recovery planning is availability, not confidentiality. Uplift beyond the 800-171 confidentiality floor; never required below Class D.",
           "origin": "CR26",
           "automatable": false,
           "uplift": true,
@@ -4256,6 +4304,7 @@
           "family_name": "Recovery Planning",
           "name": "Reviewing Recovery Objectives",
           "statement": "RTO/RPO defined and persistently reviewed (resilience uplift).",
+          "cui_impact": "RTO/RPO objectives are availability, not confidentiality. Uplift beyond the 800-171 confidentiality floor; never required below Class D.",
           "origin": "CR26",
           "automatable": false,
           "uplift": true,
@@ -4285,6 +4334,7 @@
           "family_name": "Recovery Planning",
           "name": "Testing Recovery Capabilities",
           "statement": "Recovery capability persistently tested with measured results (resilience uplift; E5 evidence).",
+          "cui_impact": "Restore testing is availability, not confidentiality. Uplift beyond the 800-171 confidentiality floor; never required below Class D.",
           "origin": "CR26",
           "automatable": false,
           "uplift": true,
@@ -4314,6 +4364,7 @@
           "family_name": "Scope & Boundary",
           "name": "Asset Categorization",
           "statement": "Every in-scope asset categorized into the five 32 CFR 170.19 categories from the authoritative inventory; persistently reviewed.",
+          "cui_impact": "Categorization decides which assets get CUI protections; a miscategorized asset holds CUI at the wrong level of care.",
           "origin": "DIB",
           "automatable": true,
           "uplift": false,
@@ -4343,6 +4394,7 @@
           "family_name": "Scope & Boundary",
           "name": "Inheritance & External Systems",
           "statement": "Every inherited control recorded in a current CRM/SRM; provider status persistently retrieved; external system connections authorized.",
+          "cui_impact": "An inherited control nobody verifies is an assumed protection on CUI; current provider status makes inheritance a checked claim.",
           "origin": "DIB",
           "automatable": true,
           "uplift": false,
@@ -4378,7 +4430,8 @@
           "family": "SCB",
           "family_name": "Scope & Boundary",
           "name": "Generated Network & CUI Dataflow Diagram",
-          "statement": "L0/L1 network and CUI dataflow views generated from live inventory on every change and validated against observed flows; the SDR is generated from the same source and checked for completeness (every in-scope requirement populated with current status) — the demonstrable successor to 3.12.4.",
+          "statement": "L0/L1 network and CUI dataflow views generated from live inventory on every change and validated against observed flows; the SDR is generated from the same source and checked for completeness (every in-scope requirement populated with current status).",
+          "cui_impact": "The dataflow diagram is where CUI actually travels; validated against observed flows, it exposes undeclared paths CUI could leak through.",
           "origin": "DIB",
           "automatable": true,
           "uplift": false,
@@ -4418,6 +4471,7 @@
           "family_name": "Scope & Boundary",
           "name": "Boundary Separation",
           "statement": "Enclave/segmentation separation implemented and persistently validated; public-access subnetworks separated; secure architecture.",
+          "cui_impact": "Separation makes the CUI boundary real; without validated segmentation, everything connected is one disclosure domain.",
           "origin": "DIB",
           "automatable": true,
           "uplift": false,
@@ -4455,6 +4509,7 @@
           "family_name": "Supply Chain Risk",
           "name": "Mitigating Supply Chain Risk",
           "statement": "Supply chain risks persistently identified, reviewed, mitigated.",
+          "cui_impact": "Supply chain compromise arrives with trusted access to CUI environments. Uplift beyond the 800-171 confidentiality floor; never required below Class D.",
           "origin": "CR26",
           "automatable": false,
           "uplift": true,
@@ -4487,6 +4542,7 @@
           "family_name": "Supply Chain Risk",
           "name": "Monitoring Supply Chain Risk",
           "statement": "Third-party software monitored for upstream vulnerabilities; security alerts/advisories actioned.",
+          "cui_impact": "A vulnerable third-party component is an inherited path to CUI; actioned advisories close it before it is used.",
           "origin": "CR26",
           "automatable": true,
           "uplift": false,
@@ -4523,6 +4579,7 @@
           "family_name": "Service & Configuration",
           "name": "Automating Configuration Management",
           "statement": "Baseline configurations enforced and drift-checked by automation: settings, banners, session/device configs, collaborative devices, VoIP, mobile.",
+          "cui_impact": "Baseline enforcement keeps the settings protecting CUI from drifting open; unmanaged devices and sessions are unmanaged exposure.",
           "origin": "CR26",
           "automatable": true,
           "uplift": false,
@@ -4570,6 +4627,7 @@
           "family_name": "Service & Configuration",
           "name": "Automating Secret Management",
           "statement": "Keys, certificates, secrets managed, protected, rotated with automation.",
+          "cui_impact": "A leaked key or secret unlocks CUI without touching a login page; managed rotation limits how long a leak works.",
           "origin": "CR26",
           "automatable": true,
           "uplift": false,
@@ -4608,6 +4666,7 @@
           "family_name": "Service & Configuration",
           "name": "Evaluating and Improving Security",
           "statement": "Flaws remediated on clocks; maintenance controlled; improvements persistently made.",
+          "cui_impact": "Unremediated flaws are open paths to CUI; remediation on clocks bounds how long each path stays open.",
           "origin": "CR26",
           "automatable": true,
           "uplift": false,
@@ -4652,6 +4711,7 @@
           "family_name": "Service & Configuration",
           "name": "Preventing Residual Risk",
           "statement": "Shared system resources controlled; residual data elements removed after change.",
+          "cui_impact": "Shared system resources can carry residual CUI between contexts; removal after change keeps data from surfacing where it does not belong.",
           "origin": "CR26",
           "automatable": true,
           "uplift": false,
@@ -4687,6 +4747,7 @@
           "family_name": "Service & Configuration",
           "name": "Removing Unwanted Data (CUI Spill)",
           "statement": "CUI spills removed promptly on direction, including from backups (DFARS-adjacent uplift).",
+          "cui_impact": "Spilled CUI in the wrong system is active disclosure until removed, including from backups. Uplift beyond the 800-171 confidentiality floor; never required below Class D.",
           "origin": "CR26",
           "automatable": true,
           "uplift": true,
@@ -4715,7 +4776,8 @@
           "family": "SVC",
           "family_name": "Service & Configuration",
           "name": "Securing Information",
-          "statement": "Information secured from unwanted access or modification at rest and in transit (KSI-CUI-ENC supplies the FIPS bar).",
+          "statement": "Information secured from unwanted access or modification at rest and in transit.",
+          "cui_impact": "At-rest and in-transit protection keeps CUI unreadable on stolen storage and intercepted links; KSI-CUI-ENC sets the FIPS bar.",
           "origin": "CR26",
           "automatable": true,
           "uplift": false,
@@ -4753,6 +4815,7 @@
           "family_name": "Service & Configuration",
           "name": "Validating Communications",
           "statement": "Authenticity/integrity of communications sessions validated.",
+          "cui_impact": "Session authenticity prevents hijacked or spoofed connections from becoming an authenticated path to CUI.",
           "origin": "CR26",
           "automatable": true,
           "uplift": false,
@@ -4788,6 +4851,7 @@
           "family_name": "Service & Configuration",
           "name": "Validating Resource Integrity",
           "statement": "Cryptographic integrity validation of resources (SI-7 uplift).",
+          "cui_impact": "Resource integrity validation is integrity, not confidentiality. Uplift beyond the 800-171 confidentiality floor; never required below Class D.",
           "origin": "CR26",
           "automatable": true,
           "uplift": true,
@@ -4823,6 +4887,7 @@
         ]
       },
       "changelog": [
+        "0.2.0 (2026-07-26): cui_impact added to every KSI stating how it protects CUI confidentiality (uplift KSIs state they sit beyond the 800-171 confidentiality floor); SCB-DFD, IAM-APM, SVC-SIN statements tightened; catalog invariants 7 and 9 tightened",
         "0.1.4 (2026-07-16): SSR renamed SDR (Security Decision Record), adopting FedRAMP CR26's SSP-successor term for one artifact language across programs; artifact-disposition, evidence-storage/CUI-handling, audience-disclosure, and levels-vs-classes rationale content added to both HTML artifacts",
         "0.1.3 (2026-07-15): requirement-level Rev3 mappings shipped per KSI (renumber + verified absorptions + new PL/SA/SR families); AO math reconciled (509 DS = ~421 AOs + 88 ODP)",
         "0.1.2 (2026-07-15): revision_profiles added for 171r2/171r3/172(2021)/172r3; APT module dual-rev mappings; 172Ar3 (final 2026-05-13) integrated as engine source",
@@ -4866,10 +4931,10 @@
     },
     "collection": {
       "registry": "DIB-KSI collection",
-      "version": "0.4.0",
-      "date": "2026-07-25",
+      "version": "0.4.1",
+      "date": "2026-07-26",
       "supersedes": "ontology/collectors.json (0.3.0), which conflated three separate things: the baseline that defines a requirement, the method used to read state, and the product that happens to implement that method.",
-      "premise": "This framework does not maintain a list of approved products, and it should not be read as endorsing any tool named here. A measurement is fed by whatever can retrieve the state and emit a conforming reading — a vendor API, a webhook, an agent, a SIEM query, a CI job, a spreadsheet export, a script somebody wrote on a Tuesday. What the framework is definitive about is the shape of the reading and the assurance properties of the method that produced it. Anything meeting the interface below is a valid collector.",
+      "premise": "This framework does not maintain a list of approved products, and it should not be read as endorsing any tool named here. A measurement is fed by whatever can retrieve the state and emit a conforming reading — a vendor API, a webhook, an agent, a SIEM query, a CI job, a spreadsheet export, a script you wrote yourself. What the framework is definitive about is the shape of the reading and the assurance properties of the method that produced it. Anything meeting the interface below is a valid collector.",
       "separation_of_concerns": {
         "statement": "Three things get confused constantly, including by earlier versions of this file. They are separate and belong in separate fields.",
         "concerns": [
@@ -4897,7 +4962,7 @@
         ]
       },
       "interface": {
-        "statement": "A collector is anything that emits this shape. There is no registration, no approval, and no vendor list. If a reading carries these fields and can be re-derived from the source named in it, the framework will grade it.",
+        "statement": "A collector is anything that emits this shape; nothing has to be registered, approved, or vendor-listed. If a reading carries these fields and can be re-derived from the source named in it, the framework will grade it.",
         "required": [
           {
             "field": "signal",

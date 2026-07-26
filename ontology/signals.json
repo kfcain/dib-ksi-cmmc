@@ -1,7 +1,7 @@
 {
   "registry": "DIB-KSI signal registry",
-  "version": "0.4.0",
-  "date": "2026-07-25",
+  "version": "0.4.1",
+  "date": "2026-07-26",
   "premise": "The unit of assurance is the signal, not the document. Each indicator names a measurable property of the running environment, the population it is measured over, the method that produces it, how fresh it must be at each assurance class, and the bar it must clear. A claim supported only by prose is not a claim this framework can grade.",
   "conventions": {
     "population": "Every percentage publishes its denominator. A measurement without {measured, total} is rejected by the validator, because a coverage number over an undefined population is not a measurement.",
@@ -79,7 +79,7 @@
         "C": 3,
         "D": 1
       },
-      "notes": "No class tolerates a privileged account without phishing-resistant MFA. This is the one indicator whose bar does not move with class.",
+      "notes": "The bar does not move with class: no class tolerates a privileged account without phishing-resistant MFA.",
       "authority": {
         "source": "CISA SCuBA — Microsoft 365 Secure Configuration Baseline",
         "policy_id": "MS.AAD.3.1v1",
@@ -274,7 +274,7 @@
         "C": 1,
         "D": 1
       },
-      "notes": "Feeds the finding queue directly. A known-exploited vulnerability past due is the clearest single statement a posture can make about itself.",
+      "notes": "Feeds the finding queue directly; the due dates come from the catalogue, not from this project.",
       "authority": {
         "source": "CISA Known Exploited Vulnerabilities catalog",
         "policy_id": "BOD 22-01",
@@ -314,7 +314,7 @@
         "C": 90,
         "D": 30
       },
-      "notes": "Dwell time is the number the losses actually track. It is measured by exercise, which is why it carries E5 rather than E1.",
+      "notes": "Measured by exercise rather than query, which is why it carries E5 rather than E1.",
       "derived": "local-policy",
       "rationale": "No authority publishes a detection-time figure. This bar is this project’s policy choice and is the least externally supported number in the registry.",
       "kind": "threshold",
@@ -531,7 +531,7 @@
         "C": 3,
         "D": 1
       },
-      "notes": "This is the indicator that keeps scope honest. A diagram that agrees with telemetry is worth grading; one that does not is a finding with a clock.",
+      "notes": "Reconciles the declared dataflow model against observed telemetry; an undeclared flow is a finding with a clock.",
       "derived": "local-policy",
       "rationale": "This measurement exists only because this framework declares a dataflow model to reconcile against. It has no external authority by construction.",
       "kind": "threshold",
@@ -601,7 +601,7 @@
         "C": 90,
         "D": 30
       },
-      "notes": "A backup that has never been restored is a hypothesis. The measurement is the restore, not the backup job's success code.",
+      "notes": "The measurement is the demonstrated restore against the stated objective, not the backup job's success code.",
       "derived": "local-policy",
       "rationale": "No authority publishes a restore-test interval. This bar is this project’s policy choice, and note that recovery is an availability concern outside the confidentiality scope this framework measures.",
       "kind": "threshold",
@@ -724,7 +724,7 @@
         "C": 3,
         "D": 1
       },
-      "notes": "A permissive sharing default leaks controlled drawings faster than any unpatched service. This is the highest-yield confidentiality control in the registry and the framework did not measure it before.",
+      "notes": "A permissive external-sharing default exposes CUI directly, with no vulnerability required.",
       "methods": [
         "platform-api",
         "config-scan",
@@ -763,7 +763,7 @@
         "C": 3,
         "D": 1
       },
-      "notes": "The only literal numeric bound any authority in this space publishes. Two is a resilience floor; eight is a blast-radius ceiling.",
+      "notes": "CISA publishes the literal bound: at least two standing global administrators for continuity, at most eight to limit blast radius.",
       "methods": [
         "platform-api",
         "log-query",
@@ -856,6 +856,6 @@
       ]
     }
   ],
-  "coverage_note": "Twenty-two indicators do not cover sixty-four KSIs, and the registry does not pretend otherwise. Nine cite an external authority; thirteen are this project’s own policy choices and say so per signal.",
+  "coverage_note": "Twenty-two indicators do not cover sixty-four KSIs, and the registry does not pretend otherwise. Eleven cite an external authority; eleven are this project’s own policy choices and say so per signal.",
   "collection_note": "Each signal lists the collection METHODS that can legitimately produce it, not products. Any implementation meeting the interface in ontology/collection.json is valid. Where two or more methods are listed they are ordered by directness, and Class C and above require two that read from different control planes — see the independence rule in that file."
 }

@@ -2,9 +2,35 @@
 
 Versions follow the intent described in [CONTRIBUTING.md](CONTRIBUTING.md): a major bump changes an invariant, an enum, or the meaning of a field; a minor bump adds an entity, relation, indicator, or profile without changing how existing data is interpreted; a patch is clarification.
 
+## 0.10.0 — 2026-07-26
+
+The rule sets clarified and the prose cut back to statement register, with the KSI-to-CUI-confidentiality link made explicit per indicator.
+
+**Added**
+
+- `cui_impact` on every KSI: one line stating how the indicator protects the confidentiality of CUI. The 13 uplift KSIs state plainly that they sit beyond the 800-171 confidentiality floor and are never required below Class D.
+- [The KSI reference](docs/01-ksi-reference.md), generated from the catalog by `tools/gen-ksi-doc.mjs` and drift-checked in CI — the first doc page to list the 64 KSIs themselves.
+- The prose linter now scans string fields in the ontology registries as well as Markdown, so registry prose is held to the same bar as the docs.
+
+**Changed**
+
+- Docs consolidated: first-principles merged into [00-why](docs/00-why.md), the three-sizes scenarios merged into [04-enclave-pattern](docs/04-enclave-pattern.md), the projections page removed in favor of the generated tables in [COMPONENTS.md](COMPONENTS.md), the invariants and evidence pages rewritten to the rules alone. START-HERE folded into the README.
+- Registry prose (signal notes, the collection premise, scenario text) tightened; three KSI statements and two catalog invariants shortened without change of meaning.
+
+**Fixed**
+
+- The ontology doc listed eight invariants; there are ten.
+- The signals doc titled its indicator table "The eighteen" over twenty-two signals, and republished aggregate percentage bars that 0.3.0 had removed — on the page explaining why no aggregate percentage is published.
+- The projections doc quoted eleven of eighteen indicators passing and thirty findings; the computed figures are 14 of 22 and 31.
+- Two doc pages claimed to be generated from the registries; neither was. The claim now exists only where a generator does.
+- The three-sizes doc labeled the enclave-only off-the-tenant figure (21) as "inherited outright" (the computed inherited figure is 20), and introduced a list of four inherited indicators with three items.
+- The signals registry's coverage note counted nine authority-bound signals; there are eleven.
+- The README linked two site pages removed in 0.7.0.
+- `tools/ci.sh` treated claims-lint and page-generation failures as advisory; both now fail the build, and an undefined helper call is removed.
+
 ## 0.9.0 — 2026-07-25
 
-The reference tool could be read. It could not be answered.
+Adds a self-assessment: the reference tool could be read but not answered.
 
 **Added**
 
@@ -24,13 +50,13 @@ The reference tool could be read. It could not be answered.
 
 ## 0.8.0 — 2026-07-25
 
-An indicator statement says what must be true. It never said what doing it looks like.
+Adds plain-language guidance per indicator: a statement says what must be true, not what doing it looks like.
 
 **Added**
 
 - `ontology/guidance.json` — four plain-language answers per indicator: what is actually being asked (phrased so a non-specialist can answer yes, partly, or no), what being able to say yes looks like concretely, what you would hand an assessor, and how the check runs without a person.
 - The reference tool leads each indicator with those four rather than with the formal statement. So `KSI-PER-SCR` opens with *"Are people screened before they get access, and does their access actually end when they leave?"* instead of the control language.
-- Written for the fifteen indicators a small contractor owns alone under the enclave-only profile. The rest are shared with or inherited from a provider, so the provider drives them, and the tool says so plainly rather than showing a blank. Coverage is reported in the component index instead of being left to discovery.
+- Written for the fifteen indicators that a small contractor owns alone under the enclave-only profile. The rest are shared with or inherited from a provider, so the provider drives them, and the tool says so plainly rather than showing a blank. Coverage is reported in the component index instead of being left to discovery.
 
 **Changed**
 
@@ -38,7 +64,7 @@ An indicator statement says what must be true. It never said what doing it looks
 
 ## 0.7.0 — 2026-07-25
 
-Fifteen tabs across two overlapping pages was the complexity problem made visible. Rebuilt as one page you read and one you look things up in.
+Site rebuilt as one page you read and one you look things up in, replacing fifteen tabs across two overlapping pages.
 
 **Changed**
 
@@ -52,7 +78,7 @@ The catalogue is exhaustive so the model can be correct about any arrangement. T
 
 ## 0.6.0 — 2026-07-25
 
-Two problems, one of them mine. The prose kept disagreeing with the data, and the whole thing had grown hard to explain.
+Adds the claims linter, because the prose kept disagreeing with the data.
 
 **Fixed, structurally**
 
@@ -61,13 +87,13 @@ Two problems, one of them mine. The prose kept disagreeing with the data, and th
 
 **Added**
 
-- [START-HERE](START-HERE.md), one page, no machinery. It leads with the thing that was buried: **this does not add requirements**. The 110 stay exactly as they are; what changes is what you hand over as proof.
+- START-HERE (since folded into the README), one page, no machinery. It leads with the thing that was buried: **this does not add requirements**. The 110 stay exactly as they are; what changes is what you hand over as proof.
 - Working sets, computed per shape. The catalogue is exhaustive so the model can be correct about any arrangement, but a 12-person shop inside a rented enclave owns fifteen indicators across nine families, four of them worth automating. The reference is large. The work is not, and conflating the two is a documentation failure rather than a security requirement.
 - A check pinning the published working sets to what the model computes, so that table cannot drift either.
 
 ## 0.5.0 — 2026-07-25
 
-A scenario claimed nothing was inherited across three commercial clouds. That is wrong, and its own computed figure said so.
+Fixes a scenario that claimed nothing was inherited across three commercial clouds; its own computed figure said four.
 
 **Fixed**
 
@@ -77,12 +103,12 @@ A scenario claimed nothing was inherited across three commercial clouds. That is
 **Added**
 
 - A third deployment profile, `commercial-cloud`, for controlled information in general-purpose cloud storage and SaaS with no enclave. The difference between it and the enclave-plus-endpoints profile is almost entirely about whether evidence flows, not about who operates what.
-- [The five kinds of evidence](docs/08-evidence-types.md), expanded from one line each into what each one proves, where it stops proving anything, three worked examples at different organisation sizes, and the mistake people make with it. A matching view in the practitioner tool.
+- [The five kinds of evidence](docs/06-evidence-types.md), expanded from one line each into what each one proves, where it stops proving anything, three worked examples at different organisation sizes, and the mistake people make with it. A matching view in the practitioner tool.
 - Six checks, including one that fails the build if a scenario's prose claims an inheritance level its own figures contradict — the exact bug above, so it cannot return.
 
 ## 0.4.1 — 2026-07-25
 
-Written for someone who already knew the model. This release fixes that.
+Documents the invariants in plain language; the earlier version was written for someone who already knew the model.
 
 **Changed**
 
@@ -91,13 +117,13 @@ Written for someone who already knew the model. This release fixes that.
 
 **Added**
 
-- [The ten rules](docs/06-invariants.md) — the invariants as a readable page, generated from the registry so the two cannot disagree.
-- [The same rules at three sizes](docs/07-at-three-sizes.md) and a matching view in the practitioner tool. A 12-person shop working entirely inside a rented enclave, a 200-person manufacturer with laptops that process controlled data, and a subcontractor whose data sits in three clouds. Every figure is computed from the catalogue and the responsibility patterns, so the scenarios move when the model does.
+- [The ten rules](docs/05-invariants.md) — the invariants as a readable page.
+- The same rules at three sizes (since folded into [04-enclave-pattern](docs/04-enclave-pattern.md)) and a matching view in the practitioner tool. A 12-person shop working entirely inside a rented enclave, a 200-person manufacturer with laptops that process controlled data, and a subcontractor whose data sits in three clouds. Every figure is computed from the catalogue and the responsibility patterns, so the scenarios move when the model does.
 - Four checks that keep the explanation honest: every invariant must carry all four plain-language fields, none of them may point a reader at a filename, the scenario set must cover more than one deployment shape, and the scenario arithmetic must reconcile against the catalogue.
 
 ## 0.4.0 — 2026-07-25
 
-Collection was modelled as a list of products. That was a category error, and this release corrects it.
+Remodels collection from a list of products to a set of methods; the product list was a category error.
 
 **Changed**
 
@@ -123,7 +149,7 @@ The explainer and practitioner pages join the repository and are published, with
 
 **Added**
 
-- `site/` — the [explainer](https://kfcain.github.io/dib-ksi-cmmc/explainer.html) and [practitioner view](https://kfcain.github.io/dib-ksi-cmmc/practitioner.html), published to GitHub Pages. Each page is a single self-contained file that reaches the network zero times once loaded, and stores nothing about the reader.
+- `site/` — the explainer and practitioner pages (since merged into the overview and the reference in 0.7.0), published to GitHub Pages. Each page is a single self-contained file that reaches the network zero times once loaded, and stores nothing about the reader.
 - Three new views in the practitioner tool: the 22 measurements with their authorities, the 12 collectors that produce them, and the 10 invariants the test suite enforces.
 - Deep links. `#lat/KSI-IAM-MFA` opens an indicator, `#sig/SIG-MFA-ENF` a measurement, `#col/ScubaGear` a collector. Opening an indicator updates the address bar, so any view is linkable.
 - `tools/gen-pages.mjs` — injects the canonical registries into the pages. CI fails if a page and its registry disagree, so a published page cannot drift from the data it describes.

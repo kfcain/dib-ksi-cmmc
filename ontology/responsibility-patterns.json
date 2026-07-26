@@ -1,7 +1,7 @@
 {
   "registry": "DIB-KSI responsibility patterns",
-  "version": "0.2.0",
-  "date": "2026-07-19",
+  "version": "0.2.1",
+  "date": "2026-07-26",
   "premise": "A defended enclave is a deployment pattern, not a product. This file expresses the shared-responsibility split as data so a tenant's responsibility matrix is generated from its architecture rather than transcribed from a provider's PDF. Modes are defaults for a tenant that has actually moved its CUI into the enclave; the validator re-tests every inherited assignment against the three-test rule before it will grade one.",
   "three_test_rule": {
     "statement": "An objective may be marked inherited only when all three tests pass. A failed test degrades the assignment to shared or tenant. Inheritance is never a status a tenant simply declares.",
@@ -506,7 +506,7 @@
   "honest_boundary": {
     "statement": "Inheritance shrinks the tenant's obligation; it never zeroes it, and this file is written so the residual is impossible to lose.",
     "points": [
-      "An unvalidated enclave inherits nothing but risk. The provider must itself be assessed at or above the tenant's class.",
+      "An unvalidated enclave inherits nothing. The provider must itself be assessed at or above the tenant's class.",
       "The grading invariant does not relax for inherited controls: every mapped objective must still be demonstrated, by the provider rather than by nobody.",
       "A tenant that exports CUI to an endpoint outside the enclave has re-scoped that endpoint back in, and the three-test rule will fail T3 rather than let the claim stand.",
       "Personnel, training, marking judgment, incident reporting, governance, log review, scope declaration, and the affirmation itself never inherit.",

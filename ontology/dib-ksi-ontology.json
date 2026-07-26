@@ -1,7 +1,7 @@
 {
   "ontology": "DIB-KSI",
-  "version": "0.6.0",
-  "date": "2026-07-25",
+  "version": "0.6.1",
+  "date": "2026-07-26",
   "basis": "NIST SP 800-171 r2/r3 + 800-171A, 800-172/172A, 32 CFR 170, DFARS 252.204-7012, FedRAMP CR26 assurance-class semantics",
   "purpose": "A deterministic system of record for defense-industrial-base CUI assurance. Entities and relations are the source; every deliverable (SDR/SSP, responsibility matrix, POA&M, affirmation package, dataflow diagram) is a projection over this graph. Nothing is authored twice, and no document can age into truth.",
   "first_principles": [
@@ -785,10 +785,10 @@
         "inheritance_note": "Four indicators are genuinely inherited: datacenter physical access, environmental protection, and the physical media lifecycle inside the provider estate. Thirty-three are shared. That shared column is the honest picture of commercial cloud — the provider is doing real work, and you still own the configuration, the evidence, and the answer."
       }
     ],
-    "reading_the_numbers": "The gap between the second and third rows is worth sitting with. Both are Class C, and they differ mainly in whether there is an arrangement scoped to controlled information with evidence that flows on a cadence. That single difference moves work between columns without changing what any provider is physically doing."
+    "reading_the_numbers": "The second and third shapes are both Class C; they differ in whether an arrangement scoped to controlled information emits evidence on a cadence. That difference moves work between columns without changing what any provider physically does."
   },
   "evidence_types": {
-    "statement": "Five kinds of evidence, ordered by how hard they are to fake and how much work they are to produce. Assurance classes differ mainly in which of these they will accept: lower classes take an assertion backed by configuration, higher classes want telemetry and a demonstration. Most arguments about \"is this good enough evidence\" are really arguments about which of these five somebody produced.",
+    "statement": "Five kinds of evidence, ordered by how hard they are to fake and how much work they are to produce. Assurance classes differ mainly in which of these they will accept: lower classes take an assertion backed by configuration, higher classes want telemetry and a demonstration.",
     "types": [
       {
         "id": "E1",
@@ -905,7 +905,7 @@
   },
   "working_sets": {
     "statement": "The catalogue is exhaustive so the model can be correct about any arrangement. No single organisation is expected to hold it in its head. This is what each of the three shapes actually touches.",
-    "point": "The reference is large. The work is not. If a framework asks you to read all of it before you can do any of it, that is a documentation failure, not a security requirement.",
+    "point": "The reference is large. The work is not.",
     "sets": [
       {
         "id": "small-enclave",

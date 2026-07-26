@@ -1,6 +1,6 @@
 # Contributing
 
-Disagreement is the point. This is a working draft published for adversarial comment, and the contributions that improve it most are the ones that show something in it is wrong.
+This is a working draft published for adversarial comment, and the contributions that improve it most are the ones that show something in it is wrong.
 
 ## What is most useful
 
@@ -12,7 +12,7 @@ Disagreement is the point. This is a working draft published for adversarial com
 
 ## What is less useful
 
-Corrections that add taxonomy without adding measurement. The framework's whole argument is that the field became very good at taxonomy while dwell time stayed long. A change that makes the model more expressive but nothing more measurable is moving in the wrong direction.
+Corrections that add taxonomy without adding measurement. A change that makes the model more expressive but nothing more measurable is moving in the wrong direction.
 
 ## Ground rules for the content
 
@@ -33,9 +33,9 @@ Corrections that add taxonomy without adding measurement. The framework's whole 
 ```
 
 That is the same script continuous integration runs, so a green local run and a green CI run mean
-the same thing. After editing any registry, regenerate the canonical dataset and the component index
-with `node tools/gen-consolidated.mjs && node tools/gen-summary.mjs`; the suite fails if either is
-stale, and it also fails if regenerating changes a file you have already committed.
+the same thing. After editing any registry, regenerate the canonical dataset, the component index,
+and the KSI reference with `node tools/gen-consolidated.mjs && node tools/gen-summary.mjs && node tools/gen-ksi-doc.mjs`;
+the suite fails if any is stale, and it also fails if regenerating changes a file you have already committed.
 
 4. Keep the repository dependency-free. Node's standard library only. This has to run inside a disconnected enclave, where no package manager exists.
 
