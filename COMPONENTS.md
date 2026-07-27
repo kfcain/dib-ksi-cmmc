@@ -153,5 +153,5 @@ Tenant-only work stays close to flat as the class rises while shared work grows.
 | `ontology/` | 8 | The registries above, the collector registry, and the requirement coverage crosswalk |
 | `instances/` | 1 | Worked instance graphs |
 | `tools/` | 11 | Validator, projection engine, generators, tests, prose lint, CI |
-| `docs/` | 7 | Why the framework exists and how it works |
+| `docs/` | 8 | Why the framework exists and how it works |
 | `site/` | 3 | The overview, the self-assessment, and the reference tool, generated from the registries |

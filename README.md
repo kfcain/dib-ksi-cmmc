@@ -13,6 +13,15 @@ This repository answers those four with measurements instead of paperwork. It ad
 
 > Independent and unofficial. Not affiliated with or endorsed by DoD, the CMMC Program Management Office, the Cyber AB, FedRAMP, GSA, or NIST. Not an adopted standard, not an assessment, not legal advice. See [DISCLAIMER.md](DISCLAIMER.md).
 
+<a href="https://kfcain.github.io/dib-ksi-cmmc/reference.html">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/images/lattice-dark.png">
+    <img alt="The Assurance Lattice: the KSI table with levels, assurance classes, and 800-171 mappings" src="docs/images/lattice-light.png">
+  </picture>
+</a>
+
+*[The Assurance Lattice](https://kfcain.github.io/dib-ksi-cmmc/reference.html), live: all 64 KSIs with class-by-class proof requirements — click any row for its evidence card.*
+
 ## The rule sets
 
 Three, each a registry with a reference generated from it:
@@ -38,7 +47,30 @@ The moment a file lands on a workstation, that workstation is in scope and those
 
 ## The site
 
-Three pages, generated from the registries, no network access once loaded: the [overview](https://kfcain.github.io/dib-ksi-cmmc/index.html), the [reference](https://kfcain.github.io/dib-ksi-cmmc/reference.html) with every indicator's evidence card, and the [self-assessment](https://kfcain.github.io/dib-ksi-cmmc/assess.html), which returns a named gap list rather than a readiness score — three unanswered indicators is a specific afternoon's work; "82% ready" is an argument.
+Three pages, generated from the registries, no network access once loaded: the [overview](https://kfcain.github.io/dib-ksi-cmmc/index.html), the [reference](https://kfcain.github.io/dib-ksi-cmmc/reference.html) shown above, and the [self-assessment](https://kfcain.github.io/dib-ksi-cmmc/assess.html).
+
+<table>
+<tr>
+<td width="50%">
+<a href="https://kfcain.github.io/dib-ksi-cmmc/reference.html">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/images/evidence-card-dark.png">
+    <img alt="A KSI evidence card: statement, CUI-confidentiality line, and per-class proof requirements" src="docs/images/evidence-card-light.png">
+  </picture>
+</a>
+</td>
+<td width="50%">
+<a href="https://kfcain.github.io/dib-ksi-cmmc/assess.html">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/images/assess-dark.png">
+    <img alt="The self-assessment: one plain question per indicator, returning a named gap list" src="docs/images/assess-light.png">
+  </picture>
+</a>
+</td>
+</tr>
+</table>
+
+*Left: every KSI opens an evidence card leading with its statement and CUI-confidentiality line, then the proof each class demands. Right: the self-assessment returns a named gap list rather than a readiness score — three unanswered indicators is a specific afternoon's work; "82% ready" is an argument.*
 
 Each page is one self-contained file. Download it from [`site/`](site/) and open it locally, or mirror it to a gist for a rendered snapshot (for example via [gistpreview](https://gistpreview.github.io)): it renders identically anywhere, because it loads nothing from the network.
 
