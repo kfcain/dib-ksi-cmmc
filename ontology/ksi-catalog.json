@@ -1,7 +1,7 @@
 {
  "catalog": "DIB\u002dKSI",
- "version": "0.2.1",
- "date": "2026\u002d07\u002d26",
+ "version": "0.2.2",
+ "date": "2026\u002d07\u002d28",
  "basis": {
   "adopted_from": "FedRAMP CR26 KSI catalog (launched 2026\u002d06\u002d24; 46 KSIs / 10 families)",
   "melds": "NIST SP 800\u002d171r2 (110 reqs / 320 AOs) + 800\u002d171r3 (97 reqs / 509 DS, 88 ODP\u002dlinked)",
@@ -63,6 +63,129 @@
    "cadence_physical": "monthly",
    "history": "18 months",
    "assessment": "DIBCAC full\u002dscope + adversarial validation"
+  }
+ },
+ "evidence_floors": {
+  "note": "Machine-checkable restatement of class_rules. Derivation grades persistent measurements and EvidenceRefs against these floors. Prose class_rules remain the human-readable source; tests fail if these floors drift from that semantics.",
+  "A": {
+   "automatable": {
+    "min_e1_methods": 0,
+    "independent_control_planes": false,
+    "required_types": ["E3"],
+    "require_other_type": false,
+    "other_types": [],
+    "require_one_of": [],
+    "min_methods": 0,
+    "require_adversarial_e5": false,
+    "require_attestation": true,
+    "e2_third_party_preferred": false,
+    "history_days": null
+   },
+   "physical": {
+    "min_e1_methods": 0,
+    "independent_control_planes": false,
+    "required_types": ["E3", "E2"],
+    "require_other_type": false,
+    "other_types": [],
+    "require_one_of": [],
+    "min_methods": 0,
+    "require_adversarial_e5": false,
+    "require_attestation": false,
+    "e2_third_party_preferred": false,
+    "history_days": null
+   },
+   "cadence_machine_days": null,
+   "cadence_physical_days": 365
+  },
+  "B": {
+   "automatable": {
+    "min_e1_methods": 1,
+    "independent_control_planes": false,
+    "required_types": ["E1"],
+    "require_other_type": true,
+    "other_types": ["E2", "E3", "E4", "E5"],
+    "require_one_of": [],
+    "min_methods": 0,
+    "require_adversarial_e5": false,
+    "require_attestation": false,
+    "e2_third_party_preferred": false,
+    "history_days": 30
+   },
+   "physical": {
+    "min_e1_methods": 0,
+    "independent_control_planes": false,
+    "required_types": ["E2", "E3"],
+    "require_other_type": false,
+    "other_types": [],
+    "require_one_of": [],
+    "min_methods": 0,
+    "require_adversarial_e5": false,
+    "require_attestation": false,
+    "e2_third_party_preferred": false,
+    "history_days": 30
+   },
+   "cadence_machine_days": 30,
+   "cadence_physical_days": 182
+  },
+  "C": {
+   "automatable": {
+    "min_e1_methods": 2,
+    "independent_control_planes": true,
+    "required_types": ["E1", "E3"],
+    "require_other_type": false,
+    "other_types": [],
+    "require_one_of": [],
+    "min_methods": 0,
+    "require_adversarial_e5": false,
+    "require_attestation": false,
+    "e2_third_party_preferred": false,
+    "history_days": 180
+   },
+   "physical": {
+    "min_e1_methods": 0,
+    "independent_control_planes": false,
+    "required_types": ["E2"],
+    "require_other_type": false,
+    "other_types": [],
+    "require_one_of": [["E4", "E5"]],
+    "min_methods": 0,
+    "require_adversarial_e5": false,
+    "require_attestation": false,
+    "e2_third_party_preferred": true,
+    "history_days": 180
+   },
+   "cadence_machine_days": 3,
+   "cadence_physical_days": 90
+  },
+  "D": {
+   "automatable": {
+    "min_e1_methods": 0,
+    "independent_control_planes": false,
+    "required_types": ["E5"],
+    "require_other_type": false,
+    "other_types": [],
+    "require_one_of": [],
+    "min_methods": 4,
+    "require_adversarial_e5": true,
+    "require_attestation": false,
+    "e2_third_party_preferred": false,
+    "history_days": 540
+   },
+   "physical": {
+    "min_e1_methods": 0,
+    "independent_control_planes": false,
+    "required_types": ["E5", "E4"],
+    "require_other_type": false,
+    "other_types": [],
+    "require_one_of": [],
+    "min_methods": 0,
+    "require_adversarial_e5": false,
+    "require_attestation": false,
+    "e2_third_party_preferred": false,
+    "history_days": 540
+   },
+   "cadence_machine_days": 1,
+   "cadence_physical_days": 30
   }
  },
  "asset_rules": {

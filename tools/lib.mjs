@@ -179,11 +179,132 @@ export function evaluateSignals(db) {
   return out;
 }
 
-// ---- claims per KSI: computed from signals + responsibility. Never asserted. ----
+// ---- class evidence floors: machine-checkable restatement of catalog.class_rules ----
+export function evidenceFloorFor(db, automatable, cls = db.instance.tenant.target_class) {
+  const floors = db.catalog.evidence_floors;
+  if (!floors?.[cls]) throw new Error(`no evidence_floors for class ${cls}`);
+  const lane = automatable ? 'automatable' : 'physical';
+  return {
+    class: cls,
+    lane,
+    ...floors[cls][lane],
+    cadence_days: automatable ? floors[cls].cadence_machine_days : floors[cls].cadence_physical_days,
+  };
+}
+
+function supportWindowDays(db, k, floor) {
+  const cls = db.instance.tenant.target_class;
+  const sigCadences = db.signals.signals
+    .filter(s => (s.validates || []).includes(k.id))
+    .map(s => s.cadence_days?.[cls])
+    .filter(d => d != null);
+  const candidates = [...sigCadences, floor.cadence_days, floor.history_days].filter(d => d != null);
+  return candidates.length ? Math.min(...candidates) : null;
+}
+
+function collectKsiSupport(db, k, floor) {
+  const asOf = db.instance.as_of;
+  const windowDays = supportWindowDays(db, k, floor);
+  const sigIds = new Set(db.signals.signals.filter(s => (s.validates || []).includes(k.id)).map(s => s.id));
+  const collectors = Object.fromEntries((db.instance.collectors || []).map(c => [c.id, c]));
+  const allMs = db.instance.measurements || [];
+
+  const measurements = allMs.filter(m => {
+    if (!sigIds.has(m.indicator)) return false;
+    if (windowDays == null) return true;
+    return ageDays(m.observed_at, asOf) <= windowDays;
+  });
+
+  const refs = (db.instance.evidence_refs || []).filter(r => {
+    const supports = r.supports || [];
+    const m = r.measurement ? allMs.find(x => x.id === r.measurement) : null;
+    const backsKsi = supports.includes(k.id);
+    const backsSignalMsr = supports.some(id => {
+      const mm = allMs.find(x => x.id === id);
+      return mm && sigIds.has(mm.indicator);
+    });
+    const backsViaMeasurement = m && sigIds.has(m.indicator);
+    if (!backsKsi && !backsSignalMsr && !backsViaMeasurement) return false;
+    if (windowDays != null && r.collected_at && ageDays(r.collected_at, asOf) > windowDays) return false;
+    if (r.retained_until && new Date(r.retained_until) < new Date(asOf)) return false;
+    return true;
+  });
+
+  const present_types = [...new Set([
+    ...measurements.map(m => m.evidence_type),
+    ...refs.map(r => r.evidence_type),
+  ].filter(Boolean))].sort();
+
+  const e1Planes = new Set();
+  for (const m of measurements) {
+    if (m.evidence_type !== 'E1') continue;
+    const plane = collectors[m.collector]?.control_plane;
+    if (plane) e1Planes.add(plane);
+  }
+  const methodPlanes = new Set();
+  for (const m of measurements) {
+    const plane = collectors[m.collector]?.control_plane;
+    if (plane) methodPlanes.add(plane);
+  }
+
+  return {
+    measurements,
+    refs,
+    present_types,
+    e1_methods: e1Planes.size,
+    independent_methods: methodPlanes.size,
+    methods: [...methodPlanes],
+    support_ids: [...measurements.map(m => m.id), ...refs.map(r => r.id)],
+    has_adversarial_e5: refs.some(r => r.evidence_type === 'E5' && r.adversarial)
+      || measurements.some(m => m.evidence_type === 'E5' && m.adversarial),
+    has_third_party_e2: refs.some(r => r.evidence_type === 'E2' && r.third_party),
+    window_days: windowDays,
+  };
+}
+
+export function evaluateEvidenceFloor(floor, support, opts = {}) {
+  const missing = [];
+  const present = new Set(support.present_types || []);
+
+  for (const t of floor.required_types || []) {
+    if (!present.has(t)) missing.push(t);
+  }
+  if (floor.require_other_type) {
+    const other = (floor.other_types || []).filter(t => present.has(t));
+    if (!other.length) missing.push('other(E2-E5)');
+  }
+  for (const group of floor.require_one_of || []) {
+    if (!group.some(t => present.has(t))) missing.push(`one_of(${group.join('|')})`);
+  }
+
+  const e1Need = floor.min_e1_methods || 0;
+  const e1Have = support.e1_methods || 0;
+  const e1Short = Math.max(0, e1Need - e1Have);
+  if (e1Short > 0) missing.push(`E1_methods×${e1Need}`);
+
+  const methodNeed = floor.min_methods || 0;
+  const methodShort = Math.max(0, methodNeed - (support.independent_methods || 0));
+  if (methodShort > 0) missing.push(`methods×${methodNeed}`);
+
+  if (floor.require_adversarial_e5 && !support.has_adversarial_e5) missing.push('adversarial_E5');
+  if (floor.require_attestation && !opts.attestation_signed) missing.push('attestation');
+
+  return {
+    floor_met: missing.length === 0,
+    missing_types: missing,
+    e1_shortfall: e1Short,
+    method_shortfall_floor: methodShort,
+    third_party_e2_preferred: !!floor.e2_third_party_preferred,
+    third_party_e2_present: !!support.has_third_party_e2,
+  };
+}
+
+// ---- claims per KSI: computed from signals + responsibility + evidence floors. Never asserted. ----
 export function deriveClaims(db, resp, sigs) {
   const cls = db.instance.tenant.target_class;
   const lvl = db.instance.tenant.target_level;
   const byKsi = Object.fromEntries(resp.map(r => [r.ksi, r]));
+  const attSigned = !!(db.instance.attestation?.signed_at);
   const claims = [];
 
   for (const k of db.catalog.ksis) {
@@ -191,6 +312,8 @@ export function deriveClaims(db, resp, sigs) {
     const requiredAtClass = k.classes?.[cls];
     const inLevel = k.levels?.[lvl];
     const sigsFor = sigs.filter(s => (s.validates || []).includes(k.id));
+    const floor = evidenceFloorFor(db, k.automatable, cls);
+    const support = collectKsiSupport(db, k, floor);
 
     let status;
     if (!inLevel || requiredAtClass === 'n/a') status = 'not_applicable';
@@ -201,11 +324,29 @@ export function deriveClaims(db, resp, sigs) {
     else if (sigsFor.some(s => s.status === 'stale' || s.status === 'unmeasured')) status = 'stale';
     else status = 'met';
 
-    // Class C and above require two independent automated methods on automatable KSIs.
-    const needsTwo = (cls === 'C' || cls === 'D') && k.automatable && status !== 'not_applicable' && status !== 'inherited';
-    const methodShortfall = needsTwo && sigsFor.length
-      ? Math.max(0, 2 - Math.max(...sigsFor.map(s => s.independent_methods || 0)))
-      : (needsTwo ? 2 : 0);
+    const gradeFloor = status !== 'not_applicable' && status !== 'inherited';
+    const evald = gradeFloor
+      ? evaluateEvidenceFloor(floor, support, { attestation_signed: attSigned })
+      : {
+        floor_met: true, missing_types: [], e1_shortfall: 0, method_shortfall_floor: 0,
+        third_party_e2_preferred: false, third_party_e2_present: false,
+      };
+
+    const methodShortfall = gradeFloor && k.automatable
+      ? Math.max(evald.e1_shortfall, evald.method_shortfall_floor)
+      : 0;
+
+    let evidence_depth;
+    if (status === 'not_applicable') evidence_depth = 'not_applicable';
+    else if (status === 'inherited') evidence_depth = 'inherited';
+    else if (!support.support_ids.length && !sigsFor.some(s => s.measured)) evidence_depth = 'unmeasured';
+    else if (evald.floor_met) evidence_depth = 'met';
+    else evidence_depth = 'short';
+
+    // Non-automatable KSIs with no signals: still grade physical floor from EvidenceRefs alone.
+    if (status === 'determination_needed' && !k.automatable && support.support_ids.length) {
+      evidence_depth = evald.floor_met ? 'met' : 'short';
+    }
 
     claims.push({
       ksi: k.id, family: k.family, automatable: k.automatable, uplift: !!k.uplift,
@@ -213,6 +354,30 @@ export function deriveClaims(db, resp, sigs) {
       status, signals: sigsFor.map(s => s.id),
       method_shortfall: methodShortfall,
       requirements: k.rev2_requirements || [],
+      required_floor: {
+        class: cls,
+        lane: floor.lane,
+        required_types: floor.required_types || [],
+        require_other_type: !!floor.require_other_type,
+        require_one_of: floor.require_one_of || [],
+        min_e1_methods: floor.min_e1_methods || 0,
+        independent_control_planes: !!floor.independent_control_planes,
+        min_methods: floor.min_methods || 0,
+        require_adversarial_e5: !!floor.require_adversarial_e5,
+        require_attestation: !!floor.require_attestation,
+        history_days: floor.history_days,
+        cadence_days: floor.cadence_days,
+      },
+      present_types: support.present_types,
+      missing_types: evald.missing_types,
+      floor_met: evald.floor_met,
+      evidence_depth,
+      support: support.support_ids,
+      e1_methods: support.e1_methods,
+      independent_methods: support.independent_methods,
+      methods: support.methods,
+      third_party_e2_preferred: evald.third_party_e2_preferred,
+      third_party_e2_present: evald.third_party_e2_present,
     });
   }
   return claims;
@@ -232,8 +397,11 @@ export function deriveFindings(db, resp, sigs, claims) {
     if (s.status === 'unmeasured' && s.applicable) push('coverage_gap', s.id, `${s.name}: required at Class ${cls} and never measured`, s.validates);
   }
   for (const c of claims) {
-    if (c.method_shortfall > 0 && c.status !== 'not_applicable')
-      push('coverage_gap', c.ksi, `Class ${cls} requires two independent automated methods; short by ${c.method_shortfall}`, [c.ksi]);
+    if (c.status === 'not_applicable' || c.status === 'inherited') continue;
+    if (c.evidence_depth === 'short')
+      push('coverage_gap', c.ksi, `Class ${cls} evidence floor short — missing ${c.missing_types.join(', ') || 'required depth'} (present: ${c.present_types.join(', ') || 'none'})`, [c.ksi]);
+    else if (c.method_shortfall > 0)
+      push('coverage_gap', c.ksi, `Class ${cls} requires ${c.required_floor?.min_e1_methods || 2} independent automated methods; short by ${c.method_shortfall}`, [c.ksi]);
   }
   for (const r of resp) {
     if (r.degraded_from)
@@ -337,6 +505,19 @@ export function validateGraph(db) {
     else if (m.population.measured > m.population.total) E('POPULATION', `measurement ${m.id} measured exceeds total`);
     if (ageDays(m.observed_at, db.instance.as_of) < 0) E('TIME', `measurement ${m.id} observed in the future relative to as_of`);
   }
+  const MSR = idset('measurements');
+  for (const r of db.instance.evidence_refs || []) {
+    if (!ENUM.evidence_type.includes(r.evidence_type)) E('ENUM', `evidence_ref ${r.id} evidence_type ${r.evidence_type} not in enum`);
+    if (!r.hash) E('EVIDENCE', `evidence_ref ${r.id} lacks a content hash`);
+    if (!r.collected_at) E('EVIDENCE', `evidence_ref ${r.id} lacks collected_at`);
+    if (r.collected_at && ageDays(r.collected_at, db.instance.as_of) < 0)
+      E('TIME', `evidence_ref ${r.id} collected in the future relative to as_of`);
+    if (r.measurement && !MSR.has(r.measurement)) E('REF', `evidence_ref ${r.id} measurement ${r.measurement} not found`);
+    for (const s of r.supports || []) {
+      if (!KSI.has(s) && !MSR.has(s) && !SIG.has(s))
+        E('REF', `evidence_ref ${r.id} supports unknown ${s}`);
+    }
+  }
   for (const s of db.signals.signals) for (const k of s.validates) if (!KSI.has(k)) E('REF', `signal ${s.id} validates unknown KSI ${k}`);
 
   const patternKsis = new Set(db.patterns.assignments.map(a => a.ksi));
@@ -346,6 +527,14 @@ export function validateGraph(db) {
     for (const prof of Object.keys(db.patterns.profiles))
       if (!ENUM.responsibility_mode.includes(a[prof])) E('ENUM', `assignment ${a.ksi} profile ${prof} mode ${a[prof]} not in enum`);
   }
+
+  // evidence_floors must exist for every class_rules key — fail before derive
+  const floors = db.catalog.evidence_floors || {};
+  for (const cls of Object.keys(db.catalog.class_rules || {})) {
+    if (!floors[cls]?.automatable || !floors[cls]?.physical)
+      E('EVIDENCE_FLOOR', `class ${cls} lacks machine-checkable evidence_floors`);
+  }
+  if (errors.some(e => e.code === 'EVIDENCE_FLOOR')) return { errors, warnings };
 
   const { resp, sigs, claims, findings } = derive(db);
 
@@ -362,6 +551,10 @@ export function validateGraph(db) {
     const supporting = sigs.filter(s => c.signals.includes(s.id));
     if (supporting.some(s => !s.fresh)) E('INV-SIGNAL', `${c.ksi} reported met on stale support`);
   }
+  for (const c of claims.filter(c => c.evidence_depth === 'met')) {
+    if (!c.floor_met) E('INV-EVIDENCE-FLOOR', `${c.ksi} reported evidence_depth met without satisfying class floor`);
+    if (c.missing_types?.length) E('INV-EVIDENCE-FLOOR', `${c.ksi} reported evidence_depth met with missing ${c.missing_types.join(',')}`);
+  }
   const att = db.instance.attestation;
   if (att?.signed_at && (!att.posture_hash || att.posture_hash === 'computed-at-signature-time'))
     E('INV-HUMAN', 'signed attestation lacks a posture hash binding the signature to the state signed');
@@ -369,7 +562,9 @@ export function validateGraph(db) {
   if (att?.person && !PSN.has(att.person)) E('REF', `attestation person ${att.person} not found`);
 
   const shortfalls = claims.filter(c => c.method_shortfall > 0).length;
-  if (shortfalls) W('INV-INDEPENDENCE', `${shortfalls} KSI(s) short of two independent automated methods at Class ${db.instance.tenant.target_class}`);
+  if (shortfalls) W('INV-INDEPENDENCE', `${shortfalls} KSI(s) short of independent automated methods at Class ${db.instance.tenant.target_class}`);
+  const depthShort = claims.filter(c => c.evidence_depth === 'short').length;
+  if (depthShort) W('INV-EVIDENCE-FLOOR', `${depthShort} KSI(s) short of Class ${db.instance.tenant.target_class} evidence-type floor`);
 
   return { errors, warnings };
 }

@@ -1,7 +1,7 @@
 {
   "ontology": "DIB-KSI",
-  "version": "0.6.1",
-  "date": "2026-07-26",
+  "version": "0.6.2",
+  "date": "2026-07-28",
   "basis": "NIST SP 800-171 r2/r3 + 800-171A, 800-172/172A, 32 CFR 170, DFARS 252.204-7012, FedRAMP CR26 assurance-class semantics",
   "purpose": "A deterministic system of record for defense-industrial-base CUI assurance. Entities and relations are the source; every deliverable (SDR/SSP, responsibility matrix, POA&M, affirmation package, dataflow diagram) is a projection over this graph. Nothing is authored twice, and no document can age into truth.",
   "first_principles": [
@@ -288,7 +288,11 @@
         "evidence_type": "enum evidence_type",
         "hash": "string",
         "collected_at": "datetime",
-        "retained_until": "date"
+        "retained_until": "date",
+        "supports": "array of ref KSI or ref Measurement — which claims this artifact underwrites",
+        "measurement": "optional ref Measurement — when the artifact backs a specific reading",
+        "third_party": "boolean — preferred for E2 at Class C and above",
+        "adversarial": "boolean — Class D adversarial demonstration marker for E5"
       }
     },
     "ResponsibilityAssignment": {
@@ -678,6 +682,15 @@
       "without_it": "Invented precision. A threshold that looks authoritative, gets quoted, gets built into somebody’s contract, and traces back to nothing at all.",
       "example": "The standing administrator count cites a published baseline that sets a floor of two and a ceiling of eight. The detection-time target cites nothing, because no authority publishes one, so it is labelled as our judgment with the reasoning attached. Eleven of the twenty-two measurements fall on each side.",
       "checked": "A measurement must carry either a citation to an external source or a written rationale for the choice. One with neither stops the build."
+    },
+    {
+      "id": "INV-EVIDENCE-FLOOR",
+      "statement": "A KSI’s evidence_depth is met only when persistent measurements and EvidenceRefs satisfy the machine-checkable evidence_floors for the tenant’s assurance class. Signal status and evidence depth are separate; a passing bar with thin evidence reports depth short, never depth met.",
+      "enforced_by": "tools/lib.mjs — evaluateEvidenceFloor; validator INV-EVIDENCE-FLOOR; tools/test.mjs negative cases",
+      "plain": "Clearing a numeric bar is not the same as bringing the proof your class demands. The floor says which evidence types and how many independent methods you need; depth reports whether you have them.",
+      "without_it": "A green MFA reading from one API, treated as Class C complete, while the second independent method and the bound-intent artifact were never collected.",
+      "example": "At Class C an identity KSI needs two independent E1 readings plus an E3 bound-intent record. Dual MFA telemetry without the E3 artifact keeps claim status met if the bar clears, but evidence_depth stays short until the bound policy is hashed in.",
+      "checked": "evidence_depth met requires floor_met with no missing_types. Reporting met depth without the floor is a validation error."
     }
   ],
   "projections": [
@@ -700,6 +713,11 @@
       "id": "PRJ-POSTURE",
       "name": "Class and level posture",
       "query": "claim statuses aggregated against class evidence floors, cadence compliance, and history depth"
+    },
+    {
+      "id": "PRJ-KSI",
+      "name": "Per-KSI evidence status",
+      "query": "each KSI with computed claim status, class evidence floor, present persistent types from measurements and EvidenceRefs, missing types, method shortfall, and evidence_depth"
     },
     {
       "id": "PRJ-DFD",

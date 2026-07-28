@@ -486,6 +486,20 @@
       "exceptions": []
     },
     {
+      "id": "MSR-003B",
+      "indicator": "SIG-MFA-PRIV",
+      "observed_at": "2026-07-19T04:06:00Z",
+      "collector": "COL-ENCLAVE-FEED",
+      "evidence_type": "E1",
+      "source": "provider validation feed privileged MFA",
+      "population": {
+        "measured": 2,
+        "total": 2
+      },
+      "uncovered": [],
+      "exceptions": []
+    },
+    {
       "id": "MSR-004",
       "indicator": "SIG-EDR-COV",
       "observed_at": "2026-07-19T03:40:00Z",
@@ -768,6 +782,58 @@
         "ostrander-tool.example"
       ],
       "exceptions": []
+    }
+  ],
+  "evidence_refs": [
+    {
+      "id": "EVR-001",
+      "evidence_type": "E3",
+      "hash": "sha256:7c8f0a1b2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a",
+      "collected_at": "2026-07-18T16:00:00Z",
+      "retained_until": "2027-07-18",
+      "supports": ["KSI-IAM-APM", "KSI-IAM-AAM"],
+      "note": "Bound MFA enforcement intent wired to conditional-access policy object. Raw policy export retained in tenant trust center."
+    },
+    {
+      "id": "EVR-002",
+      "evidence_type": "E3",
+      "hash": "sha256:1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b",
+      "collected_at": "2026-07-18T16:05:00Z",
+      "retained_until": "2027-07-18",
+      "supports": ["KSI-IAM-ELP"],
+      "measurement": "MSR-003",
+      "note": "Privileged-role MFA intent bound to directory role Conditional Access."
+    },
+    {
+      "id": "EVR-003",
+      "evidence_type": "E2",
+      "hash": "sha256:abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789",
+      "collected_at": "2026-07-10T12:00:00Z",
+      "retained_until": "2027-01-10",
+      "supports": ["KSI-CED-CUI", "KSI-CED-RAT", "MSR-019"],
+      "third_party": false,
+      "note": "Tenant HR training export hashed at ingest. Not third-party-originated."
+    },
+    {
+      "id": "EVR-004",
+      "evidence_type": "E5",
+      "hash": "sha256:9f8e7d6c5b4a3928170695a4b3c2d1e0f9e8d7c6b5a4938271605f4e3d2c1b0a",
+      "collected_at": "2026-07-19T00:00:00Z",
+      "retained_until": "2027-07-19",
+      "supports": ["KSI-INR-RPI", "KSI-INR-AAR", "MSR-018"],
+      "measurement": "MSR-018",
+      "adversarial": false,
+      "note": "Incident reporting-path exercise packet."
+    },
+    {
+      "id": "EVR-005",
+      "evidence_type": "E2",
+      "hash": "sha256:55aa11bb22cc33dd44ee55ff6677889900aabbccddeeff001122334455667788",
+      "collected_at": "2026-07-15T08:00:00Z",
+      "retained_until": "2027-01-15",
+      "supports": ["KSI-CUI-ENC"],
+      "third_party": true,
+      "note": "CMVP certificate extract from NIST — third-party-originated artifact for encryption posture."
     }
   ],
   "attestation": {
