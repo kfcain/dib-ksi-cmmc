@@ -1,7 +1,7 @@
 // test.mjs — the test suite. Positive cases prove the framework computes; negative cases prove it
 // fails closed. Every invariant in the ontology has at least one test that must fail without it.
 // Run: node tools/test.mjs
-import { load, validateGraph, derive, deriveResponsibility, parseThreshold, compare, ROOT } from './lib.mjs';
+import { load, validateGraph, derive, deriveResponsibility, parseThreshold, compare, ROOT, evaluateEvidenceFloor, evidenceFloorFor } from './lib.mjs';
 import { join, resolve } from 'node:path';
 import { readFileSync } from 'node:fs';
 
@@ -397,6 +397,93 @@ console.log('\n=== registry integrity ===');
   check('every uplift KSI admits it sits beyond the confidentiality floor',
     db.catalog.ksis.filter(k => k.uplift).every(k => /beyond the 800-171 confidentiality floor/.test(k.cui_impact)));
   check('the POA&M policy declares that it needs confirmation against the rule', /REQUIRES CONFIRMATION/.test(db.poam.status));
+}
+
+console.log('\n=== INV-EVIDENCE-FLOOR: class evidence depth ===');
+{
+  const db = load(BASE);
+  const floors = db.catalog.evidence_floors;
+  check('every class_rules key has machine-checkable evidence_floors',
+    Object.keys(db.catalog.class_rules).every(c => floors?.[c]?.automatable && floors?.[c]?.physical));
+  check('Class C automatable floor requires two independent E1 methods and E3',
+    floors.C.automatable.min_e1_methods === 2
+      && floors.C.automatable.independent_control_planes === true
+      && floors.C.automatable.required_types.includes('E1')
+      && floors.C.automatable.required_types.includes('E3'));
+  check('Class B automatable floor requires E1 plus another type',
+    floors.B.automatable.min_e1_methods === 1 && floors.B.automatable.require_other_type === true);
+  check('Class C physical floor requires E2 and one of E4/E5',
+    floors.C.physical.required_types.includes('E2')
+      && floors.C.physical.require_one_of.some(g => g.includes('E4') && g.includes('E5')));
+
+  const d = derive(db);
+  check('base instance seeds EvidenceRefs', (db.instance.evidence_refs || []).length >= 1);
+  check('claims carry evidence_depth distinct from status',
+    d.claims.every(c => c.evidence_depth && c.status));
+  check('a green signal bar can coexist with evidence_depth short',
+    d.claims.some(c => c.status === 'met' && c.evidence_depth === 'short'));
+  // Ostrander targets Class C: dual MFA + E3 refs make IAM-APM depth met; many others stay short.
+  const apm = d.claims.find(c => c.ksi === 'KSI-IAM-APM');
+  check('KSI-IAM-APM reaches evidence_depth met with dual E1 and E3 ref',
+    apm?.status === 'met' && apm?.evidence_depth === 'met' && apm.present_types.includes('E3') && apm.e1_methods >= 2,
+    JSON.stringify({ status: apm?.status, depth: apm?.evidence_depth, present: apm?.present_types, e1: apm?.e1_methods }));
+  check('some applicable KSIs report evidence_depth short rather than pretending met',
+    d.claims.some(c => c.evidence_depth === 'short'));
+  check('evidence floor shortfalls open coverage_gap findings',
+    d.findings.some(f => f.kind === 'coverage_gap' && /evidence floor short/.test(f.detail)));
+}
+{
+  // Removing E3 refs must drop depth on IAM-APM even if signals still pass.
+  const db = mutate(i => { i.evidence_refs = (i.evidence_refs || []).filter(r => r.evidence_type !== 'E3'); });
+  const apm = derive(db).claims.find(c => c.ksi === 'KSI-IAM-APM');
+  check('dropping E3 refs makes IAM-APM evidence_depth short while status can stay met',
+    apm?.status === 'met' && apm?.evidence_depth === 'short' && apm.missing_types.includes('E3'),
+    JSON.stringify({ status: apm?.status, depth: apm?.evidence_depth, missing: apm?.missing_types }));
+}
+{
+  // Collapse collectors onto one control plane — independence fails Class C floor.
+  const db = mutate(i => {
+    for (const c of i.collectors) c.control_plane = 'one-plane';
+  });
+  const apm = derive(db).claims.find(c => c.ksi === 'KSI-IAM-APM');
+  check('one control plane cannot satisfy Class C independent E1 floor',
+    apm?.evidence_depth === 'short' && apm.missing_types.some(m => /E1_methods/.test(m)),
+    JSON.stringify({ depth: apm?.evidence_depth, missing: apm?.missing_types, e1: apm?.e1_methods }));
+}
+{
+  // evaluateEvidenceFloor refuses Class C met on thin evidence
+  const db = load(BASE);
+  const floor = evidenceFloorFor(db, true, 'C');
+  const ev = evaluateEvidenceFloor(floor, { present_types: ['E1'], e1_methods: 1, independent_methods: 1 });
+  check('evaluateEvidenceFloor refuses Class C met on single E1 without E3',
+    !ev.floor_met && ev.missing_types.includes('E3') && ev.e1_shortfall >= 1);
+}
+{
+  // Validator rejects forged evidence_depth met without floor_met
+  const db = load(BASE);
+  const r = validateGraph(db);
+  // Patch after derive inside validateGraph — simulate by mutating catalog floors away
+  const db2 = mutate((i, full) => {
+    delete full.catalog.evidence_floors.C;
+  });
+  check('missing evidence_floors for a class fails validation', hasErr(validateGraph(db2), 'EVIDENCE_FLOOR'));
+  check('base instance still validates with evidence floors present', r.errors.length === 0);
+}
+{
+  const db = mutate(i => {
+    i.evidence_refs.push({
+      id: 'EVR-BAD', evidence_type: 'E9', hash: 'x', collected_at: '2026-07-01T00:00:00Z', supports: ['KSI-IAM-APM'],
+    });
+  });
+  check('invalid evidence_type on EvidenceRef fails closed', hasErr(validateGraph(db), 'ENUM'));
+}
+{
+  const db = mutate(i => {
+    i.evidence_refs.push({
+      id: 'EVR-NOHASH', evidence_type: 'E3', collected_at: '2026-07-01T00:00:00Z', supports: ['KSI-IAM-APM'],
+    });
+  });
+  check('EvidenceRef without hash fails closed', hasErr(validateGraph(db), 'EVIDENCE'));
 }
 
 console.log(`\n${fail ? 'TESTS FAILED' : 'TESTS OK'} — ${pass}/${pass + fail} passed`);

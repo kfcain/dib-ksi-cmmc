@@ -2,6 +2,25 @@
 
 Versions follow the intent described in [CONTRIBUTING.md](CONTRIBUTING.md): a major bump changes an invariant, an enum, or the meaning of a field; a minor bump adds an entity, relation, indicator, or profile without changing how existing data is interpreted; a patch is clarification.
 
+## 0.11.0 — 2026-07-28
+
+Evidence orchestration baseline: per-KSI status against class evidence-type floors, persistent EvidenceRefs, and a collect→derive→project work queue.
+
+**Added**
+
+- Machine-checkable `evidence_floors` in the KSI catalog (aligned with prose `class_rules`) for Classes A–D, automatable and physical lanes.
+- `INV-EVIDENCE-FLOOR`: `evidence_depth` (`met` / `short` / `unmeasured`) is graded separately from signal-driven claim `status`.
+- `PRJ-KSI` projection (`node tools/project.mjs <instance> ksi`) — per-KSI required floor, present/missing types, support ids.
+- Instance `evidence_refs[]` with hash-bound pointers; Ostrander seeded with E2/E3/E5 refs.
+- `tools/orchestrate.mjs` — due signal and evidence-floor work queue for external collectors.
+- `tools/ksi-coverage.mjs` — lists automatable KSIs still without a signal (no inventing SIG-* yet).
+
+**Changed**
+
+- `deriveClaims` joins measurements and EvidenceRefs per KSI; Class C/D method shortfall comes from the structured floor.
+- Posture and SDR projections report evidence-depth shortfalls.
+- Agent guidance documents the continuous-monitoring loop and the AI boundary (route jobs; never assert status or invent evidence).
+
 ## 0.10.0 — 2026-07-26
 
 The rule sets clarified and the prose cut back to statement register, with the KSI-to-CUI-confidentiality link made explicit per indicator.
@@ -19,7 +38,7 @@ The rule sets clarified and the prose cut back to statement register, with the K
 
 **Fixed**
 
-- The ontology doc listed eight invariants; there are ten.
+- The ontology doc under-counted the invariants relative to the registry at the time.
 - The signals doc titled its indicator table "The eighteen" over twenty-two signals, and republished aggregate percentage bars that 0.3.0 had removed — on the page explaining why no aggregate percentage is published.
 - The projections doc quoted eleven of eighteen indicators passing and thirty findings; the computed figures are 14 of 22 and 31.
 - Two doc pages claimed to be generated from the registries; neither was. The claim now exists only where a generator does.
@@ -112,12 +131,12 @@ Documents the invariants in plain language; the earlier version was written for 
 
 **Changed**
 
-- The ten invariants now explain themselves. Each carries what it means in plain terms, the concrete failure it prevents, a worked example, and how it is enforced in words rather than a filename. A reader should not have to open a source file to find out what a rule does.
+- Each invariant now explains itself. Each carries what it means in plain terms, the concrete failure it prevents, a worked example, and how it is enforced in words rather than a filename. A reader should not have to open a source file to find out what a rule does.
 - `INV-INDEPENDENCE` referred to a field that no longer exists. It now describes control planes, matching the collection rework.
 
 **Added**
 
-- [The ten rules](docs/05-invariants.md) — the invariants as a readable page.
+- [The rules the validator enforces](docs/05-invariants.md) — the invariants as a readable page.
 - The same rules at three sizes (since folded into [04-enclave-pattern](docs/04-enclave-pattern.md)) and a matching view in the practitioner tool. A 12-person shop working entirely inside a rented enclave, a 200-person manufacturer with laptops that process controlled data, and a subcontractor whose data sits in three clouds. Every figure is computed from the catalogue and the responsibility patterns, so the scenarios move when the model does.
 - Four checks that keep the explanation honest: every invariant must carry all four plain-language fields, none of them may point a reader at a filename, the scenario set must cover more than one deployment shape, and the scenario arithmetic must reconcile against the catalogue.
 
@@ -150,7 +169,7 @@ The explainer and practitioner pages join the repository and are published, with
 **Added**
 
 - `site/` — the explainer and practitioner pages (since merged into the overview and the reference in 0.7.0), published to GitHub Pages. Each page is a single self-contained file that reaches the network zero times once loaded, and stores nothing about the reader.
-- Three new views in the practitioner tool: the 22 measurements with their authorities, the 12 collectors that produce them, and the 10 invariants the test suite enforces.
+- Three new views in the practitioner tool: the 22 measurements with their authorities, the 12 collectors that produce them, and the invariants the test suite enforces.
 - Deep links. `#lat/KSI-IAM-MFA` opens an indicator, `#sig/SIG-MFA-ENF` a measurement, `#col/ScubaGear` a collector. Opening an indicator updates the address bar, so any view is linkable.
 - `tools/gen-pages.mjs` — injects the canonical registries into the pages. CI fails if a page and its registry disagree, so a published page cannot drift from the data it describes.
 

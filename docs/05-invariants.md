@@ -1,6 +1,6 @@
-# The ten rules the validator enforces
+# The eleven rules the validator enforces
 
-Ten properties the model holds about itself regardless of what anyone types into it. Each has an automated check that runs on every change to this repository, and a change that breaks one is rejected rather than published.
+Eleven properties the model holds about itself regardless of what anyone types into it. Each has an automated check that runs on every change to this repository, and a change that breaks one is rejected rather than published.
 
 The source of record is the `invariants` block of [`ontology/dib-ksi-ontology.json`](../ontology/dib-ksi-ontology.json); the formal statements below are copied from it, and the generated table in [COMPONENTS.md](../COMPONENTS.md) is rebuilt from it on every change.
 
@@ -89,3 +89,11 @@ The source of record is the `invariants` block of [`ontology/dib-ksi-ontology.js
 *Formal.* Every measurement either cites an external authority for its requirement, or is explicitly marked as this project's own policy choice with a stated rationale. A number with no stated origin is not allowed.
 
 *Enforced.* The test suite fails if any signal has neither an authority nor a local-policy rationale.
+
+## INV-EVIDENCE-FLOOR
+
+**Clearing a numeric bar is not the same as bringing the proof your class demands.**
+
+*Formal.* A KSI's evidence_depth is met only when persistent measurements and EvidenceRefs satisfy the machine-checkable evidence_floors for the tenant's assurance class. Signal status and evidence depth are separate; a passing bar with thin evidence reports depth short, never depth met.
+
+*Enforced.* `evaluateEvidenceFloor` in `tools/lib.mjs`; the validator rejects `evidence_depth: met` without a satisfied floor; negative tests in `tools/test.mjs`.
